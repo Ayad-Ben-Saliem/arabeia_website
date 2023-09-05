@@ -265,6 +265,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.6.0"
+  firebase_storage:
+    dependency: "direct main"
+    description:
+      name: firebase_storage
+      sha256: "195ae2b623ba054b9be3934c79bf6282831ca15a81cfd392841feea930e50253"
+      url: "https://pub.dev"
+    source: hosted
+    version: "11.2.4"
+  firebase_storage_platform_interface:
+    dependency: transitive
+    description:
+      name: firebase_storage_platform_interface
+      sha256: be0f4254cae3ccaefd5d1435b82c1fa3bda33187387b241c55b27d7516ea9b93
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.4.3"
+  firebase_storage_web:
+    dependency: transitive
+    description:
+      name: firebase_storage_web
+      sha256: f02c63c871deb36180b39a5fab1ee5b2677a01fa0fb642746ca62ae7f9d1a482
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.6.4"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -517,14 +541,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
-  open_filex:
-    dependency: "direct main"
-    description:
-      name: open_filex
-      sha256: "854aefd72dfd74219dc8c8d1767c34ec1eae64b8399a5be317bddb1ec2108915"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.3.2"
   path:
     dependency: transitive
     description:
@@ -962,14 +978,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.4"
-  whatsapp:
-    dependency: "direct main"
-    description:
-      name: whatsapp
-      sha256: fa919cb750f982cb70a3f4d265fa8be7a4e305de8f11bb537af40ee07bfa7a43
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.1"
   win32:
     dependency: transitive
     description:

@@ -13,6 +13,9 @@ abstract class Reporting {
     final font = await fontFromAssetBundle(
       'assets/fonts/HacenTunisia/Regular.ttf',
     );
+    final fontBold = await fontFromAssetBundle(
+      'assets/fonts/HacenTunisia/Bold-Regular.ttf',
+    );
 
     final logo = await imageFromAssetBundle('assets/images/logo.webp');
 
@@ -22,7 +25,9 @@ abstract class Reporting {
       Page(
         pageTheme: PageTheme(
           pageFormat: PdfPageFormat.a4,
-          theme: ThemeData(defaultTextStyle: TextStyle(font: font)),
+          theme: ThemeData(
+            defaultTextStyle: TextStyle(font: font, fontBold: fontBold),
+          ),
           textDirection: TextDirection.rtl,
         ),
         // textDirection: TextDirection.rtl,
@@ -38,6 +43,8 @@ abstract class Reporting {
                       header(bill, logo),
                       SizedBox(height: 32),
                       table(bill),
+                      SizedBox(height: 32),
+                      footer(bill),
                     ],
                   ),
                 ),
@@ -79,7 +86,7 @@ abstract class Reporting {
             CustomText(bill.recipientPhone),
             CustomText(bill.recipientAddress),
             CustomText(
-              DateFormat('yyyy-MM-dd E hh:mm a').format(bill.createAt),
+              DateFormat('yyyy-MM-dd E hh:mm a', 'en').format(bill.createAt),
             ),
           ],
         ),
@@ -98,22 +105,24 @@ abstract class Reporting {
 
     return Table(
       columnWidths: {
-        0: const FractionColumnWidth(0.2),
-        1: const FractionColumnWidth(0.2),
-        2: const FractionColumnWidth(0.1),
-        3: const FractionColumnWidth(0.5),
+        0: const FixedColumnWidth(60),
+        1: const FixedColumnWidth(80),
+        2: const FixedColumnWidth(40),
+        3: const FixedColumnWidth(40),
+        4: const FractionColumnWidth(0.5),
       },
       children: [
         TableRow(
           children: [
-            CustomText('الإجمالي (د.ل)'),
+            CustomText('المجموع (د.ل)'),
             CustomText('سعر الوحدة (د.ل)'),
             CustomText('الكمية'),
+            CustomText('الحجم'),
             CustomText('اسم الصنف'),
           ],
         ),
         TableRow(
-          children: [for (int i = 0; i < 4; i++) Divider()],
+          children: [for (int i = 0; i < 5; i++) Divider()],
         ),
         for (int i = 0; i < cartItems.length; i++) ...[
           TableRow(
@@ -132,12 +141,16 @@ abstract class Reporting {
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 1),
+                child: CustomText(cartItems.elementAt(i).size),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 1),
                 child: CustomText(cartItems.elementAt(i).item.name),
               ),
             ],
           ),
           TableRow(
-            children: [for (int i = 0; i < 4; i++) Divider(thickness: 0.25)],
+            children: [for (int i = 0; i < 5; i++) Divider(thickness: 0.25)],
           ),
         ],
       ],
@@ -145,20 +158,42 @@ abstract class Reporting {
   }
 
   static Widget priceWidget(Item item) {
-    if (item.discount != null) {
-      return CustomColumn(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CustomText(
-            '${item.price}',
-            style: const TextStyle(
-              decoration: TextDecoration.lineThrough,
-            ),
-          ),
-          CustomText('${item.effectivePrice}'),
-        ],
-      );
-    }
+    // if (item.discount != null) {
+    //   return CustomColumn(
+    //     crossAxisAlignment: CrossAxisAlignment.start,
+    //     children: [
+    //       CustomText(
+    //         '${item.price}',
+    //         style: const TextStyle(
+    //           decoration: TextDecoration.lineThrough,
+    //         ),
+    //       ),
+    //       CustomText('${item.effectivePrice}'),
+    //     ],
+    //   );
+    // }
     return CustomText('${item.effectivePrice}');
+  }
+
+  static Widget footer(Bill bill) {
+    const googleMapUrl = 'https://www.google.com/maps/';
+    return CustomRow(
+      children: [
+        CustomColumn(children: [
+          BarcodeWidget(
+            data: '$googleMapUrl@${bill.latitude},${bill.longitude},15z',
+            barcode: Barcode.qrCode(),
+            width: 64,
+            height: 64,
+          ),
+          Text('الموقع'),
+        ]),
+        Spacer(),
+        Text(
+          'المجموع: ${bill.total} د.ل',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        )
+      ],
+    );
   }
 }

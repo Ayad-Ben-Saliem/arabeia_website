@@ -1,11 +1,12 @@
 import 'dart:async';
 
+import 'package:arabeia_website/ui/cart_notifier.dart';
 import 'package:arabeia_website/ui/cart_page.dart';
+import 'package:arabeia_website/ui/widgets/item_card.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:arabeia_website/db/db.dart';
 import 'package:arabeia_website/models/item.dart';
 import 'package:arabeia_website/ui/app.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -53,7 +54,8 @@ class HomePage extends StatelessWidget {
                             constraints.maxWidth / crossAxisCount(constraints);
 
                         // image carousel + carousel indicators + name and footer
-                        final height = width / (16 / 9) + 36 + 118;
+                        // final height = width / (16 / 9) + 36 + 128 + 118;
+                        final height = width / (16 / 9) + 36 + 128 + 128;
                         return width / height;
                       }
 
@@ -81,7 +83,7 @@ class HomePage extends StatelessWidget {
                   child: Consumer(
                     builder: (context, ref, widget) {
                       return ElevatedButton(
-                        onPressed: ref.watch(CartItems.provider).isNotEmpty
+                        onPressed: ref.watch(CartNotifier.itemsProvider).isNotEmpty
                             ? cartPage(context)
                             : null,
                         child: Row(
@@ -110,7 +112,7 @@ class HomePage extends StatelessWidget {
                                           : Colors.white,
                                     ),
                                     badgeContent: Text(
-                                      '${ref.watch(CartItems.provider).length}',
+                                      '${ref.watch(CartNotifier.itemsProvider).length}',
                                       style: TextStyle(
                                         color: ref.watch(darkMode)
                                             ? Colors.white
@@ -155,149 +157,3 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class ItemCard extends StatelessWidget {
-  final Item item;
-
-  const ItemCard({super.key, required this.item});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Column(
-        children: [
-          if (item.images.isNotEmpty) ImageCarousel(images: item.images),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                item.name,
-                style: const TextStyle(fontSize: 18),
-              ),
-            ),
-          ),
-          const Spacer(),
-          Row(
-            children: [
-              const SizedBox(width: 8),
-              if (item.discount != null)
-                Column(
-                  children: [
-                    Text(
-                      '${item.price} $currency',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        color: Colors.grey,
-                        decoration: TextDecoration.lineThrough,
-                      ),
-                    ),
-                    Text(
-                      '${item.effectivePrice} $currency',
-                      style: const TextStyle(
-                        fontSize: 18,
-                      ),
-                    ),
-                  ],
-                )
-              else
-                Text(
-                  '${item.price} $currency',
-                  style: const TextStyle(fontSize: 18),
-                ),
-              const Spacer(),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Consumer(
-                  builder: (context, ref, child) {
-                    return ElevatedButton(
-                      onPressed: () =>
-                          ref.read(CartItems.provider.notifier).addItem(item),
-                      child: const Text('إضافة للسلة'),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class ImageCarousel extends StatefulWidget {
-  final List<String> images;
-
-  const ImageCarousel({super.key, required this.images});
-
-  @override
-  State<StatefulWidget> createState() {
-    return _ImageCarouselState();
-  }
-}
-
-class _ImageCarouselState extends State<ImageCarousel> {
-  int _current = 0;
-
-  final CarouselController _controller = CarouselController();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          decoration: const BoxDecoration(
-            color: Colors.grey,
-            borderRadius: BorderRadius.all(Radius.circular(8)),
-          ),
-          child: CarouselSlider(
-            items: [
-              for (final image in widget.images)
-                Image.network(image, fit: BoxFit.fill),
-              // FadeInImage.memoryNetwork(
-              //   placeholder: placeholder,
-              //   image: image,
-              //   fit: BoxFit.fill,
-              // )
-            ],
-            carouselController: _controller,
-            options: CarouselOptions(
-              enlargeCenterPage: true,
-              viewportFraction: 1,
-              onPageChanged: (index, reason) =>
-                  setState(() => _current = index),
-            ),
-          ),
-        ),
-        SizedBox(
-          height: 36,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: widget.images.asMap().entries.map((entry) {
-              return GestureDetector(
-                onTap: () => _controller.animateToPage(entry.key),
-                child: Padding(
-                  padding: const EdgeInsets.all(2.0),
-                  child: CircleAvatar(
-                    backgroundColor: Colors.black,
-                    radius: _getIndicatorSize(entry.key),
-                    child: Padding(
-                      padding: EdgeInsets.all(entry.key == _current ? 2 : 1),
-                      child: CircleAvatar(
-                        backgroundImage: NetworkImage(entry.value),
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ),
-      ],
-    );
-  }
-
-  double _getIndicatorSize(int index) {
-    return index == _current ? 16 : 12;
-  }
-}

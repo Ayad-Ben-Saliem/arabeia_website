@@ -6,30 +6,34 @@ class Item extends Equatable {
   final String? id;
   final String name;
   final String? description;
+  final List<String> sizes;
   final List<String> images;
   final double price;
   final double? discount;
 
-  Item({
+  const Item({
     this.id,
     required this.name,
     this.description,
+    required this.sizes,
     required this.images,
     required this.price,
     this.discount,
   });
 
   Item.copyWith(
-    Item item,
+    Item item, {
     String? id,
     String? name,
     String? description,
+    List<String>? sizes,
     List<String>? images,
     double? price,
     double? discount,
-  )   : id = id ?? item.id,
+  })  : id = id ?? item.id,
         name = name ?? item.name,
         description = description ?? item.description,
+        sizes = sizes ?? item.sizes,
         images = images ?? item.images,
         price = price ?? item.price,
         discount = discount ?? item.discount;
@@ -38,25 +42,28 @@ class Item extends Equatable {
     String? id,
     String? name,
     String? description,
+    List<String>? sizes,
     List<String>? images,
     double? price,
     double? discount,
   }) =>
       Item.copyWith(
         this,
-        id,
-        name,
-        description,
-        images,
-        price,
-        discount,
+        id: id,
+        name: name,
+        description: description,
+        sizes: sizes,
+        images: images,
+        price: price,
+        discount: discount,
       );
 
   Item.fromJson(JsonMap json)
       : id = json['id'],
         name = json['name'],
         description = json['description'],
-        images = List.from(json['images']),
+        sizes = List.from(json['sizes'] ?? []),
+        images = List.from(json['images'] ?? []),
         price = json['price'],
         discount = json['discount'];
 
@@ -64,6 +71,7 @@ class Item extends Equatable {
         'id': id,
         'name': name,
         'description': description,
+        'sizes': sizes,
         'images': images,
         'price': price,
         'discount': discount,
@@ -78,11 +86,13 @@ class Item extends Equatable {
 
   @override
   List<Object?> get props => [
-    id,
-    name,
-    // ...images,
-    price,
-    discount,
-    effectivePrice,
-  ];
+        id,
+        name,
+        description,
+        ...sizes,
+        ...images,
+        price,
+        discount,
+        effectivePrice,
+      ];
 }

@@ -1,13 +1,17 @@
+import 'dart:math';
+
 import 'package:arabeia_website/models/bill.dart';
 import 'package:arabeia_website/pdf/reporting.dart';
-import 'package:arabeia_website/ui/app.dart';
+import 'package:arabeia_website/ui/cart_notifier.dart';
 import 'package:arabeia_website/ui/user_address_page.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
-import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 final socialMethod = StateProvider((ref) => 'W');
 Uint8List? pdfBytes;
@@ -31,17 +35,19 @@ class CheckoutPage extends StatelessWidget {
                   builder: (context, ref, widget) {
                     final bill = Bill(
                       recipientName: ref.read(nameProvider),
-                      recipientPhone: ref.read(nameProvider),
-                      recipientAddress: ref.read(nameProvider),
-                      latitude: 0,
-                      // TODO
-                      longitude: 0,
-                      // TODO
-                      cartItems: ref.read(CartItems.sortedItemsProvider),
+                      recipientPhone: ref.read(phoneProvider),
+                      recipientAddress: ref.read(addressProvider),
+                      latitude: ref.read(locationProvider)!.latitude,
+                      longitude: ref.read(locationProvider)!.longitude,
+                      cartItems: ref.read(CartNotifier.groupedItemsProvider),
                       createAt: DateTime.now(),
                     );
+
                     return FutureBuilder(
-                      future: Reporting.createPdfBill(bill),
+                      future: compute<Bill, Uint8List>(
+                        Reporting.createPdfBill,
+                        bill,
+                      ),
                       builder: (context, snapshot) {
                         if (snapshot.hasError) return Text('${snapshot.error}');
                         if (!snapshot.hasData) {
@@ -56,38 +62,8 @@ class CheckoutPage extends StatelessWidget {
                         }
 
                         pdfBytes = snapshot.data;
-                        return SfPdfViewer.memory(
-                          snapshot.data!,
-                          initialZoomLevel: -1,
-                        );
+                        return SfPdfViewer.memory(pdfBytes!);
                       },
-                    );
-                  },
-                ),
-              ),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1000),
-                child: Consumer(
-                  builder: (context, ref, widget) {
-                    final isWhatsApp = ref.watch(socialMethod) == 'W';
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        SocialMethod(
-                          icon: Icons.whatshot,
-                          title: 'واتساب',
-                          active: isWhatsApp,
-                          onTap: () =>
-                              ref.read(socialMethod.notifier).state = 'W',
-                        ),
-                        SocialMethod(
-                          icon: Icons.telegram,
-                          title: 'تيليجرام',
-                          active: !isWhatsApp,
-                          onTap: () =>
-                              ref.read(socialMethod.notifier).state = 'T',
-                        ),
-                      ],
                     );
                   },
                 ),
@@ -97,17 +73,33 @@ class CheckoutPage extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () async {
                     if (pdfBytes != null) {
-                      print('sharing pdf ...');
-                      // launchUrlString('https://wa.me/+218910215272/?text=test');
-                      // Printing.sharePdf(bytes: pdfBytes!);
-                      final result = await Share.shareXFiles([
-                        XFile.fromData(
-                          pdfBytes!,
-                          mimeType: 'application/pdf',
-                          name: 'invoce.pdf',
-                        ),
-                      ]);
-                      print(result);
+                      final filename =
+                          '${DateTime.now().millisecondsSinceEpoch.toRadixString(16)}-'
+                          '${Random().nextInt(256).toRadixString(16)}.pdf';
+
+                      // await Share.shareXFiles(
+                      //   [
+                      //     XFile.fromData(
+                      //       pdfBytes!,
+                      //       mimeType: 'application/pdf',
+                      //       name: 'invoce.pdf',
+                      //     ),
+                      //   ],
+                      //
+                      // );
+
+                      final url = await savePdf(pdfBytes!, filename);
+                      final text = 'مرحبا!! أريد طلب المنتجات الموجودة في هذه الفاتورة : $url';
+                      // launchUrlString('https://wa.me/+218910215272/?text=$text');
+                      launchUrlString(
+                        'whatsapp://send?phone=+218910215272&text=$text',
+                      );
+
+                      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      });
                     }
                   },
                   child: const Row(
@@ -125,6 +117,13 @@ class CheckoutPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<String> savePdf(Uint8List data, String name) async {
+    final reference = FirebaseStorage.instance.ref().child(name);
+    final taskSnapshot = await reference.putData(data);
+    final url = await taskSnapshot.ref.getDownloadURL();
+    return url;
   }
 }
 

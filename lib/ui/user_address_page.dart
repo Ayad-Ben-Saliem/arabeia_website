@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:arabeia_website/ui/checkout_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -9,7 +10,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 final nameProvider = StateProvider((ref) => '');
 final phoneProvider = StateProvider((ref) => '');
 final addressProvider = StateProvider((ref) => '');
-final locationProvider = StateProvider<LatLng?>((ref) => null);
+final locationProvider = StateProvider<LatLng>(
+  (ref) => const LatLng(32.8829352, 13.1677362),
+);
 
 class UserAddressPage extends ConsumerWidget {
   const UserAddressPage({super.key});
@@ -29,6 +32,9 @@ class UserAddressPage extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: TextFormField(
+                  controller: TextEditingController(
+                    text: ref.read(nameProvider),
+                  ),
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'اسم المستلم',
@@ -41,6 +47,9 @@ class UserAddressPage extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: TextFormField(
+                  controller: TextEditingController(
+                    text: ref.read(phoneProvider),
+                  ),
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'رقم هاتف المستلم',
@@ -48,14 +57,21 @@ class UserAddressPage extends ConsumerWidget {
                   onChanged: (txt) {
                     ref.read(phoneProvider.notifier).state = txt;
                   },
+                  keyboardType: TextInputType.phone,
+                  autocorrect: false,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: TextFormField(
+                  controller: TextEditingController(
+                    text: ref.read(addressProvider),
+                  ),
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'عنوان الاستلام',
+                    hintText: 'المدينة، المنطقة، الشارع، أقرب نقطة دالة',
                   ),
                   onChanged: (txt) {
                     ref.read(addressProvider.notifier).state = txt;
@@ -66,6 +82,7 @@ class UserAddressPage extends ConsumerWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: LocationMap(
+                    target: ref.read(locationProvider),
                     onMapMove: (position) {
                       ref.read(locationProvider.notifier).state =
                           position.target;
@@ -108,12 +125,14 @@ class UserAddressPage extends ConsumerWidget {
 }
 
 class LocationMap extends StatelessWidget {
+  final LatLng target;
+
   final Completer<GoogleMapController> _completer =
       Completer<GoogleMapController>();
 
   final CameraPositionCallback? onMapMove;
 
-  LocationMap({super.key, this.onMapMove});
+  LocationMap({super.key, required this.target, this.onMapMove});
 
   @override
   Widget build(BuildContext context) {
@@ -122,10 +141,9 @@ class LocationMap extends StatelessWidget {
           desiredAccuracy: LocationAccuracy.high,
         ),
         builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            print(snapshot.error);
-            return Center(child: Text('${snapshot.error}'));
-          }
+          // if (snapshot.hasError) {
+          //   return Center(child: Text('${snapshot.error}'));
+          // }
 
           if (snapshot.hasData) {
             goto(
@@ -142,15 +160,12 @@ class LocationMap extends StatelessWidget {
           return Stack(
             children: [
               GoogleMap(
-                initialCameraPosition: const CameraPosition(
-                  target: LatLng(32.603596, 67.771863),
-                  zoom: 10,
-                ),
+                initialCameraPosition: CameraPosition(target: target, zoom: 14),
                 onMapCreated: (controller) => _completer.complete(controller),
                 myLocationEnabled: true,
                 onCameraMove: onMapMove,
               ),
-              if (!snapshot.hasData)
+              if (snapshot.connectionState == ConnectionState.waiting)
                 const Center(
                   child: CircularProgressIndicator(),
                 ),
@@ -159,9 +174,7 @@ class LocationMap extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.pin_drop_outlined),
-                    Text(
-                      'مكان التوصيل',
-                    )
+                    Text('مكان التوصيل')
                   ],
                 ),
               ),

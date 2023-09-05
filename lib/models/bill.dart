@@ -6,7 +6,7 @@ class Bill {
   final String recipientAddress;
   final double latitude;
   final double longitude;
-  final Set<CartItem> cartItems;
+  final Iterable<CartItem> cartItems;
   final DateTime createAt;
 
   const Bill({
@@ -18,4 +18,13 @@ class Bill {
     required this.cartItems,
     required this.createAt,
   });
+
+  double get total {
+    var total = 0.0;
+    for (final cartItem in cartItems) {
+      total += cartItem.totalPrice;
+    }
+    return total;
+  }
+
 }

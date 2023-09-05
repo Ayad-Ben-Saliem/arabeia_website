@@ -46,11 +46,10 @@ dependencies:
   geolocator: ^9.0.2
   syncfusion_flutter_pdfviewer: ^22.1.37
   printing: ^5.11.0
-  whatsapp: ^0.0.1
   share_plus: ^7.0.2
-  open_filex: ^4.3.2
   url_launcher: ^6.1.11
   flutter_launcher_icons: ^0.13.1
+  firebase_storage: ^11.2.4
 
 dev_dependencies:
   flutter_test:
@@ -109,19 +108,6 @@ flutter:
         - asset: assets/fonts/Tajawal-ExtraBold.ttf
           weight: 600
         - asset: assets/fonts/Tajawal-Black.ttf
-          weight: 700
-
-    - family: Roboto_Mono
-      fonts:
-        - asset: assets/fonts/Roboto_Mono/static/RobotoMono-Regular.ttf
-        - asset: assets/fonts/Roboto_Mono/static/RobotoMono-ExtraLight.ttf
-          weight: 100
-        - asset: assets/fonts/Roboto_Mono/static/RobotoMono-ExtraLightItalic.ttf
-          weight: 100
-          style: italic
-        - asset: assets/fonts/Roboto_Mono/static/RobotoMono-Bold.ttf
-          weight: 700
-        - asset: assets/fonts/Roboto_Mono/static/RobotoMono-BoldItalic.ttf
           weight: 700
 
     - family: HacenTunisia
