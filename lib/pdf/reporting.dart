@@ -1,7 +1,6 @@
 import 'package:arabeia_website/models/bill.dart';
 import 'package:arabeia_website/models/item.dart';
 import 'package:arabeia_website/pdf/pdf.dart';
-import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/services.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/widgets.dart';
@@ -85,9 +84,7 @@ abstract class Reporting {
             CustomText(bill.recipientName),
             CustomText(bill.recipientPhone),
             CustomText(bill.recipientAddress),
-            CustomText(
-              DateFormat('yyyy-MM-dd E hh:mm a', 'en').format(bill.createAt),
-            ),
+            CustomText(format(bill.createAt)),
           ],
         ),
         Spacer(),
@@ -98,6 +95,16 @@ abstract class Reporting {
         ),
       ],
     );
+  }
+
+  static String format(DateTime dateTime) {
+    final year = '${dateTime.year}';
+    final month = '${dateTime.month}';
+    final day = '${dateTime.day}';
+    final hour = dateTime.hour;
+    final minute = dateTime.minute;
+    return '$year-${month.padLeft(2, '0')}-${day.padLeft(2, '0')} '
+        '${hour % 12}:$minute ${hour < 12 ? 'AM' : 'PM'}';
   }
 
   static Widget table(Bill bill) {
