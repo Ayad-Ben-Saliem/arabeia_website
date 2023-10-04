@@ -18,7 +18,7 @@ class App extends ConsumerWidget {
         colorScheme: ref.watch(darkMode)
             ? const ColorScheme.dark(primary: Colors.white)
             : const ColorScheme.light(primary: Colors.black),
-        fontFamily: 'Tajawal',
+        fontFamily: 'HacenTunisia',
       ),
       initialRoute: '/',
       routes: {
