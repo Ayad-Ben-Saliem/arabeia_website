@@ -1,6 +1,7 @@
-import 'package:arabeia_website/models/cart_item.dart';
-import 'package:arabeia_website/models/item.dart';
+import 'package:arabeia_website/ui/cart_page.dart';
+import 'package:arabeia_website/ui/checkout_page.dart';
 import 'package:arabeia_website/ui/home_page.dart';
+import 'package:arabeia_website/ui/user_address_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -19,10 +20,15 @@ class App extends ConsumerWidget {
             : const ColorScheme.light(primary: Colors.black),
         fontFamily: 'Tajawal',
       ),
-      localizationsDelegates: context.localizationDelegates,
-      supportedLocales: context.supportedLocales,
-      locale: context.locale,
-      home: const HomePage(),
+      initialRoute: '/',
+      routes: {
+        '/': (ctx) => const HomePage(),
+        '/cart': (ctx) => const CartPage(),
+        '/address': (ctx) => const UserAddressPage(),
+        '/checkout': (ctx) => const CheckoutPage(),
+      },
+      locale: const Locale('ar'),
+      // home: const HomePage(),
     );
   }
 }

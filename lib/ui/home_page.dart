@@ -83,9 +83,10 @@ class HomePage extends StatelessWidget {
                   child: Consumer(
                     builder: (context, ref, widget) {
                       return ElevatedButton(
-                        onPressed: ref.watch(CartNotifier.itemsProvider).isNotEmpty
-                            ? cartPage(context)
-                            : null,
+                        onPressed:
+                            ref.watch(CartNotifier.itemsProvider).isNotEmpty
+                                ? () => Navigator.pushNamed(context, '/cart')
+                                : null,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -146,14 +147,4 @@ class HomePage extends StatelessWidget {
       // ),
     );
   }
-
-  VoidCallback cartPage(BuildContext context) {
-    return () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const CartPage()),
-      );
-    };
-  }
 }
-

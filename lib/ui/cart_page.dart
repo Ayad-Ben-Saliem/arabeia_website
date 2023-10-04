@@ -51,14 +51,7 @@ class CartPage extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const UserAddressPage(),
-                          ),
-                        );
-                      },
+                      onPressed: () => Navigator.pushNamed(context, '/address'),
                       child: const Text('التالي'),
                     ),
                   ),

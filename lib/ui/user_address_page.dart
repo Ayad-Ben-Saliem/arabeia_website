@@ -96,14 +96,7 @@ class UserAddressPage extends ConsumerWidget {
                   builder: (context, ref, widget) {
                     return ElevatedButton(
                       onPressed: _isValid(ref)
-                          ? () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const CheckoutPage(),
-                                ),
-                              );
-                            }
+                          ? () => Navigator.pushNamed(context, '/checkout')
                           : null,
                       child: const Text('تأكيد'),
                     );
