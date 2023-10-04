@@ -5,6 +5,7 @@ typedef JsonMap = Map<String, dynamic>;
 class Item extends Equatable {
   final String? id;
   final String name;
+  final int? order;
   final String? description;
   final List<String> sizes;
   final List<String> images;
@@ -14,6 +15,7 @@ class Item extends Equatable {
   const Item({
     this.id,
     required this.name,
+    this.order,
     this.description,
     required this.sizes,
     required this.images,
@@ -25,6 +27,7 @@ class Item extends Equatable {
     Item item, {
     String? id,
     String? name,
+    int? order,
     String? description,
     List<String>? sizes,
     List<String>? images,
@@ -32,6 +35,7 @@ class Item extends Equatable {
     double? discount,
   })  : id = id ?? item.id,
         name = name ?? item.name,
+        order = order ?? item.order,
         description = description ?? item.description,
         sizes = sizes ?? item.sizes,
         images = images ?? item.images,
@@ -41,6 +45,7 @@ class Item extends Equatable {
   Item copyWith({
     String? id,
     String? name,
+    int? order,
     String? description,
     List<String>? sizes,
     List<String>? images,
@@ -51,6 +56,7 @@ class Item extends Equatable {
         this,
         id: id,
         name: name,
+        order: order,
         description: description,
         sizes: sizes,
         images: images,
@@ -61,15 +67,17 @@ class Item extends Equatable {
   Item.fromJson(JsonMap json)
       : id = json['id'],
         name = json['name'],
+        order = json['order'],
         description = json['description'],
         sizes = List.from(json['sizes'] ?? []),
         images = List.from(json['images'] ?? []),
-        price = json['price'],
-        discount = json['discount'];
+        price = json['price'] + 0.0,
+        discount = json['discount'] + 0.0;
 
   JsonMap get toJson => {
         'id': id,
         'name': name,
+        'order': order,
         'description': description,
         'sizes': sizes,
         'images': images,
