@@ -31,40 +31,36 @@ class CartNotifier extends StateNotifier<List<CartItem>> {
     },
   );
 
-  void removeItem(CartItem item, {int removeCount = -1}) {
-    final items = <CartItem>[];
-    for (final item0 in state.reversed) {
-      if (item == item0) {
-        removeCount == 0 ? items.add(item0) : removeCount--;
-      } else {
-        items.add(item0);
-      }
-    }
-    state = items;
-  }
+  void addItem(CartItem cartItem) {
+    final index = state.indexWhere(
+      (cartItem0) =>
+          cartItem.item == cartItem0.item && cartItem.size == cartItem0.size,
+    );
 
-  void addItem(CartItem item, {int count = 1}) {
-    state = [
-      ...state,
-      for (int i = 0; i < count; i++) item.copyWith(),
-    ];
-  }
-
-  void increaseQty(CartItem item, [int quantity = 1]) {
-    addItem(item, count: quantity);
-  }
-
-  void decreaseQty(CartItem item, [int quantity = 1]) {
-    if (state.contains(item)) {
+    if (index == -1) {
+      state = [...state, cartItem.copyWith()];
+    } else {
+      final currentItem = state[index].increase(cartItem.quantity);
       final items = List<CartItem>.from(state);
-      int lastIndex = -1;
-      for (int index = items.length - 1; index >= 0; index--) {
-        if (items[index] == item) {
-          lastIndex = index;
-          break;
-        }
+      items.replaceRange(index, index + 1, [currentItem]);
+      state = items;
+    }
+  }
+  
+  void removeItem(CartItem cartItem) {
+    final index = state.indexWhere(
+          (cartItem0) =>
+      cartItem.item == cartItem0.item && cartItem.size == cartItem0.size,
+    );
+
+    if(index != -1) {
+      final currentItem = state[index].decrease(cartItem.quantity);
+      final items = List<CartItem>.from(state);
+      if(currentItem.quantity > 0) {
+        items.replaceRange(index, index + 1, [currentItem]);
+      } else {
+        items.removeAt(index);
       }
-      items.removeAt(lastIndex);
       state = items;
     }
   }

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:arabiya/ui/cart_notifier.dart';
-import 'package:arabiya/ui/cart_page.dart';
 import 'package:arabiya/ui/widgets/item_card.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:arabiya/db/db.dart';
@@ -11,6 +10,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 const currency = 'د.ل';
+
+final cartCount = StateProvider((ref) {
+  final items = ref.watch(CartNotifier.itemsProvider);
+  int count = 0;
+  for (var item in items) {
+    count += item.quantity;
+  }
+  return count;
+});
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -112,9 +120,9 @@ class HomePage extends StatelessWidget {
                               child: Consumer(
                                 builder: (context, ref, widget) {
                                   return badges.Badge(
-                                    position: badges.BadgePosition.topStart(
-                                      start: 32,
-                                      top: -2,
+                                    position: badges.BadgePosition.custom(
+                                      start: -25,
+                                      top: -5,
                                     ),
                                     badgeAnimation:
                                         const badges.BadgeAnimation.scale(
@@ -129,7 +137,7 @@ class HomePage extends StatelessWidget {
                                           : Colors.white,
                                     ),
                                     badgeContent: Text(
-                                      '${ref.watch(CartNotifier.itemsProvider).length}',
+                                      '${ref.watch(cartCount)}',
                                       textDirection: TextDirection.rtl,
                                       style: TextStyle(
                                         color: ref.watch(darkMode)
@@ -138,7 +146,8 @@ class HomePage extends StatelessWidget {
                                       ),
                                     ),
                                     child: const Icon(
-                                        Icons.shopping_cart_outlined),
+                                      Icons.shopping_cart_outlined,
+                                    ),
                                   );
                                 },
                               ),

@@ -2,7 +2,6 @@ import 'package:arabiya/models/cart_item.dart';
 import 'package:arabiya/models/item.dart';
 import 'package:arabiya/ui/cart_notifier.dart';
 import 'package:arabiya/ui/home_page.dart';
-import 'package:arabiya/ui/user_address_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -210,7 +209,7 @@ class CartPage extends StatelessWidget {
               onPressed: () {
                 ref
                     .read(CartNotifier.itemsProvider.notifier)
-                    .increaseQty(cartItem);
+                    .addItem(cartItem);
               },
               icon: const Icon(Icons.add),
             ),
@@ -222,7 +221,7 @@ class CartPage extends StatelessWidget {
                 } else {
                   ref
                       .read(CartNotifier.itemsProvider.notifier)
-                      .decreaseQty(cartItem);
+                      .removeItem(cartItem.copyWith(quantity: 1));
                 }
               },
               icon: const Icon(Icons.remove),
@@ -252,7 +251,7 @@ class CartPage extends StatelessWidget {
               onPressed: () {
                 ref
                     .read(CartNotifier.itemsProvider.notifier)
-                    .decreaseQty(cartItem);
+                    .removeItem(cartItem);
                 Navigator.pop(context);
               },
               child: const Text('نعم', textDirection: TextDirection.rtl),
