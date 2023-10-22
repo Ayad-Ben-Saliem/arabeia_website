@@ -1,7 +1,7 @@
-import 'package:arabeia_website/models/cart_item.dart';
-import 'package:arabeia_website/models/item.dart';
-import 'package:arabeia_website/ui/cart_notifier.dart';
-import 'package:arabeia_website/ui/home_page.dart';
+import 'package:arabiya/models/cart_item.dart';
+import 'package:arabiya/models/item.dart';
+import 'package:arabiya/ui/cart_notifier.dart';
+import 'package:arabiya/ui/home_page.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,37 +17,55 @@ class ItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Column(
+        textDirection: TextDirection.rtl,
         children: [
           if (item.images.isNotEmpty) ImageCarousel(images: item.images),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                item.name,
-                style: const TextStyle(fontSize: 18),
+          Row(
+            textDirection: TextDirection.rtl,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    item.name,
+                    textDirection: TextDirection.rtl,
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                ),
               ),
-            ),
+              const Spacer(),
+              IconButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/item/${item.id}',
+                      arguments: item);
+                },
+                icon: const Icon(Icons.open_in_new),
+              ),
+            ],
           ),
           const Spacer(),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 8),
             child: Align(
               alignment: Alignment.centerRight,
-              child: Text('الحجم'),
+              child: Text('الحجم', textDirection: TextDirection.rtl),
             ),
           ),
-          Wrap(
-            children: [
-              for (final size in item.sizes)
-                Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Consumer(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Wrap(
+              spacing: 4.0,
+              textDirection: TextDirection.rtl,
+              children: [
+                for (final size in item.sizes)
+                  Consumer(
                     builder: (context, ref, widget) {
                       final selected = size == ref.watch(sizeProvider);
                       return ActionChip(
                         label: Text(
                           size,
+                          textDirection: TextDirection.rtl,
                           style: TextStyle(
                             color: selected
                                 ? Theme.of(context).colorScheme.onPrimary
@@ -64,8 +82,8 @@ class ItemCard extends StatelessWidget {
                       );
                     },
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
           const Spacer(),
           footer(),
@@ -86,15 +104,19 @@ class ItemCard extends StatelessWidget {
             builder: (context, ref, child) {
               return ElevatedButton(
                 onPressed: (ref.watch(sizeProvider) != null)
-                    ? () => ref.read(CartNotifier.itemsProvider.notifier).addItem(
-                          CartItem(
-                            item: item,
-                            size: ref.read(sizeProvider)!,
-                            quantity: 1,
-                          ),
-                        )
+                    ? () =>
+                        ref.read(CartNotifier.itemsProvider.notifier).addItem(
+                              CartItem(
+                                item: item,
+                                size: ref.read(sizeProvider)!,
+                                quantity: 1,
+                              ),
+                            )
                     : null,
-                child: const Text('إضافة للسلة'),
+                child: const Text(
+                  'إضافة للسلة',
+                  textDirection: TextDirection.rtl,
+                ),
               );
             },
           ),
@@ -106,9 +128,11 @@ class ItemCard extends StatelessWidget {
   Widget priceWidget() {
     if (item.discount != null) {
       return Column(
+        textDirection: TextDirection.rtl,
         children: [
           Text(
             '${item.price} $currency',
+            textDirection: TextDirection.rtl,
             style: const TextStyle(
               fontSize: 18,
               color: Colors.grey,
@@ -117,6 +141,7 @@ class ItemCard extends StatelessWidget {
           ),
           Text(
             '${item.effectivePrice} $currency',
+            textDirection: TextDirection.rtl,
             style: const TextStyle(
               fontSize: 18,
             ),
@@ -126,6 +151,7 @@ class ItemCard extends StatelessWidget {
     } else {
       return Text(
         '${item.price} $currency',
+        textDirection: TextDirection.rtl,
         style: const TextStyle(fontSize: 18),
       );
     }
@@ -151,6 +177,7 @@ class _ImageCarouselState extends State<ImageCarousel> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      textDirection: TextDirection.rtl,
       children: [
         Container(
           decoration: const BoxDecoration(
@@ -174,6 +201,7 @@ class _ImageCarouselState extends State<ImageCarousel> {
         SizedBox(
           height: 36,
           child: Row(
+            textDirection: TextDirection.rtl,
             mainAxisAlignment: MainAxisAlignment.center,
             children: widget.images.asMap().entries.map((entry) {
               return GestureDetector(

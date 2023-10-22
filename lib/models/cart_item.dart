@@ -1,4 +1,4 @@
-import 'package:arabeia_website/models/item.dart';
+import 'package:arabiya/models/item.dart';
 import 'package:equatable/equatable.dart';
 
 class CartItem extends Equatable {

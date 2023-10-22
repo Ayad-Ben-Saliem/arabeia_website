@@ -1,4 +1,4 @@
-package ly.manassa.ly.arabeia_website
+package ly.manassa.ly.arabiya
 
 import io.flutter.embedding.android.FlutterActivity
 

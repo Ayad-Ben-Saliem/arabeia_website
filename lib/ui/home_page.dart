@@ -1,12 +1,12 @@
 import 'dart:async';
 
-import 'package:arabeia_website/ui/cart_notifier.dart';
-import 'package:arabeia_website/ui/cart_page.dart';
-import 'package:arabeia_website/ui/widgets/item_card.dart';
+import 'package:arabiya/ui/cart_notifier.dart';
+import 'package:arabiya/ui/cart_page.dart';
+import 'package:arabiya/ui/widgets/item_card.dart';
 import 'package:badges/badges.dart' as badges;
-import 'package:arabeia_website/db/db.dart';
-import 'package:arabeia_website/models/item.dart';
-import 'package:arabeia_website/ui/app.dart';
+import 'package:arabiya/db/db.dart';
+import 'package:arabiya/models/item.dart';
+import 'package:arabiya/ui/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -25,6 +25,7 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
       body: Column(
+        textDirection: TextDirection.rtl,
         children: [
           Expanded(
             child: FutureBuilder(
@@ -34,11 +35,21 @@ class HomePage extends StatelessWidget {
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (snapshot.hasError) {
-                    return Center(child: Text('${snapshot.error}'));
+                    return Center(
+                      child: Text(
+                        '${snapshot.error}',
+                        textDirection: TextDirection.rtl,
+                      ),
+                    );
                   }
 
                   if (snapshot.data == null) {
-                    return const Center(child: Text('No data!!!'));
+                    return const Center(
+                      child: Text(
+                        'لا توجد بيانات!!!',
+                        textDirection: TextDirection.rtl,
+                      ),
+                    );
                   }
 
                   final items = snapshot.data!;
@@ -76,6 +87,7 @@ class HomePage extends StatelessWidget {
                 }),
           ),
           Row(
+            textDirection: TextDirection.rtl,
             children: [
               Expanded(
                 child: Padding(
@@ -88,9 +100,13 @@ class HomePage extends StatelessWidget {
                                 ? () => Navigator.pushNamed(context, '/cart')
                                 : null,
                         child: Row(
+                          textDirection: TextDirection.rtl,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text('سلة المشتريات'),
+                            const Text(
+                              'سلة المشتريات',
+                              textDirection: TextDirection.rtl,
+                            ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Consumer(
@@ -114,6 +130,7 @@ class HomePage extends StatelessWidget {
                                     ),
                                     badgeContent: Text(
                                       '${ref.watch(CartNotifier.itemsProvider).length}',
+                                      textDirection: TextDirection.rtl,
                                       style: TextStyle(
                                         color: ref.watch(darkMode)
                                             ? Colors.white

@@ -1,8 +1,8 @@
-import 'package:arabeia_website/models/cart_item.dart';
-import 'package:arabeia_website/models/item.dart';
-import 'package:arabeia_website/ui/cart_notifier.dart';
-import 'package:arabeia_website/ui/home_page.dart';
-import 'package:arabeia_website/ui/user_address_page.dart';
+import 'package:arabiya/models/cart_item.dart';
+import 'package:arabiya/models/item.dart';
+import 'package:arabiya/ui/cart_notifier.dart';
+import 'package:arabiya/ui/home_page.dart';
+import 'package:arabiya/ui/user_address_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -13,7 +13,7 @@ class CartPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('سلة المشتريات'),
+        title: const Text('سلة المشتريات', textDirection: TextDirection.rtl),
       ),
       body: Center(
         child: ConstrainedBox(
@@ -23,6 +23,7 @@ class CartPage extends StatelessWidget {
               final cartItems = ref.watch(CartNotifier.groupedItemsProvider);
 
               return Column(
+                textDirection: TextDirection.rtl,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Expanded(
@@ -45,14 +46,20 @@ class CartPage extends StatelessWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: Align(
                       alignment: Alignment.centerLeft,
-                      child: Text('${total(cartItems)} $currency'),
+                      child: Text(
+                        '${total(cartItems)} $currency',
+                        textDirection: TextDirection.rtl,
+                      ),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
                       onPressed: () => Navigator.pushNamed(context, '/address'),
-                      child: const Text('التالي'),
+                      child: const Text(
+                        'التالي',
+                        textDirection: TextDirection.rtl,
+                      ),
                     ),
                   ),
                 ],
@@ -67,8 +74,10 @@ class CartPage extends StatelessWidget {
   Widget vCard(CartItem cartItem) {
     return Card(
       child: Column(
+        textDirection: TextDirection.rtl,
         children: [
           Row(
+            textDirection: TextDirection.rtl,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ConstrainedBox(
@@ -81,12 +90,14 @@ class CartPage extends StatelessWidget {
                   child: Text(
                     cartItem.item.name,
                     maxLines: 5,
+                    textDirection: TextDirection.rtl,
                   ),
                 ),
               ),
             ],
           ),
           Row(
+            textDirection: TextDirection.rtl,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -97,19 +108,22 @@ class CartPage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
+                  textDirection: TextDirection.rtl,
                   children: [
-                    const Text('الحجم'),
-                    Text(cartItem.size),
+                    const Text('الحجم', textDirection: TextDirection.rtl),
+                    Text(cartItem.size, textDirection: TextDirection.rtl),
                   ],
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
+                  textDirection: TextDirection.rtl,
                   children: [
                     qtyWidget(cartItem),
                     const SizedBox(height: 8),
-                    Text('(${cartItem.totalPrice}) $currency'),
+                    Text('(${cartItem.totalPrice}) $currency',
+                        textDirection: TextDirection.rtl),
                   ],
                 ),
               ),
@@ -125,28 +139,39 @@ class CartPage extends StatelessWidget {
       constraints: const BoxConstraints(maxHeight: 128),
       child: Card(
         child: Row(
+          textDirection: TextDirection.rtl,
           children: [
             Image.network(cartItem.item.images[0]),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
+                  textDirection: TextDirection.rtl,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: Text(
                         cartItem.item.name,
                         maxLines: 5,
+                        textDirection: TextDirection.rtl,
                       ),
                     ),
                     Row(
+                      textDirection: TextDirection.rtl,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         priceWidget(cartItem.item),
                         Column(
+                          textDirection: TextDirection.rtl,
                           children: [
-                            const Text('الحجم'),
-                            Text(cartItem.size),
+                            const Text(
+                              'الحجم',
+                              textDirection: TextDirection.rtl,
+                            ),
+                            Text(
+                              cartItem.size,
+                              textDirection: TextDirection.rtl,
+                            ),
                           ],
                         ),
                       ],
@@ -158,11 +183,13 @@ class CartPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
+                textDirection: TextDirection.rtl,
                 children: [
                   qtyWidget(cartItem),
                   const Spacer(),
                   Text(
                     '(${cartItem.totalPrice}) $currency',
+                    textDirection: TextDirection.rtl,
                   ),
                 ],
               ),
@@ -177,6 +204,7 @@ class CartPage extends StatelessWidget {
     return Consumer(
       builder: (context, ref, widget) {
         return Row(
+          textDirection: TextDirection.rtl,
           children: [
             IconButton(
               onPressed: () {
@@ -186,7 +214,7 @@ class CartPage extends StatelessWidget {
               },
               icon: const Icon(Icons.add),
             ),
-            Text('(${cartItem.quantity})'),
+            Text('(${cartItem.quantity})', textDirection: TextDirection.rtl),
             IconButton(
               onPressed: () {
                 if (cartItem.quantity == 1) {
@@ -214,8 +242,11 @@ class CartPage extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('هل أنت متأكد من أنك تريد حذف هذا العنصر؟'),
-          content: Text('${cartItem.item.name}'),
+          title: const Text(
+            'هل أنت متأكد من أنك تريد حذف هذا العنصر؟',
+            textDirection: TextDirection.rtl,
+          ),
+          content: Text(cartItem.item.name, textDirection: TextDirection.rtl),
           actions: [
             ElevatedButton(
               onPressed: () {
@@ -224,11 +255,11 @@ class CartPage extends StatelessWidget {
                     .decreaseQty(cartItem);
                 Navigator.pop(context);
               },
-              child: const Text('نعم'),
+              child: const Text('نعم', textDirection: TextDirection.rtl),
             ),
             ElevatedButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('لا'),
+              child: const Text('لا', textDirection: TextDirection.rtl),
             ),
           ],
         );
@@ -247,17 +278,25 @@ class CartPage extends StatelessWidget {
   Widget priceWidget(Item item) {
     if (item.discount != null) {
       return Column(
+        textDirection: TextDirection.rtl,
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             '${item.price} $currency',
+            textDirection: TextDirection.rtl,
             style: const TextStyle(decoration: TextDecoration.lineThrough),
           ),
-          Text('${item.effectivePrice} $currency'),
+          Text(
+            '${item.effectivePrice} $currency',
+            textDirection: TextDirection.rtl,
+          ),
         ],
       );
     }
-    return Text('${item.effectivePrice} $currency');
+    return Text(
+      '${item.effectivePrice} $currency',
+      textDirection: TextDirection.rtl,
+    );
   }
 }

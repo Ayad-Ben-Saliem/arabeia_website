@@ -1,6 +1,6 @@
-# arabeia_website
+# arabiya
 
-E-Commerce website for arabeia.ly
+E-Commerce website for arabiya.ly
 
 ## Getting Started
 

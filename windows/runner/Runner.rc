@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "ly.manassa.ly" "\0"
-            VALUE "FileDescription", "arabeia_website" "\0"
+            VALUE "FileDescription", "arabiya" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "arabeia_website" "\0"
+            VALUE "InternalName", "arabiya" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2023 ly.manassa.ly. All rights reserved." "\0"
-            VALUE "OriginalFilename", "arabeia_website.exe" "\0"
-            VALUE "ProductName", "arabeia_website" "\0"
+            VALUE "OriginalFilename", "arabiya.exe" "\0"
+            VALUE "ProductName", "arabiya" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

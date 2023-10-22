@@ -1,9 +1,9 @@
 import 'dart:math';
 
-import 'package:arabeia_website/models/bill.dart';
-import 'package:arabeia_website/pdf/reporting.dart';
-import 'package:arabeia_website/ui/cart_notifier.dart';
-import 'package:arabeia_website/ui/user_address_page.dart';
+import 'package:arabiya/models/bill.dart';
+import 'package:arabiya/pdf/reporting.dart';
+import 'package:arabiya/ui/cart_notifier.dart';
+import 'package:arabiya/ui/user_address_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -23,12 +23,13 @@ class CheckoutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ارسال الفاتورة'),
+        title: const Text('ارسال الفاتورة', textDirection: TextDirection.rtl),
       ),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1024),
           child: Column(
+            textDirection: TextDirection.rtl,
             children: [
               Expanded(
                 child: Consumer(
@@ -37,8 +38,8 @@ class CheckoutPage extends StatelessWidget {
                       recipientName: ref.read(nameProvider),
                       recipientPhone: ref.read(phoneProvider),
                       recipientAddress: ref.read(addressProvider),
-                      latitude: ref.read(locationProvider)!.latitude,
-                      longitude: ref.read(locationProvider)!.longitude,
+                      latitude: ref.read(locationProvider).latitude,
+                      longitude: ref.read(locationProvider).longitude,
                       cartItems: ref.read(CartNotifier.groupedItemsProvider),
                       createAt: DateTime.now(),
                     );
@@ -49,7 +50,12 @@ class CheckoutPage extends StatelessWidget {
                         bill,
                       ),
                       builder: (context, snapshot) {
-                        if (snapshot.hasError) return Text('${snapshot.error}');
+                        if (snapshot.hasError) {
+                          return Text(
+                            '${snapshot.error}',
+                            textDirection: TextDirection.rtl,
+                          );
+                        }
                         if (!snapshot.hasData) {
                           return const SizedBox(
                             height: 32,
@@ -89,7 +95,8 @@ class CheckoutPage extends StatelessWidget {
                       // );
 
                       final url = await savePdf(pdfBytes!, filename);
-                      final text = 'مرحبا!! أريد طلب المنتجات الموجودة في هذه الفاتورة : $url';
+                      final text =
+                          'مرحبا!! أريد طلب المنتجات الموجودة في هذه الفاتورة : $url';
                       // launchUrlString('https://wa.me/+218910215272/?text=$text');
                       launchUrlString(
                         'whatsapp://send?phone=+218910215272&text=$text',
@@ -103,9 +110,10 @@ class CheckoutPage extends StatelessWidget {
                     }
                   },
                   child: const Row(
+                    textDirection: TextDirection.rtl,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('إرسال'),
+                      Text('إرسال', textDirection: TextDirection.rtl),
                       SizedBox(width: 8),
                       Icon(Icons.send),
                     ],
@@ -150,6 +158,7 @@ class SocialMethod extends StatelessWidget {
       child: Card(
         color: active ? color : null,
         child: Column(
+          textDirection: TextDirection.rtl,
           children: [
             Padding(
               padding: const EdgeInsets.all(4.0),
@@ -157,7 +166,7 @@ class SocialMethod extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.all(4.0),
-              child: Text(title),
+              child: Text(title, textDirection: TextDirection.rtl),
             ),
           ],
         ),

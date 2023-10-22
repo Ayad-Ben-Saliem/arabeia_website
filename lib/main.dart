@@ -1,5 +1,5 @@
-import 'package:arabeia_website/db/db.dart';
-import 'package:arabeia_website/ui/app.dart';
+import 'package:arabiya/db/db.dart';
+import 'package:arabiya/ui/app.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase_core/firebase_core.dart';

@@ -1,6 +1,6 @@
-import 'package:arabeia_website/models/bill.dart';
-import 'package:arabeia_website/models/item.dart';
-import 'package:arabeia_website/pdf/pdf.dart';
+import 'package:arabiya/models/bill.dart';
+import 'package:arabiya/models/item.dart';
+import 'package:arabiya/pdf/pdf.dart';
 import 'package:flutter/services.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/widgets.dart';

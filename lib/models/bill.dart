@@ -1,4 +1,4 @@
-import 'package:arabeia_website/models/cart_item.dart';
+import 'package:arabiya/models/cart_item.dart';
 
 class Bill {
   final String recipientName;

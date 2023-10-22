@@ -68,7 +68,7 @@ class DefaultFirebaseOptions {
     projectId: 'arabeia',
     storageBucket: 'arabeia.appspot.com',
     iosClientId: '89090094536-nlrcmk29kikegnbbqg15us4fvtgq7pjn.apps.googleusercontent.com',
-    iosBundleId: 'ly.manassa.ly.arabeiaWebsite',
+    iosBundleId: 'ly.manassa.ly.arabiya',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -78,6 +78,6 @@ class DefaultFirebaseOptions {
     projectId: 'arabeia',
     storageBucket: 'arabeia.appspot.com',
     iosClientId: '89090094536-vr8uhea22r6fsuu87monij4ttm0oa01m.apps.googleusercontent.com',
-    iosBundleId: 'ly.manassa.ly.arabeiaWebsite.RunnerTests',
+    iosBundleId: 'ly.manassa.ly.arabiya.RunnerTests',
   );
 }

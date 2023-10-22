@@ -1,4 +1,4 @@
-import 'package:arabeia_website/models/item.dart';
+import 'package:arabiya/models/item.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Database {
@@ -16,10 +16,8 @@ class Database {
   }
 
   static Future<Item?> getItem(String id) async {
-    final query = await _itemsRef.where('id', isEqualTo: id).get();
-
-    return query.docs
-        .map((doc) => Item.fromJson({'id': doc.id, ...doc.data()}))
-        .single;
+    final doc = await _itemsRef.doc(id).get();
+    if (doc.exists) return Item.fromJson(doc.data()!);
+    return null;
   }
 }

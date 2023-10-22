@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:89090094536:android:6d757bc9bde98922ccbcfd",
         "android_client_info": {
-          "package_name": "ly.manassa.ly.arabeia_website"
+          "package_name": "ly.manassa.ly.arabiya"
         }
       },
       "oauth_client": [
@@ -34,7 +34,7 @@
               "client_id": "89090094536-nlrcmk29kikegnbbqg15us4fvtgq7pjn.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "ly.manassa.ly.arabeiaWebsite"
+                "bundle_id": "ly.manassa.ly.arabiya"
               }
             }
           ]

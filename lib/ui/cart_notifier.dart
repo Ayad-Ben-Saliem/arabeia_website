@@ -1,4 +1,4 @@
-import 'package:arabeia_website/models/cart_item.dart';
+import 'package:arabiya/models/cart_item.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CartNotifier extends StateNotifier<List<CartItem>> {
