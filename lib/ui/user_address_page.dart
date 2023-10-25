@@ -21,13 +21,12 @@ class UserAddressPage extends ConsumerWidget {
   Widget build(context, ref) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('بيانات المستلم', textDirection: TextDirection.rtl),
+        title: const Text('بيانات المستلم'),
       ),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1024),
           child: Column(
-            textDirection: TextDirection.rtl,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Padding(
@@ -99,10 +98,7 @@ class UserAddressPage extends ConsumerWidget {
                       onPressed: _isValid(ref)
                           ? () => Navigator.pushNamed(context, '/checkout')
                           : null,
-                      child: const Text(
-                        'تأكيد',
-                        textDirection: TextDirection.rtl,
-                      ),
+                      child: const Text('تأكيد'),
                     );
                   },
                 ),
@@ -139,7 +135,7 @@ class LocationMap extends StatelessWidget {
         ),
         builder: (context, snapshot) {
           // if (snapshot.hasError) {
-          //   return Center(child: Text('${snapshot.error}', textDirection: TextDirection.rtl));
+          //   return Center(child: Text('${snapshot.error}'));
           // }
 
           if (snapshot.hasData) {
@@ -168,11 +164,10 @@ class LocationMap extends StatelessWidget {
                 ),
               const Center(
                 child: Column(
-                  textDirection: TextDirection.rtl,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.pin_drop_outlined),
-                    Text('مكان التوصيل', textDirection: TextDirection.rtl)
+                    Text('مكان التوصيل')
                   ],
                 ),
               ),

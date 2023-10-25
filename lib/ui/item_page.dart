@@ -34,8 +34,7 @@ class ItemPage extends StatelessWidget {
               } else if (snapshot.connectionState == ConnectionState.waiting) {
                 return const CircularProgressIndicator();
               }
-              return Text('Error!! ${snapshot.error}',
-                  textDirection: TextDirection.rtl);
+              return Text('Error!! ${snapshot.error}');
             },
           ),
         );
@@ -64,7 +63,6 @@ class ItemView extends StatelessWidget {
             ),
             child: IntrinsicHeight(
               child: Column(
-                textDirection: TextDirection.rtl,
                 mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -76,7 +74,6 @@ class ItemView extends StatelessWidget {
                       padding: const EdgeInsets.all(24),
                       child: Text(
                         item.name,
-                        textDirection: TextDirection.rtl,
                         style: const TextStyle(fontSize: 18),
                       ),
                     ),
@@ -86,7 +83,6 @@ class ItemView extends StatelessWidget {
                       padding: const EdgeInsets.all(24),
                       child: Text(
                         item.description!,
-                        textDirection: TextDirection.rtl,
                         style: const TextStyle(fontSize: 12),
                       ),
                     ),
@@ -95,14 +91,12 @@ class ItemView extends StatelessWidget {
                     padding: EdgeInsets.symmetric(horizontal: 8),
                     child: Text(
                       'الحجم',
-                      textDirection: TextDirection.rtl,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Wrap(
-                      textDirection: TextDirection.rtl,
                       spacing: 4.0,
                       children: [
                         for (final size in item.sizes)
@@ -112,7 +106,6 @@ class ItemView extends StatelessWidget {
                               return ActionChip(
                                 label: Text(
                                   size,
-                                  textDirection: TextDirection.rtl,
                                   style: TextStyle(
                                     color: selected
                                         ? Theme.of(context)
@@ -147,7 +140,6 @@ class ItemView extends StatelessWidget {
 
   Widget footer() {
     return Row(
-      textDirection: TextDirection.rtl,
       children: [
         const SizedBox(width: 8),
         priceWidget(),
@@ -167,8 +159,7 @@ class ItemView extends StatelessWidget {
                               ),
                             )
                     : null,
-                child:
-                    const Text('إضافة للسلة', textDirection: TextDirection.rtl),
+                child: const Text('إضافة للسلة'),
               );
             },
           ),
@@ -180,11 +171,9 @@ class ItemView extends StatelessWidget {
   Widget priceWidget() {
     if (item.discount != null) {
       return Column(
-        textDirection: TextDirection.rtl,
         children: [
           Text(
             '${item.price} $currency',
-            textDirection: TextDirection.rtl,
             style: const TextStyle(
               fontSize: 18,
               color: Colors.grey,
@@ -193,17 +182,13 @@ class ItemView extends StatelessWidget {
           ),
           Text(
             '${item.effectivePrice} $currency',
-            textDirection: TextDirection.rtl,
-            style: const TextStyle(
-              fontSize: 18,
-            ),
+            style: const TextStyle(fontSize: 18),
           ),
         ],
       );
     } else {
       return Text(
         '${item.price} $currency',
-          textDirection: TextDirection.rtl,
         style: const TextStyle(fontSize: 18),
       );
     }

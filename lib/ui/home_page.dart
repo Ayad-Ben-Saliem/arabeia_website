@@ -33,7 +33,6 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
       body: Column(
-        textDirection: TextDirection.rtl,
         children: [
           Expanded(
             child: FutureBuilder(
@@ -44,19 +43,13 @@ class HomePage extends StatelessWidget {
                   }
                   if (snapshot.hasError) {
                     return Center(
-                      child: Text(
-                        '${snapshot.error}',
-                        textDirection: TextDirection.rtl,
-                      ),
+                      child: Text('${snapshot.error}'),
                     );
                   }
 
                   if (snapshot.data == null) {
                     return const Center(
-                      child: Text(
-                        'لا توجد بيانات!!!',
-                        textDirection: TextDirection.rtl,
-                      ),
+                      child: Text('لا توجد بيانات!!!'),
                     );
                   }
 
@@ -95,7 +88,6 @@ class HomePage extends StatelessWidget {
                 }),
           ),
           Row(
-            textDirection: TextDirection.rtl,
             children: [
               Expanded(
                 child: Padding(
@@ -108,13 +100,9 @@ class HomePage extends StatelessWidget {
                                 ? () => Navigator.pushNamed(context, '/cart')
                                 : null,
                         child: Row(
-                          textDirection: TextDirection.rtl,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text(
-                              'سلة المشتريات',
-                              textDirection: TextDirection.rtl,
-                            ),
+                            const Text('سلة المشتريات'),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Consumer(
@@ -138,7 +126,6 @@ class HomePage extends StatelessWidget {
                                     ),
                                     badgeContent: Text(
                                       '${ref.watch(cartCount)}',
-                                      textDirection: TextDirection.rtl,
                                       style: TextStyle(
                                         color: ref.watch(darkMode)
                                             ? Colors.white

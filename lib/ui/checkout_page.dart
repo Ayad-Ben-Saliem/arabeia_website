@@ -23,13 +23,12 @@ class CheckoutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ارسال الفاتورة', textDirection: TextDirection.rtl),
+        title: const Text('ارسال الفاتورة'),
       ),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1024),
           child: Column(
-            textDirection: TextDirection.rtl,
             children: [
               Expanded(
                 child: Consumer(
@@ -52,10 +51,7 @@ class CheckoutPage extends StatelessWidget {
                       future: Reporting.createPdfBill(bill),
                       builder: (context, snapshot) {
                         if (snapshot.hasError) {
-                          return Text(
-                            '${snapshot.error}',
-                            textDirection: TextDirection.rtl,
-                          );
+                          return Text('${snapshot.error}');
                         }
                         if (!snapshot.hasData) {
                           return const SizedBox(
@@ -111,10 +107,9 @@ class CheckoutPage extends StatelessWidget {
                     }
                   },
                   child: const Row(
-                    textDirection: TextDirection.rtl,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('إرسال', textDirection: TextDirection.rtl),
+                      Text('إرسال'),
                       SizedBox(width: 8),
                       Icon(Icons.send),
                     ],
@@ -159,7 +154,6 @@ class SocialMethod extends StatelessWidget {
       child: Card(
         color: active ? color : null,
         child: Column(
-          textDirection: TextDirection.rtl,
           children: [
             Padding(
               padding: const EdgeInsets.all(4.0),
@@ -167,7 +161,7 @@ class SocialMethod extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.all(4.0),
-              child: Text(title, textDirection: TextDirection.rtl),
+              child: Text(title),
             ),
           ],
         ),

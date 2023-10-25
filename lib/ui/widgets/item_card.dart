@@ -17,11 +17,9 @@ class ItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Column(
-        textDirection: TextDirection.rtl,
         children: [
           if (item.images.isNotEmpty) ImageCarousel(images: item.images),
           Row(
-            textDirection: TextDirection.rtl,
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -29,7 +27,6 @@ class ItemCard extends StatelessWidget {
                   alignment: Alignment.centerRight,
                   child: Text(
                     item.name,
-                    textDirection: TextDirection.rtl,
                     style: const TextStyle(fontSize: 18),
                   ),
                 ),
@@ -49,14 +46,13 @@ class ItemCard extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 8),
             child: Align(
               alignment: Alignment.centerRight,
-              child: Text('الحجم', textDirection: TextDirection.rtl),
+              child: Text('الحجم'),
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Wrap(
               spacing: 4.0,
-              textDirection: TextDirection.rtl,
               children: [
                 for (final size in item.sizes)
                   Consumer(
@@ -65,7 +61,6 @@ class ItemCard extends StatelessWidget {
                       return ActionChip(
                         label: Text(
                           size,
-                          textDirection: TextDirection.rtl,
                           style: TextStyle(
                             color: selected
                                 ? Theme.of(context).colorScheme.onPrimary
@@ -113,10 +108,7 @@ class ItemCard extends StatelessWidget {
                               ),
                             )
                     : null,
-                child: const Text(
-                  'إضافة للسلة',
-                  textDirection: TextDirection.rtl,
-                ),
+                child: const Text('إضافة للسلة'),
               );
             },
           ),
@@ -128,11 +120,9 @@ class ItemCard extends StatelessWidget {
   Widget priceWidget() {
     if (item.discount != null) {
       return Column(
-        textDirection: TextDirection.rtl,
         children: [
           Text(
             '${item.price} $currency',
-            textDirection: TextDirection.rtl,
             style: const TextStyle(
               fontSize: 18,
               color: Colors.grey,
@@ -141,17 +131,13 @@ class ItemCard extends StatelessWidget {
           ),
           Text(
             '${item.effectivePrice} $currency',
-            textDirection: TextDirection.rtl,
-            style: const TextStyle(
-              fontSize: 18,
-            ),
+            style: const TextStyle(fontSize: 18),
           ),
         ],
       );
     } else {
       return Text(
         '${item.price} $currency',
-        textDirection: TextDirection.rtl,
         style: const TextStyle(fontSize: 18),
       );
     }
@@ -177,7 +163,6 @@ class _ImageCarouselState extends State<ImageCarousel> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      textDirection: TextDirection.rtl,
       children: [
         Container(
           decoration: const BoxDecoration(
@@ -201,7 +186,6 @@ class _ImageCarouselState extends State<ImageCarousel> {
         SizedBox(
           height: 36,
           child: Row(
-            textDirection: TextDirection.rtl,
             mainAxisAlignment: MainAxisAlignment.center,
             children: widget.images.asMap().entries.map((entry) {
               return GestureDetector(

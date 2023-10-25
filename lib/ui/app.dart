@@ -15,38 +15,34 @@ class App extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: MaterialApp(
-        title: 'عربية',
-        theme: ThemeData(
-          colorScheme: ref.watch(darkMode)
-              ? const ColorScheme.dark(primary: Colors.white)
-              : const ColorScheme.light(primary: Colors.black),
-          fontFamily: 'HacenTunisia',
-        ),
-        locale: const Locale('ar'),
-        initialRoute: '/',
-        // routes: {
-        //   '/': (ctx) => const HomePage(),
-        //   '/cart': (ctx) => const CartPage(),
-        //   '/address': (ctx) => const UserAddressPage(),
-        //   '/checkout': (ctx) => const CheckoutPage(),
-        // },
-        onGenerateRoute: FRouter.Router({
-          '/cart': (ctx, match, settings) => const CartPage(),
-          '/address': (ctx, match, settings) => const UserAddressPage(),
-          '/checkout': (ctx, match, settings) => const CheckoutPage(),
-          '/item/{id}': (ctx, match, settings) {
-            return ItemPage(
-              item: settings.arguments as Item?,
-              id: match!.parameters['id']!,
-            );
-          },
-          '/': (ctx, match, settings) => const HomePage(),
-        }).get,
-        // home: const HomePage(),
+    return MaterialApp(
+      title: 'عربية',
+      theme: ThemeData(
+        colorScheme: ref.watch(darkMode)
+            ? const ColorScheme.dark(primary: Colors.white)
+            : const ColorScheme.light(primary: Colors.black),
+        fontFamily: 'HacenTunisia',
       ),
+      locale: const Locale('ar'),
+      initialRoute: '/',
+      builder: (context, child) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: child!,
+        );
+      },
+      onGenerateRoute: FRouter.Router({
+        '/cart': (ctx, match, settings) => const CartPage(),
+        '/address': (ctx, match, settings) => const UserAddressPage(),
+        '/checkout': (ctx, match, settings) => const CheckoutPage(),
+        '/item/{id}': (ctx, match, settings) {
+          return ItemPage(
+            item: settings.arguments as Item?,
+            id: match!.parameters['id']!,
+          );
+        },
+        '/': (ctx, match, settings) => const HomePage(),
+      }).get,
     );
   }
 }
