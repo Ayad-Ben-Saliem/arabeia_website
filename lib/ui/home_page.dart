@@ -109,8 +109,8 @@ class HomePage extends StatelessWidget {
                                 builder: (context, ref, widget) {
                                   return badges.Badge(
                                     position: badges.BadgePosition.custom(
-                                      start: -25,
-                                      top: -5,
+                                      start: 30,
+                                      top: -3,
                                     ),
                                     badgeAnimation:
                                         const badges.BadgeAnimation.scale(
