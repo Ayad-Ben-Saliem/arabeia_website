@@ -38,7 +38,6 @@ class AddEditItemPage extends ConsumerWidget {
           }
           return Text(
             'Error!! ${snapshot.error}',
-
           );
         },
       );
@@ -80,41 +79,42 @@ class _JsonFormItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Timer timer = Timer(
-      const Duration(milliseconds: 100),
-      () {},
-    );
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Consumer(
-        builder: (context, ref, child) {
-          final currentItem = ref.read(_currentItem);
-          return TextField(
-            controller: TextEditingController(
-              text: Utils.getPrettyString(currentItem.toJson),
-            ),
-            decoration: const InputDecoration(border: InputBorder.none),
-            scrollPadding: const EdgeInsets.all(8.0),
-            keyboardType: TextInputType.multiline,
-            maxLines: 0xffff,
-            autofocus: true,
-            onChanged: (txt) {
-              if (timer.isActive) timer.cancel();
-              timer = Timer(
-                const Duration(milliseconds: 100),
-                () {
-                  try {
-                    final currentItem = Item.fromJson(json.decode(txt));
-                    ref.read(_currentItem.notifier).state = currentItem;
-                  } catch (e) {
-                    // TODO: show an error
-                    print(e);
-                  }
-                },
-              );
-            },
-          );
-        },
+    Timer timer = Timer(const Duration(milliseconds: 100), () {});
+
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Consumer(
+          builder: (context, ref, child) {
+            final currentItem = ref.read(_currentItem);
+            return TextField(
+              controller: TextEditingController(
+                text: Utils.getPrettyString(currentItem.toJson),
+              ),
+              decoration: const InputDecoration(border: InputBorder.none),
+              scrollPadding: const EdgeInsets.all(8.0),
+              keyboardType: TextInputType.multiline,
+              maxLines: 0xffff,
+              autofocus: true,
+              onChanged: (txt) {
+                if (timer.isActive) timer.cancel();
+                timer = Timer(
+                  const Duration(milliseconds: 100),
+                  () {
+                    try {
+                      final currentItem = Item.fromJson(json.decode(txt));
+                      ref.read(_currentItem.notifier).state = currentItem;
+                    } catch (e) {
+                      // TODO: show an error
+                      print(e);
+                    }
+                  },
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
