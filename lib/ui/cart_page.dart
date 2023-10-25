@@ -10,57 +10,54 @@ class CartPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('سلة المشتريات'),
-        ),
-        body: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1024),
-            child: Consumer(
-              builder: (context, ref, widget) {
-                final cartItems = ref.watch(CartNotifier.groupedItemsProvider);
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('سلة المشتريات'),
+      ),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1024),
+          child: Consumer(
+            builder: (context, ref, widget) {
+              final cartItems = ref.watch(CartNotifier.groupedItemsProvider);
 
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(
-                      child: LayoutBuilder(builder: (context, constraints) {
-                        final isVertical = constraints.maxWidth < 300;
-                        return ListView(
-                          children: [
-                            for (final cartItem in cartItems)
-                              Padding(
-                                padding: const EdgeInsets.all(4.0),
-                                child: isVertical
-                                    ? vCard(cartItem)
-                                    : hCard(cartItem),
-                              ),
-                          ],
-                        );
-                      }),
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: LayoutBuilder(builder: (context, constraints) {
+                      final isVertical = constraints.maxWidth < 300;
+                      return ListView(
+                        children: [
+                          for (final cartItem in cartItems)
+                            Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: isVertical
+                                  ? vCard(cartItem)
+                                  : hCard(cartItem),
+                            ),
+                        ],
+                      );
+                    }),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text('${total(cartItems)} $currency'),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text('${total(cartItems)} $currency'),
-                      ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      onPressed: () =>
+                          Navigator.pushNamed(context, '/address'),
+                      child: const Text('التالي'),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ElevatedButton(
-                        onPressed: () =>
-                            Navigator.pushNamed(context, '/address'),
-                        child: const Text('التالي'),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),

@@ -53,25 +53,22 @@ class _AddEditItemPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: DefaultTabController(
-        length: 2,
-        child: Scaffold(
-          appBar: AppBar(
-            bottom: const TabBar(
-              tabs: [
-                Tab(text: 'JSON'),
-                Tab(text: 'Visual'),
-              ],
-            ),
-          ),
-          body: const TabBarView(
-            children: [
-              _JsonFormItem(),
-              _VisualFormItem(),
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          bottom: const TabBar(
+            tabs: [
+              Tab(text: 'JSON'),
+              Tab(text: 'Visual'),
             ],
           ),
+        ),
+        body: const TabBarView(
+          children: [
+            _JsonFormItem(),
+            _VisualFormItem(),
+          ],
         ),
       ),
     );
@@ -87,40 +84,37 @@ class _JsonFormItem extends StatelessWidget {
       const Duration(milliseconds: 100),
       () {},
     );
-    return Directionality(
-      textDirection: TextDirection.ltr,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Consumer(
-          builder: (context, ref, child) {
-            final currentItem = ref.read(_currentItem);
-            return TextField(
-              controller: TextEditingController(
-                text: Utils.getPrettyString(currentItem.toJson),
-              ),
-              decoration: const InputDecoration(border: InputBorder.none),
-              scrollPadding: const EdgeInsets.all(8.0),
-              keyboardType: TextInputType.multiline,
-              maxLines: 0xffff,
-              autofocus: true,
-              onChanged: (txt) {
-                if (timer.isActive) timer.cancel();
-                timer = Timer(
-                  const Duration(milliseconds: 100),
-                  () {
-                    try {
-                      final currentItem = Item.fromJson(json.decode(txt));
-                      ref.read(_currentItem.notifier).state = currentItem;
-                    } catch (e) {
-                      // TODO: show an error
-                      print(e);
-                    }
-                  },
-                );
-              },
-            );
-          },
-        ),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Consumer(
+        builder: (context, ref, child) {
+          final currentItem = ref.read(_currentItem);
+          return TextField(
+            controller: TextEditingController(
+              text: Utils.getPrettyString(currentItem.toJson),
+            ),
+            decoration: const InputDecoration(border: InputBorder.none),
+            scrollPadding: const EdgeInsets.all(8.0),
+            keyboardType: TextInputType.multiline,
+            maxLines: 0xffff,
+            autofocus: true,
+            onChanged: (txt) {
+              if (timer.isActive) timer.cancel();
+              timer = Timer(
+                const Duration(milliseconds: 100),
+                () {
+                  try {
+                    final currentItem = Item.fromJson(json.decode(txt));
+                    ref.read(_currentItem.notifier).state = currentItem;
+                  } catch (e) {
+                    // TODO: show an error
+                    print(e);
+                  }
+                },
+              );
+            },
+          );
+        },
       ),
     );
   }

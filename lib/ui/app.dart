@@ -43,6 +43,12 @@ class App extends ConsumerWidget {
         },
         '/': (ctx, match, settings) => const HomePage(),
       }).get,
+      builder: (context, child) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: child!,
+        );
+      },
     );
   }
 }

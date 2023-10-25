@@ -19,96 +19,93 @@ class UserAddressPage extends ConsumerWidget {
 
   @override
   Widget build(context, ref) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('بيانات المستلم'),
-        ),
-        body: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1024),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('بيانات المستلم'),
+      ),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1024),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextFormField(
+                  controller: TextEditingController(
+                    text: ref.read(nameProvider),
+                  ),
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'اسم المستلم',
+                  ),
+                  onChanged: (txt) {
+                    ref.read(nameProvider.notifier).state = txt;
+                  },
+                  textInputAction: TextInputAction.next,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextFormField(
+                  controller: TextEditingController(
+                    text: ref.read(phoneProvider),
+                  ),
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'رقم هاتف المستلم',
+                  ),
+                  onChanged: (txt) {
+                    ref.read(phoneProvider.notifier).state = txt;
+                  },
+                  keyboardType: TextInputType.phone,
+                  autocorrect: false,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  textInputAction: TextInputAction.next,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextFormField(
+                  controller: TextEditingController(
+                    text: ref.read(addressProvider),
+                  ),
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'عنوان الاستلام',
+                    hintText: 'المدينة، المنطقة، الشارع، أقرب نقطة دالة',
+                  ),
+                  onChanged: (txt) {
+                    ref.read(addressProvider.notifier).state = txt;
+                  },
+                ),
+              ),
+              Expanded(
+                child: Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: TextFormField(
-                    controller: TextEditingController(
-                      text: ref.read(nameProvider),
-                    ),
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'اسم المستلم',
-                    ),
-                    onChanged: (txt) {
-                      ref.read(nameProvider.notifier).state = txt;
-                    },
-                    textInputAction: TextInputAction.next,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: TextFormField(
-                    controller: TextEditingController(
-                      text: ref.read(phoneProvider),
-                    ),
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'رقم هاتف المستلم',
-                    ),
-                    onChanged: (txt) {
-                      ref.read(phoneProvider.notifier).state = txt;
-                    },
-                    keyboardType: TextInputType.phone,
-                    autocorrect: false,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    textInputAction: TextInputAction.next,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: TextFormField(
-                    controller: TextEditingController(
-                      text: ref.read(addressProvider),
-                    ),
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'عنوان الاستلام',
-                      hintText: 'المدينة، المنطقة، الشارع، أقرب نقطة دالة',
-                    ),
-                    onChanged: (txt) {
-                      ref.read(addressProvider.notifier).state = txt;
+                  child: LocationMap(
+                    target: ref.read(locationProvider),
+                    onMapMove: (position) {
+                      ref.read(locationProvider.notifier).state =
+                          position.target;
                     },
                   ),
                 ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: LocationMap(
-                      target: ref.read(locationProvider),
-                      onMapMove: (position) {
-                        ref.read(locationProvider.notifier).state =
-                            position.target;
-                      },
-                    ),
-                  ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Consumer(
+                  builder: (context, ref, widget) {
+                    return ElevatedButton(
+                      onPressed: _isValid(ref)
+                          ? () => Navigator.pushNamed(context, '/checkout')
+                          : null,
+                      child: const Text('تأكيد'),
+                    );
+                  },
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Consumer(
-                    builder: (context, ref, widget) {
-                      return ElevatedButton(
-                        onPressed: _isValid(ref)
-                            ? () => Navigator.pushNamed(context, '/checkout')
-                            : null,
-                        child: const Text('تأكيد'),
-                      );
-                    },
-                  ),
-                )
-              ],
-            ),
+              )
+            ],
           ),
         ),
       ),

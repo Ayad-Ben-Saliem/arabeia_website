@@ -19,31 +19,28 @@ class ItemPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        appBar: AppBar(),
-        body: Builder(
-          builder: (context) {
-            if (item != null) return ItemView(item: item!);
-            return Center(
-              child: FutureBuilder<Item?>(
-                future: Database.getItem(id!),
-                builder: (ctx, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    if (snapshot.hasData) {
-                      return ItemView(item: snapshot.requireData!);
-                    }
-                  } else if (snapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
+    return Scaffold(
+      appBar: AppBar(),
+      body: Builder(
+        builder: (context) {
+          if (item != null) return ItemView(item: item!);
+          return Center(
+            child: FutureBuilder<Item?>(
+              future: Database.getItem(id!),
+              builder: (ctx, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.hasData) {
+                    return ItemView(item: snapshot.requireData!);
                   }
-                  return Text('Error!! ${snapshot.error}');
-                },
-              ),
-            );
-          },
-        ),
+                } else if (snapshot.connectionState ==
+                    ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                }
+                return Text('Error!! ${snapshot.error}');
+              },
+            ),
+          );
+        },
       ),
     );
   }
