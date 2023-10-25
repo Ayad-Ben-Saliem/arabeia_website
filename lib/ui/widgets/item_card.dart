@@ -90,28 +90,35 @@ class ItemCard extends StatelessWidget {
               footer(),
             ],
           ),
-          DropdownButton<String>(
-            items: const [
-              DropdownMenuItem(
-                value: 'edit',
-                child: Text('Edit'),
+
+          SizedBox(
+            width: 32,
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                isExpanded: true,
+                items: const [
+                  DropdownMenuItem(
+                    value: 'edit',
+                    child: Text('تعديل'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'delete',
+                    child: Text('حذف'),
+                  ),
+                ],
+                onChanged: (action) {
+                  switch (action) {
+                    case 'edit':
+                      Navigator.pushNamed(context, '/edit-item', arguments: item);
+                      break;
+                    case 'delete':
+                      deleteItemConfirmationDialog(context);
+                      break;
+                  }
+                },
+                icon: const Icon(Icons.more_vert),
               ),
-              DropdownMenuItem(
-                value: 'delete',
-                child: Text('Delete'),
-              ),
-            ],
-            onChanged: (action) {
-              switch (action) {
-                case 'edit':
-                  Navigator.pushNamed(context, '/edit-item', arguments: item);
-                  break;
-                case 'delete':
-                  deleteItemConfirmationDialog(context);
-                  break;
-              }
-            },
-            icon: const Icon(Icons.more_vert),
+            ),
           ),
         ],
       ),
