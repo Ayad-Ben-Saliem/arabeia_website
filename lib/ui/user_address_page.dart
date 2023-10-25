@@ -42,6 +42,7 @@ class UserAddressPage extends ConsumerWidget {
                   onChanged: (txt) {
                     ref.read(nameProvider.notifier).state = txt;
                   },
+                  textInputAction: TextInputAction.next,
                 ),
               ),
               Padding(
@@ -60,6 +61,7 @@ class UserAddressPage extends ConsumerWidget {
                   keyboardType: TextInputType.phone,
                   autocorrect: false,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  textInputAction: TextInputAction.next,
                 ),
               ),
               Padding(
