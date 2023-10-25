@@ -9,6 +9,7 @@ class Item extends Equatable {
   final String? description;
   final List<String> sizes;
   final List<String> images;
+  final Map<String, String> images2;
   final double price;
   final double? discount;
 
@@ -19,6 +20,7 @@ class Item extends Equatable {
     this.description,
     required this.sizes,
     required this.images,
+    required this.images2,
     required this.price,
     this.discount,
   });
@@ -31,6 +33,7 @@ class Item extends Equatable {
     String? description,
     List<String>? sizes,
     List<String>? images,
+    Map<String, String>? images2,
     double? price,
     double? discount,
   })  : id = id ?? item.id,
@@ -39,6 +42,7 @@ class Item extends Equatable {
         description = description ?? item.description,
         sizes = sizes ?? item.sizes,
         images = images ?? item.images,
+        images2 = images2 ?? item.images2,
         price = price ?? item.price,
         discount = discount ?? item.discount;
 
@@ -49,6 +53,7 @@ class Item extends Equatable {
     String? description,
     List<String>? sizes,
     List<String>? images,
+    Map<String, String>? images2,
     double? price,
     double? discount,
   }) =>
@@ -60,6 +65,7 @@ class Item extends Equatable {
         description: description,
         sizes: sizes,
         images: images,
+        images2: images2,
         price: price,
         discount: discount,
       );
@@ -71,6 +77,7 @@ class Item extends Equatable {
         description = json['description'],
         sizes = List.from(json['sizes'] ?? []),
         images = List.from(json['images'] ?? []),
+        images2 = Map.from(json['images2'] ?? {}),
         price = json['price'] + 0.0,
         discount = json['discount'] + 0.0;
 
@@ -81,14 +88,13 @@ class Item extends Equatable {
         'description': description,
         'sizes': sizes,
         'images': images,
+        'images2': images2,
         'price': price,
         'discount': discount,
       };
 
   @override
-  String toString() {
-    return 'Item($name)';
-  }
+  String toString() => 'Item($name)';
 
   double get effectivePrice => price - (discount ?? 0);
 
@@ -99,6 +105,8 @@ class Item extends Equatable {
         description,
         ...sizes,
         ...images,
+        ...images2.keys,
+        ...images2.values,
         price,
         discount,
         effectivePrice,

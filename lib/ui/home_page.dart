@@ -31,146 +31,147 @@ class HomePage extends StatelessWidget {
         .then(getItemsCompleter.complete)
         .catchError(getItemsCompleter.completeError);
 
-    return Scaffold(
-      body: Column(
-        textDirection: TextDirection.rtl,
-        children: [
-          Expanded(
-            child: FutureBuilder(
-                future: getItemsFuture,
-                builder: (context, snapshot) {
-                  if (!getItemsCompleter.isCompleted) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (snapshot.hasError) {
-                    return Center(
-                      child: Text(
-                        '${snapshot.error}',
-                        textDirection: TextDirection.rtl,
-                      ),
-                    );
-                  }
-
-                  if (snapshot.data == null) {
-                    return const Center(
-                      child: Text(
-                        'لا توجد بيانات!!!',
-                        textDirection: TextDirection.rtl,
-                      ),
-                    );
-                  }
-
-                  final items = snapshot.data!;
-
-                  return LayoutBuilder(
-                    builder: (context, constraints) {
-                      int crossAxisCount(BoxConstraints constraints) {
-                        return (constraints.maxWidth / 500).ceil();
-                      }
-
-                      double aspectRatio(BoxConstraints constraints) {
-                        final width =
-                            constraints.maxWidth / crossAxisCount(constraints);
-
-                        // image carousel + carousel indicators + name and footer
-                        // final height = width / (16 / 9) + 36 + 128 + 118;
-                        final height = width / (16 / 9) + 36 + 128 + 128;
-                        return width / height;
-                      }
-
-                      return GridView(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: crossAxisCount(constraints),
-                          childAspectRatio: aspectRatio(constraints),
-                        ),
-                        shrinkWrap: true,
-                        // todo comment this out and check the result
-                        physics: const ClampingScrollPhysics(),
-                        children: [
-                          for (final item in items) ItemCard(item: item)
-                        ],
-                      );
-                    },
-                  );
-                }),
-          ),
-          Row(
-            textDirection: TextDirection.rtl,
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Scaffold(
+        drawer: Drawer(
+          child: ListView(
             children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Consumer(
-                    builder: (context, ref, widget) {
-                      return ElevatedButton(
-                        onPressed:
-                            ref.watch(CartNotifier.itemsProvider).isNotEmpty
-                                ? () => Navigator.pushNamed(context, '/cart')
-                                : null,
-                        child: Row(
-                          textDirection: TextDirection.rtl,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              'سلة المشتريات',
-                              textDirection: TextDirection.rtl,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Consumer(
-                                builder: (context, ref, widget) {
-                                  return badges.Badge(
-                                    position: badges.BadgePosition.custom(
-                                      start: -25,
-                                      top: -5,
-                                    ),
-                                    badgeAnimation:
-                                        const badges.BadgeAnimation.scale(
-                                      disappearanceFadeAnimationDuration:
-                                          Duration(milliseconds: 100),
-                                      curve: Curves.easeInCubic,
-                                    ),
-                                    showBadge: true,
-                                    badgeStyle: badges.BadgeStyle(
-                                      badgeColor: ref.watch(darkMode)
-                                          ? Colors.black
-                                          : Colors.white,
-                                    ),
-                                    badgeContent: Text(
-                                      '${ref.watch(cartCount)}',
-                                      textDirection: TextDirection.rtl,
-                                      style: TextStyle(
-                                        color: ref.watch(darkMode)
-                                            ? Colors.white
-                                            : Colors.black,
-                                      ),
-                                    ),
-                                    child: const Icon(
-                                      Icons.shopping_cart_outlined,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
+              ListTile(
+                title: const Text('Management'),
+                onTap: () {},
+              )
             ],
           ),
-        ],
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: FutureBuilder(
+                  future: getItemsFuture,
+                  builder: (context, snapshot) {
+                    if (!getItemsCompleter.isCompleted) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return Center(
+                        child: Text('${snapshot.error}'),
+                      );
+                    }
+
+                    if (snapshot.data == null) {
+                      return const Center(
+                        child: Text('لا توجد بيانات!!!'),
+                      );
+                    }
+
+                    final items = snapshot.data!;
+
+                    return LayoutBuilder(
+                      builder: (context, constraints) {
+                        int crossAxisCount(BoxConstraints constraints) {
+                          return (constraints.maxWidth / 500).ceil();
+                        }
+
+                        double aspectRatio(BoxConstraints constraints) {
+                          final width = constraints.maxWidth /
+                              crossAxisCount(constraints);
+
+                          // image carousel + carousel indicators + name and footer
+                          // final height = width / (16 / 9) + 36 + 128 + 118;
+                          final height = width / (16 / 9) + 36 + 128 + 128;
+                          return width / height;
+                        }
+
+                        return GridView(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: crossAxisCount(constraints),
+                            childAspectRatio: aspectRatio(constraints),
+                          ),
+                          shrinkWrap: true,
+                          // todo comment this out and check the result
+                          physics: const ClampingScrollPhysics(),
+                          children: [
+                            for (final item in items) ItemCard(item: item)
+                          ],
+                        );
+                      },
+                    );
+                  }),
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Consumer(
+                      builder: (context, ref, widget) {
+                        return ElevatedButton(
+                          onPressed:
+                              ref.watch(CartNotifier.itemsProvider).isNotEmpty
+                                  ? () => Navigator.pushNamed(context, '/cart')
+                                  : null,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text('سلة المشتريات'),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Consumer(
+                                  builder: (context, ref, widget) {
+                                    return badges.Badge(
+                                      position: badges.BadgePosition.custom(
+                                        start: -25,
+                                        top: -5,
+                                      ),
+                                      badgeAnimation:
+                                          const badges.BadgeAnimation.scale(
+                                        disappearanceFadeAnimationDuration:
+                                            Duration(milliseconds: 100),
+                                        curve: Curves.easeInCubic,
+                                      ),
+                                      showBadge: true,
+                                      badgeStyle: badges.BadgeStyle(
+                                        badgeColor: ref.watch(darkMode)
+                                            ? Colors.black
+                                            : Colors.white,
+                                      ),
+                                      badgeContent: Text(
+                                        '${ref.watch(cartCount)}',
+                                        style: TextStyle(
+                                          color: ref.watch(darkMode)
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                      child: const Icon(
+                                        Icons.shopping_cart_outlined,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        // floatingActionButton: Consumer(
+        //   builder: (context, ref, child) {
+        //     return IconButton(
+        //       onPressed: () => ref.read(darkMode.notifier).state = !ref.read(darkMode),
+        //       icon: const Icon(Icons.dark_mode_outlined),
+        //     );
+        //   },
+        // ),
       ),
-      // floatingActionButton: Consumer(
-      //   builder: (context, ref, child) {
-      //     return IconButton(
-      //       onPressed: () => ref.read(darkMode.notifier).state = !ref.read(darkMode),
-      //       icon: const Icon(Icons.dark_mode_outlined),
-      //     );
-      //   },
-      // ),
     );
   }
 }

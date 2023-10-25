@@ -20,4 +20,37 @@ class Database {
     if (doc.exists) return Item.fromJson(doc.data()!);
     return null;
   }
+
+
+  static Future<Item> addItem(Item item) async {
+    final docRef = await _itemsRef.add(item.toJson);
+    final doc = await docRef.get();
+    return Item.fromJson(doc.data()!);
+  }
+
+  static Stream<Item> addItems(Iterable<Item> items) async* {
+    for (var item in items) {
+      yield await addItem(item);
+    }
+  }
+
+  static Future<void> updateItem(Item item) async {
+    await _itemsRef.doc(item.id).update(item.toJson);
+  }
+
+  static Stream<void> updateItems(Iterable<Item> items) async* {
+    for (var item in items) {
+      updateItem(item);
+    }
+  }
+
+  static Future<void> deleteItem(Item item) async {
+    await _itemsRef.doc(item.id).delete();
+  }
+
+  static Stream<void> deleteItems(Iterable<Item> items) async* {
+    for (var item in items) {
+      deleteItem(item);
+    }
+  }
 }
