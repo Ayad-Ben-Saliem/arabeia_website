@@ -42,8 +42,8 @@ dependencies:
   badges: ^3.1.1
   equatable: ^2.0.5
   google_maps_flutter: ^2.3.1
-  geolocator: ^9.0.2
-  syncfusion_flutter_pdfviewer: ^22.1.37
+  geolocator: ^10.1.0
+  syncfusion_flutter_pdfviewer: ^23.1.42
   printing: ^5.11.0
   share_plus: ^7.0.2
   url_launcher: ^6.1.11
@@ -60,7 +60,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
