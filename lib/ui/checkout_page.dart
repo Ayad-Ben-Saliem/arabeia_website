@@ -45,10 +45,11 @@ class CheckoutPage extends StatelessWidget {
                     );
 
                     return FutureBuilder(
-                      future: compute<Bill, Uint8List>(
-                        Reporting.createPdfBill,
-                        bill,
-                      ),
+                      // future: compute<Bill, Uint8List>(
+                      //   Reporting.createPdfBill,
+                      //   bill,
+                      // ),
+                      future: Reporting.createPdfBill(bill),
                       builder: (context, snapshot) {
                         if (snapshot.hasError) {
                           return Text(
