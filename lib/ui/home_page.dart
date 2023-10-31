@@ -32,12 +32,13 @@ class HomePage extends StatelessWidget {
         .catchError(getItemsCompleter.completeError);
 
     return Scaffold(
+      appBar: AppBar(),
       drawer: Drawer(
         child: ListView(
           children: [
             ListTile(
-              title: const Text('Management'),
-              onTap: () {},
+              title: const Text('إضافة صنف'),
+              onTap: () => Navigator.pushNamed(context, '/add-item'),
             )
           ],
         ),
@@ -82,8 +83,7 @@ class HomePage extends StatelessWidget {
                       }
 
                       return GridView(
-                        gridDelegate:
-                            SliverGridDelegateWithFixedCrossAxisCount(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: crossAxisCount(constraints),
                           childAspectRatio: aspectRatio(constraints),
                         ),
