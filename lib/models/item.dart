@@ -72,7 +72,7 @@ class Item extends Equatable {
         sizes = List.from(json['sizes'] ?? []),
         images = List.from(json['images'] ?? []),
         price = json['price'] + 0.0,
-        discount = json['discount'] + 0.0;
+        discount = json['discount'] == null ? null : json['discount'] + 0.0;
 
   JsonMap get toJson => {
         'id': id,
