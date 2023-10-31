@@ -18,6 +18,7 @@ class App extends ConsumerWidget {
   Widget build(BuildContext context, ref) {
     return MaterialApp(
       title: 'عربية',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ref.watch(darkMode)
             ? const ColorScheme.dark(primary: Colors.white)
@@ -32,9 +33,9 @@ class App extends ConsumerWidget {
         '/checkout': (ctx, match, settings) => const CheckoutPage(),
         '/add-item': (ctx, match, settings) => const AddEditItemPage(),
         '/edit-item': (ctx, match, settings) => AddEditItemPage(
-          item: settings.arguments as Item?,
-          id: match!.parameters['id'],
-        ),
+              item: settings.arguments as Item?,
+              id: match!.parameters['id'],
+            ),
         '/item/{id}': (ctx, match, settings) {
           return ItemPage(
             item: settings.arguments as Item?,
