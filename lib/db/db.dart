@@ -21,7 +21,6 @@ class Database {
     return null;
   }
 
-
   static Future<Item> addItem(Item item) async {
     final docRef = await _itemsRef.add(item.toJson);
     final doc = await docRef.get();
@@ -31,6 +30,15 @@ class Database {
   static Stream<Item> addItems(Iterable<Item> items) async* {
     for (var item in items) {
       yield await addItem(item);
+    }
+  }
+
+  static Future<Item> addUpdateItem(Item item) async {
+    if (item.id == null) {
+      return addItem(item);
+    } else {
+      await updateItem(item);
+      return item;
     }
   }
 
