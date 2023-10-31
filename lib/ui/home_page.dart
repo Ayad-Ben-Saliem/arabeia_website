@@ -38,7 +38,7 @@ class HomePage extends StatelessWidget {
           children: [
             ListTile(
               title: const Text('إضافة صنف'),
-              onTap: () => Navigator.pushNamed(context, '/add-item'),
+              onTap: () => Navigator.popAndPushNamed(context, '/add-item'),
             )
           ],
         ),
@@ -73,8 +73,8 @@ class HomePage extends StatelessWidget {
                       }
 
                       double aspectRatio(BoxConstraints constraints) {
-                        final width = constraints.maxWidth /
-                            crossAxisCount(constraints);
+                        final width =
+                            constraints.maxWidth / crossAxisCount(constraints);
 
                         // image carousel + carousel indicators + name and footer
                         // final height = width / (16 / 9) + 36 + 128 + 118;
