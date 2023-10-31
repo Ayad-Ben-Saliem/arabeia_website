@@ -7,8 +7,32 @@ import 'package:arabiya/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final _currentItem = StateProvider(
-  (ref) => const Item(name: '', sizes: [], images: [], images2: {}, price: 0.0),
+const _emptyItem = Item(
+  name: '',
+  sizes: [],
+  images: [],
+  images2: {},
+  price: 0.0,
+);
+
+final _originalItem = StateProvider((ref) => _emptyItem);
+
+final _currentItem = StateProvider((ref) => ref.watch(_originalItem));
+
+class _JsonError {
+  final FormatException exception;
+  final StackTrace stackTrace;
+
+  _JsonError(this.exception, this.stackTrace);
+}
+
+final _jsonError = StateProvider<_JsonError?>((ref) => null);
+
+final _canSave = StateProvider(
+  (ref) {
+    return ref.watch(_originalItem) != ref.watch(_currentItem) &&
+        ref.watch(_jsonError) == null;
+  },
 );
 
 class AddEditItemPage extends ConsumerWidget {
@@ -19,9 +43,14 @@ class AddEditItemPage extends ConsumerWidget {
 
   @override
   Widget build(context, ref) {
+    // _jsonError need to be reset to remove previous state if set.
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) => ref.read(_jsonError.notifier).state = null,
+    );
+
     if (item != null) {
       WidgetsBinding.instance.addPostFrameCallback(
-        (timeStamp) => ref.read(_currentItem.notifier).state = item!,
+        (timeStamp) => ref.read(_originalItem.notifier).state = item!,
       );
       return const _AddEditItemPage();
     } else if (id != null) {
@@ -30,18 +59,20 @@ class AddEditItemPage extends ConsumerWidget {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
-              ref.read(_currentItem.notifier).state = snapshot.requireData!;
+              ref.read(_originalItem.notifier).state = snapshot.requireData!;
               return const _AddEditItemPage();
             }
           } else if (snapshot.connectionState == ConnectionState.waiting) {
             return const CircularProgressIndicator();
           }
-          return Text(
-            'Error!! ${snapshot.error}',
-          );
+          return Text('Error!! ${snapshot.error}');
         },
       );
     } else {
+      // Ensure that _original item is _emptyItem
+      WidgetsBinding.instance.addPostFrameCallback(
+        (timeStamp) => ref.read(_originalItem.notifier).state = _emptyItem,
+      );
       return const _AddEditItemPage();
     }
   }
@@ -56,6 +87,16 @@ class _AddEditItemPage extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
+          actions: [
+            Consumer(builder: (context, ref, child) {
+              return IconButton(
+                onPressed: ref.watch(_canSave)
+                    ? () => Database.addUpdateItem(ref.read(_currentItem))
+                    : null,
+                icon: const Icon(Icons.check),
+              );
+            }),
+          ],
           bottom: const TabBar(
             tabs: [
               Tab(text: 'JSON'),
@@ -81,34 +122,56 @@ class _JsonFormItem extends StatelessWidget {
   Widget build(BuildContext context) {
     Timer timer = Timer(const Duration(milliseconds: 100), () {});
 
+    final controller = TextEditingController();
+
     return Directionality(
       textDirection: TextDirection.ltr,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Consumer(
           builder: (context, ref, child) {
-            final currentItem = ref.read(_currentItem);
-            return TextField(
-              controller: TextEditingController(
-                text: Utils.getPrettyString(currentItem.toJson),
-              ),
-              decoration: const InputDecoration(border: InputBorder.none),
-              scrollPadding: const EdgeInsets.all(8.0),
-              keyboardType: TextInputType.multiline,
-              maxLines: 0xffff,
-              autofocus: true,
-              onChanged: (txt) {
-                if (timer.isActive) timer.cancel();
-                timer = Timer(
-                  const Duration(milliseconds: 100),
-                  () {
-                    try {
-                      final currentItem = Item.fromJson(json.decode(txt));
-                      ref.read(_currentItem.notifier).state = currentItem;
-                    } catch (e) {
-                      // TODO: show an error
-                      print(e);
-                    }
+            final selection = controller.selection;
+            controller.text = Utils.getPrettyString(
+              ref.watch(_currentItem).toJson,
+            );
+            try {
+              controller.selection = selection;
+            } catch (e) {
+              // Sometimes error happened
+            }
+            return Consumer(
+              builder: (context, ref, child) {
+                return TextField(
+                  controller: controller,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    filled: true,
+                    fillColor: ref.watch(_jsonError) == null
+                        ? Colors.transparent
+                        : Colors.red.shade50,
+                  ),
+                  scrollPadding: const EdgeInsets.all(8.0),
+                  keyboardType: TextInputType.multiline,
+                  maxLines: 0xffff,
+                  autofocus: true,
+                  onChanged: (txt) {
+                    if (timer.isActive) timer.cancel();
+                    timer = Timer(
+                      const Duration(milliseconds: 100),
+                      () {
+                        try {
+                          final currentItem = Item.fromJson(json.decode(txt));
+                          ref.read(_currentItem.notifier).state = currentItem;
+
+                          // Reset _jsonError
+                          ref.read(_jsonError.notifier).state = null;
+                        } on FormatException catch (exception, stackTrace) {
+                          ref.read(_jsonError.notifier).state =
+                              _JsonError(exception, stackTrace);
+                          print(exception);
+                        }
+                      },
+                    );
                   },
                 );
               },
