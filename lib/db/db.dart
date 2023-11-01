@@ -11,7 +11,7 @@ class Database {
     final query = await _itemsRef.get();
 
     return query.docs.map(
-      (doc) => Item.fromJson({'id': doc.id, ...doc.data()}),
+      (doc) => Item.fromJson({...doc.data(), 'id': doc.id}),
     );
   }
 
