@@ -7,6 +7,8 @@ import 'package:arabiya/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'add_image.dart';
+
 const _emptyItem = Item(
   name: '',
   sizes: [],
@@ -210,7 +212,10 @@ class _VisualFormItem extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(4.0),
                       child: TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=> AddImage()));
+                          
+                        },
                         child: const Icon(Icons.add),
                       ),
                     ),

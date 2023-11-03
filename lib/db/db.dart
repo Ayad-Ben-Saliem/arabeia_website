@@ -22,6 +22,7 @@ class Database {
   }
 
   static Future<Item> addItem(Item item) async {
+
     final docRef = await _itemsRef.add(item.toJson..remove('id'));
     final doc = await docRef.get();
     return Item.fromJson(doc.data()!);

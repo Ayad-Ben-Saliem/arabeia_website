@@ -6,6 +6,7 @@ import 'package:arabiya/ui/home_page.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ItemCard extends StatelessWidget {
   final Item item;
@@ -90,7 +91,6 @@ class ItemCard extends StatelessWidget {
               footer(),
             ],
           ),
-
           SizedBox(
             width: 32,
             child: DropdownButtonHideUnderline(
@@ -109,7 +109,8 @@ class ItemCard extends StatelessWidget {
                 onChanged: (action) {
                   switch (action) {
                     case 'edit':
-                      Navigator.pushNamed(context, '/edit-item', arguments: item);
+                      Navigator.pushNamed(context, '/edit-item',
+                          arguments: item);
                       break;
                     case 'delete':
                       deleteItemConfirmationDialog(context);
@@ -238,7 +239,12 @@ class _ImageCarouselState extends State<ImageCarousel> {
           child: CarouselSlider(
             items: [
               for (final image in widget.images)
-                Image.network(image, fit: BoxFit.fill),
+                CachedNetworkImage(
+                  imageUrl: image,
+                  fit: BoxFit.fill,
+                  placeholder: (context, url) =>
+                      const Center(child: CircularProgressIndicator()),
+                )
             ],
             carouselController: _controller,
             options: CarouselOptions(
