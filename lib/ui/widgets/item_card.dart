@@ -22,7 +22,7 @@ class ItemCard extends StatelessWidget {
         children: [
           Column(
             children: [
-              if (item.images.isNotEmpty) ImageCarousel(images: item.images),
+              if (item.images2.isNotEmpty) ImageCarousel(images2: item.images2),
               Row(
                 children: [
                   Padding(
@@ -212,9 +212,10 @@ class ItemCard extends StatelessWidget {
 }
 
 class ImageCarousel extends StatefulWidget {
-  final List<String> images;
+  // final List<String> images;
+   Map<String, String> images2={};
 
-  const ImageCarousel({super.key, required this.images});
+   ImageCarousel({super.key, required this.images2});
 
   @override
   State<StatefulWidget> createState() {
@@ -229,6 +230,13 @@ class _ImageCarouselState extends State<ImageCarousel> {
 
   @override
   Widget build(BuildContext context) {
+
+   // Accessing values
+    List<String> valuesList = widget.images2.values.toList();
+    for (int i = 0; i < valuesList.length; i++) {
+      String value = valuesList[i];
+    }
+
     return Column(
       children: [
         Container(
@@ -238,7 +246,8 @@ class _ImageCarouselState extends State<ImageCarousel> {
           ),
           child: CarouselSlider(
             items: [
-              for (final image in widget.images)
+              //fullHD are keys
+              for (final image in widget.images2.keys)
                 CachedNetworkImage(
                   imageUrl: image,
                   fit: BoxFit.fill,
@@ -257,27 +266,35 @@ class _ImageCarouselState extends State<ImageCarousel> {
         ),
         SizedBox(
           height: 36,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: widget.images.asMap().entries.map((entry) {
-              return GestureDetector(
-                onTap: () => _controller.animateToPage(entry.key),
-                child: Padding(
-                  padding: const EdgeInsets.all(2.0),
-                  child: CircleAvatar(
-                    backgroundColor: Colors.black,
-                    radius: _getIndicatorSize(entry.key),
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            SizedBox(
+              height: 30,
+              width: MediaQuery.of(context).size.width*0.3,
+              child: ListView.builder(
+                itemCount: valuesList.length,
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (BuildContext context, int index) {
+                  String item = valuesList[index];
+                  return GestureDetector(
+                    onTap: () => _controller.animateToPage(index),
                     child: Padding(
-                      padding: EdgeInsets.all(entry.key == _current ? 2 : 1),
+                      padding: const EdgeInsets.all(2.0),
                       child: CircleAvatar(
-                        backgroundImage: NetworkImage(entry.value),
+                        backgroundColor: Colors.black,
+                        radius: _getIndicatorSize(index),
+                        child: Padding(
+                          padding: EdgeInsets.all(index == _current ? 2 : 1),
+                          child: CircleAvatar(
+                            backgroundImage: NetworkImage(valuesList[index]),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
+                  );
+                },
+              ),
+            )
+          ]),
         ),
       ],
     );
