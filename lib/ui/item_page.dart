@@ -70,7 +70,7 @@ class ItemView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (item.images.isNotEmpty)
-                    ImageCarousel(images2: item.images2),
+                    ImageCarousel(images: item.images2),
                   Align(
                     alignment: Alignment.center,
                     child: Padding(

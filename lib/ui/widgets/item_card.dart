@@ -22,7 +22,7 @@ class ItemCard extends StatelessWidget {
         children: [
           Column(
             children: [
-              if (item.images2.isNotEmpty) ImageCarousel(images2: item.images2),
+              if (item.images2.isNotEmpty) ImageCarousel(images: item.images2),
               Row(
                 children: [
                   Padding(
@@ -212,10 +212,9 @@ class ItemCard extends StatelessWidget {
 }
 
 class ImageCarousel extends StatefulWidget {
-  // final List<String> images;
-   Map<String, String> images2={};
+  final Map<String, String> images;
 
-   ImageCarousel({super.key, required this.images2});
+  const ImageCarousel({super.key, required this.images});
 
   @override
   State<StatefulWidget> createState() {
@@ -230,13 +229,6 @@ class _ImageCarouselState extends State<ImageCarousel> {
 
   @override
   Widget build(BuildContext context) {
-
-   // Accessing values
-    List<String> valuesList = widget.images2.values.toList();
-    for (int i = 0; i < valuesList.length; i++) {
-      String value = valuesList[i];
-    }
-
     return Column(
       children: [
         Container(
@@ -247,7 +239,7 @@ class _ImageCarouselState extends State<ImageCarousel> {
           child: CarouselSlider(
             items: [
               //fullHD are keys
-              for (final image in widget.images2.keys)
+              for (final image in widget.images.values)
                 CachedNetworkImage(
                   imageUrl: image,
                   fit: BoxFit.fill,
@@ -264,17 +256,18 @@ class _ImageCarouselState extends State<ImageCarousel> {
             ),
           ),
         ),
-        SizedBox(
-          height: 36,
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            SizedBox(
-              height: 30,
-              width: MediaQuery.of(context).size.width*0.3,
+        LayoutBuilder(builder: (context, constraints) {
+          final thumbs = widget.images.keys;
+          return SizedBox(
+            height: 36,
+            width: constraints.maxWidth,
+            child: Center(
               child: ListView.builder(
-                itemCount: valuesList.length,
+                shrinkWrap: true,
+                itemCount: thumbs.length,
                 scrollDirection: Axis.horizontal,
-                itemBuilder: (BuildContext context, int index) {
-                  String item = valuesList[index];
+                itemBuilder: (context, index) {
+                  final thumb = thumbs.elementAt(index);
                   return GestureDetector(
                     onTap: () => _controller.animateToPage(index),
                     child: Padding(
@@ -285,7 +278,7 @@ class _ImageCarouselState extends State<ImageCarousel> {
                         child: Padding(
                           padding: EdgeInsets.all(index == _current ? 2 : 1),
                           child: CircleAvatar(
-                            backgroundImage: NetworkImage(valuesList[index]),
+                            backgroundImage: NetworkImage(thumb),
                           ),
                         ),
                       ),
@@ -293,9 +286,9 @@ class _ImageCarouselState extends State<ImageCarousel> {
                   );
                 },
               ),
-            )
-          ]),
-        ),
+            ),
+          );
+        }),
       ],
     );
   }
