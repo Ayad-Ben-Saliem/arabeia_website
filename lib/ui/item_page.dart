@@ -19,7 +19,6 @@ class ItemPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(),
       body: Builder(
@@ -109,16 +108,24 @@ class ItemView extends StatelessWidget {
                                 size,
                                 style: TextStyle(
                                   color: selected
-                                      ? Theme.of(context).colorScheme.onPrimary
+                                      ? Theme
+                                      .of(context)
+                                      .colorScheme
+                                      .onPrimary
                                       : null,
                                   fontWeight: FontWeight.w400,
                                 ),
                               ),
                               backgroundColor: selected
-                                  ? Theme.of(context).colorScheme.primary
+                                  ? Theme
+                                  .of(context)
+                                  .colorScheme
+                                  .primary
                                   : null,
                               onPressed: () {
-                                ref.read(sizeProvider.notifier).state = size;
+                                ref
+                                    .read(sizeProvider.notifier)
+                                    .state = size;
                               },
                             );
                           },

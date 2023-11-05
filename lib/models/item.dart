@@ -8,7 +8,8 @@ class Item extends Equatable {
   final int? order;
   final String? description;
   final List<String> sizes;
-  final List<String> images;
+  final List<ArabiyaImages> images;
+  final Map<String, String> images2;
   final double price;
   final double? discount;
 
@@ -19,6 +20,7 @@ class Item extends Equatable {
     this.description,
     required this.sizes,
     required this.images,
+    required this.images2,
     required this.price,
     this.discount,
   });
@@ -30,7 +32,8 @@ class Item extends Equatable {
     int? order,
     String? description,
     List<String>? sizes,
-    List<String>? images,
+    List<ArabiyaImages>? images,
+    Map<String, String>? images2,
     double? price,
     double? discount,
   })  : id = id ?? item.id,
@@ -39,6 +42,7 @@ class Item extends Equatable {
         description = description ?? item.description,
         sizes = sizes ?? item.sizes,
         images = images ?? item.images,
+        images2 = images2 ?? item.images2,
         price = price ?? item.price,
         discount = discount ?? item.discount;
 
@@ -48,7 +52,8 @@ class Item extends Equatable {
     int? order,
     String? description,
     List<String>? sizes,
-    List<String>? images,
+    List<ArabiyaImages>? images,
+    Map<String, String>? images2,
     double? price,
     double? discount,
   }) =>
@@ -60,6 +65,7 @@ class Item extends Equatable {
         description: description,
         sizes: sizes,
         images: images,
+        images2: images2,
         price: price,
         discount: discount,
       );
@@ -70,9 +76,10 @@ class Item extends Equatable {
         order = json['order'],
         description = json['description'],
         sizes = List.from(json['sizes'] ?? []),
-        images = List.from(json['images'] ?? []),
-        price = json['price'] + 0.0,
-        discount = json['discount'] == null ? null : json['discount'] + 0.0;
+        images = ArabiyaImages.fromJson(json['images']),
+        images2 = Map.from(json['images2'] ?? {}),
+        price = json['price'] ?? 0.0,
+        discount = json['discount'] == null ? null : json['discount'] ?? 0.0;
 
   JsonMap get toJson => {
         'id': id,
@@ -80,15 +87,19 @@ class Item extends Equatable {
         'order': order,
         'description': description,
         'sizes': sizes,
-        'images': images,
+        'images': images
+            .map((image) => {
+                  'fullHDImage': image.fullHDImage,
+                  'thumbImage': image.thumbImage,
+                })
+            .toList(),
+        'images2': images2,
         'price': price,
         'discount': discount,
       };
 
   @override
-  String toString() {
-    return 'Item($name)';
-  }
+  String toString() => 'Item($name)';
 
   double get effectivePrice => price - (discount ?? 0);
 
@@ -99,8 +110,25 @@ class Item extends Equatable {
         description,
         ...sizes,
         ...images,
+        ...images2.keys,
+        ...images2.values,
         price,
         discount,
         effectivePrice,
       ];
+}
+
+class ArabiyaImages {
+  final String fullHDImage;
+  final String thumbImage;
+
+  ArabiyaImages(this.fullHDImage, this.thumbImage);
+
+  static List<ArabiyaImages> fromJson(dynamic m) {
+    var l = <ArabiyaImages>[];
+    for(var i in m) {
+      l.add(ArabiyaImages(i, ""));
+    }
+    return l;
+  }
 }

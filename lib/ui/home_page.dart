@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:arabiya/ui/cart_notifier.dart';
 import 'package:arabiya/ui/widgets/item_card.dart';
 import 'package:badges/badges.dart' as badges;
@@ -53,7 +52,7 @@ class HomePage extends StatelessWidget {
                     );
                   }
 
-                  final items = snapshot.data!;
+                   final items = snapshot.data!;
 
                   return LayoutBuilder(
                     builder: (context, constraints) {
@@ -77,11 +76,8 @@ class HomePage extends StatelessWidget {
                           childAspectRatio: aspectRatio(constraints),
                         ),
                         shrinkWrap: true,
-                        // todo comment this out and check the result
                         physics: const ClampingScrollPhysics(),
-                        children: [
-                          for (final item in items) ItemCard(item: item)
-                        ],
+                        children: items.map((e) => ItemCard(item: e)).toList()
                       );
                     },
                   );
