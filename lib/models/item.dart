@@ -8,7 +8,7 @@ class Item extends Equatable {
   final int? order;
   final String? description;
   final List<String> sizes;
-  final List<String> images;
+  final List<ArabiyaImages> images;
   final Map<String, String> images2;
   final double price;
   final double? discount;
@@ -32,7 +32,7 @@ class Item extends Equatable {
     int? order,
     String? description,
     List<String>? sizes,
-    List<String>? images,
+    List<ArabiyaImages>? images,
     Map<String, String>? images2,
     double? price,
     double? discount,
@@ -52,7 +52,7 @@ class Item extends Equatable {
     int? order,
     String? description,
     List<String>? sizes,
-    List<String>? images,
+    List<ArabiyaImages>? images,
     Map<String, String>? images2,
     double? price,
     double? discount,
@@ -76,10 +76,10 @@ class Item extends Equatable {
         order = json['order'],
         description = json['description'],
         sizes = List.from(json['sizes'] ?? []),
-        images = List.from(json['images'] ?? []),
+        images = ArabiyaImages.fromJson(json['images']),
         images2 = Map.from(json['images2'] ?? {}),
-        price = json['price'] + 0.0,
-        discount = json['discount'] == null ? null : json['discount'] + 0.0;
+        price = json['price'] ?? 0.0,
+        discount = json['discount'] == null ? null : json['discount'] ?? 0.0;
 
   JsonMap get toJson => {
         'id': id,
@@ -87,7 +87,12 @@ class Item extends Equatable {
         'order': order,
         'description': description,
         'sizes': sizes,
-        'images': images,
+        'images': images
+            .map((image) => {
+                  'fullHDImage': image.fullHDImage,
+                  'thumbImage': image.thumbImage,
+                })
+            .toList(),
         'images2': images2,
         'price': price,
         'discount': discount,
@@ -111,4 +116,19 @@ class Item extends Equatable {
         discount,
         effectivePrice,
       ];
+}
+
+class ArabiyaImages {
+  final String fullHDImage;
+  final String thumbImage;
+
+  ArabiyaImages(this.fullHDImage, this.thumbImage);
+
+  static List<ArabiyaImages> fromJson(dynamic m) {
+    var l = <ArabiyaImages>[];
+    for(var i in m) {
+      l.add(ArabiyaImages(i, ""));
+    }
+    return l;
+  }
 }

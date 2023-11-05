@@ -205,7 +205,7 @@ class _VisualFormItem extends StatelessWidget {
                     for (var image in images)
                       Padding(
                         padding: const EdgeInsets.all(4.0),
-                        child: Image.network(image),
+                        child: Image.network(image.fullHDImage),
                       ),
                     Padding(
                       padding: const EdgeInsets.all(4.0),

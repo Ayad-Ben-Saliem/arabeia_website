@@ -139,13 +139,13 @@ class ItemCard extends StatelessWidget {
               return ElevatedButton(
                 onPressed: (ref.watch(sizeProvider) != null)
                     ? () =>
-                        ref.read(CartNotifier.itemsProvider.notifier).addItem(
-                              CartItem(
-                                item: item,
-                                size: ref.read(sizeProvider)!,
-                                quantity: 1,
-                              ),
-                            )
+                    ref.read(CartNotifier.itemsProvider.notifier).addItem(
+                      CartItem(
+                        item: item,
+                        size: ref.read(sizeProvider)!,
+                        quantity: 1,
+                      ),
+                    )
                     : null,
                 child: const Text('إضافة للسلة'),
               );
@@ -183,8 +183,8 @@ class ItemCard extends StatelessWidget {
   }
 
   void deleteItemConfirmationDialog(
-    BuildContext context,
-  ) {
+      BuildContext context,
+      ) {
     showDialog<bool>(
       context: context,
       builder: (context) {
@@ -240,11 +240,41 @@ class _ImageCarouselState extends State<ImageCarousel> {
             items: [
               //fullHD are keys
               for (final image in widget.images.values)
-                CachedNetworkImage(
-                  imageUrl: image,
-                  fit: BoxFit.fill,
-                  placeholder: (context, url) =>
-                      const Center(child: CircularProgressIndicator()),
+                GestureDetector(
+                  onTap: (){
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Dialog(
+                          backgroundColor: Colors.transparent,
+                          child: Stack(
+                            children: [
+                              CachedNetworkImage(
+                                imageUrl: image,
+                                fit: BoxFit.contain,
+                              ),
+                              Positioned(
+                                top: 8.0,
+                                right: 8.0,
+                                child: IconButton(
+                                  icon: const Icon(Icons.cancel),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                  child: CachedNetworkImage(
+                    imageUrl: image,
+                    fit: BoxFit.fill,
+                    placeholder: (context, url) =>
+                    const Center(child: CircularProgressIndicator()),
+                  ),
                 )
             ],
             carouselController: _controller,

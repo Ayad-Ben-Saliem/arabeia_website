@@ -73,7 +73,7 @@ class CartPage extends StatelessWidget {
             children: [
               ConstrainedBox(
                 constraints: const BoxConstraints(maxHeight: 128),
-                child: Image.network(cartItem.item.images[0]),
+                child: Image.network(cartItem.item.images[0].fullHDImage),
               ),
               Expanded(
                 child: Padding(
@@ -123,7 +123,7 @@ class CartPage extends StatelessWidget {
       child: Card(
         child: Row(
           children: [
-            Image.network(cartItem.item.images[0]),
+            Image.network(cartItem.item.images[0].fullHDImage),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),

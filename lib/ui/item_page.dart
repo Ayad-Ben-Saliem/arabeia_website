@@ -12,13 +12,14 @@ class ItemPage extends StatelessWidget {
   final Item? item;
 
   const ItemPage({
-    super.key,
+    Key? key,
     this.id,
     this.item,
   }) : assert(id != null || item != null);
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(),
       body: Builder(
@@ -32,6 +33,7 @@ class ItemPage extends StatelessWidget {
                   if (snapshot.hasData) {
                     return ItemView(item: snapshot.requireData!);
                   }
+
                 } else if (snapshot.connectionState ==
                     ConnectionState.waiting) {
                   return const CircularProgressIndicator();
@@ -53,18 +55,19 @@ class ItemView extends StatelessWidget {
 
   final sizeProvider = StateProvider<String?>((ref) => null);
 
+
+
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      return SingleChildScrollView(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: constraints.copyWith(
-              minHeight: constraints.maxHeight,
-              maxHeight: double.infinity,
-              maxWidth: 720,
-            ),
-            child: IntrinsicHeight(
+
+    return SingleChildScrollView(
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 20.0),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height*1.2,
+            width: MediaQuery.of(context).size.width*0.5,
+            child: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,7 +92,6 @@ class ItemView extends StatelessWidget {
                         style: const TextStyle(fontSize: 12),
                       ),
                     ),
-                  Expanded(child: Container()),
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8),
                     child: Text(
@@ -111,9 +113,7 @@ class ItemView extends StatelessWidget {
                                   size,
                                   style: TextStyle(
                                     color: selected
-                                        ? Theme.of(context)
-                                            .colorScheme
-                                            .onPrimary
+                                        ? Theme.of(context).colorScheme.onPrimary
                                         : null,
                                     fontWeight: FontWeight.w400,
                                   ),
@@ -137,8 +137,8 @@ class ItemView extends StatelessWidget {
             ),
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 
   Widget footer() {
@@ -154,13 +154,13 @@ class ItemView extends StatelessWidget {
               return ElevatedButton(
                 onPressed: (ref.watch(sizeProvider) != null)
                     ? () =>
-                        ref.read(CartNotifier.itemsProvider.notifier).addItem(
-                              CartItem(
-                                item: item,
-                                size: ref.read(sizeProvider)!,
-                                quantity: 1,
-                              ),
-                            )
+                    ref.read(CartNotifier.itemsProvider.notifier).addItem(
+                      CartItem(
+                        item: item,
+                        size: ref.read(sizeProvider)!,
+                        quantity: 1,
+                      ),
+                    )
                     : null,
                 child: const Text('إضافة للسلة'),
               );
