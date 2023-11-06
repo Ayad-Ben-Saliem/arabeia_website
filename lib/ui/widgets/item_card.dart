@@ -22,7 +22,7 @@ class ItemCard extends StatelessWidget {
         children: [
           Column(
             children: [
-              if (item.images2.isNotEmpty) ImageCarousel(images: item.images2),
+              if (item.images.isNotEmpty) ImageCarousel(images: item.images),
               Row(
                 children: [
                   Padding(
@@ -212,7 +212,7 @@ class ItemCard extends StatelessWidget {
 }
 
 class ImageCarousel extends StatefulWidget {
-  final Map<String, String> images;
+  final List<ArabiyaImages> images;
 
   const ImageCarousel({super.key, required this.images});
 
@@ -239,7 +239,7 @@ class _ImageCarouselState extends State<ImageCarousel> {
           child: CarouselSlider(
             items: [
               //fullHD are keys
-              for (final image in widget.images.values)
+              for (final image in widget.images)
                 GestureDetector(
                   onTap: (){
                     showDialog(
@@ -250,7 +250,7 @@ class _ImageCarouselState extends State<ImageCarousel> {
                           child: Stack(
                             children: [
                               CachedNetworkImage(
-                                imageUrl: image,
+                                imageUrl: image.fullHDImage,
                                 fit: BoxFit.contain,
                               ),
                               Positioned(
@@ -270,7 +270,7 @@ class _ImageCarouselState extends State<ImageCarousel> {
                     );
                   },
                   child: CachedNetworkImage(
-                    imageUrl: image,
+                    imageUrl: image.fullHDImage,
                     fit: BoxFit.fill,
                     placeholder: (context, url) =>
                     const Center(child: CircularProgressIndicator()),
@@ -287,17 +287,16 @@ class _ImageCarouselState extends State<ImageCarousel> {
           ),
         ),
         LayoutBuilder(builder: (context, constraints) {
-          final thumbs = widget.images.keys;
           return SizedBox(
             height: 36,
             width: constraints.maxWidth,
             child: Center(
               child: ListView.builder(
                 shrinkWrap: true,
-                itemCount: thumbs.length,
+                itemCount: widget.images.length,
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (context, index) {
-                  final thumb = thumbs.elementAt(index);
+                  final image = widget.images.elementAt(index);
                   return GestureDetector(
                     onTap: () => _controller.animateToPage(index),
                     child: Padding(
@@ -308,7 +307,7 @@ class _ImageCarouselState extends State<ImageCarousel> {
                         child: Padding(
                           padding: EdgeInsets.all(index == _current ? 2 : 1),
                           child: CircleAvatar(
-                            backgroundImage: NetworkImage(thumb),
+                            backgroundImage: NetworkImage(image.thumbImage),
                           ),
                         ),
                       ),

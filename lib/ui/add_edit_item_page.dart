@@ -11,7 +11,6 @@ const _emptyItem = Item(
   name: '',
   sizes: [],
   images: [],
-  images2: {},
   price: 0.0,
 );
 
