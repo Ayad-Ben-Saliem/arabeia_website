@@ -9,7 +9,6 @@ class Item extends Equatable {
   final String? description;
   final List<String> sizes;
   final List<ArabiyaImages> images;
-  final Map<String, String> images2;
   final double price;
   final double? discount;
 
@@ -20,7 +19,6 @@ class Item extends Equatable {
     this.description,
     required this.sizes,
     required this.images,
-    required this.images2,
     required this.price,
     this.discount,
   });
@@ -33,7 +31,6 @@ class Item extends Equatable {
     String? description,
     List<String>? sizes,
     List<ArabiyaImages>? images,
-    Map<String, String>? images2,
     double? price,
     double? discount,
   })  : id = id ?? item.id,
@@ -42,7 +39,6 @@ class Item extends Equatable {
         description = description ?? item.description,
         sizes = sizes ?? item.sizes,
         images = images ?? item.images,
-        images2 = images2 ?? item.images2,
         price = price ?? item.price,
         discount = discount ?? item.discount;
 
@@ -53,7 +49,6 @@ class Item extends Equatable {
     String? description,
     List<String>? sizes,
     List<ArabiyaImages>? images,
-    Map<String, String>? images2,
     double? price,
     double? discount,
   }) =>
@@ -65,7 +60,6 @@ class Item extends Equatable {
         description: description,
         sizes: sizes,
         images: images,
-        images2: images2,
         price: price,
         discount: discount,
       );
@@ -76,8 +70,9 @@ class Item extends Equatable {
         order = json['order'],
         description = json['description'],
         sizes = List.from(json['sizes'] ?? []),
-        images = ArabiyaImages.fromJson(json['images']),
-        images2 = Map.from(json['images2'] ?? {}),
+        images = List.unmodifiable([
+          for (final jsonMap in json['images']) ArabiyaImages.fromJson(jsonMap)
+        ]),
         price = json['price'] ?? 0.0,
         discount = json['discount'] == null ? null : json['discount'] ?? 0.0;
 
@@ -93,7 +88,6 @@ class Item extends Equatable {
                   'thumbImage': image.thumbImage,
                 })
             .toList(),
-        'images2': images2,
         'price': price,
         'discount': discount,
       };
@@ -110,25 +104,26 @@ class Item extends Equatable {
         description,
         ...sizes,
         ...images,
-        ...images2.keys,
-        ...images2.values,
         price,
         discount,
         effectivePrice,
       ];
 }
 
-class ArabiyaImages {
-  final String fullHDImage;
+class ArabiyaImages extends Equatable {
   final String thumbImage;
+  final String fullHDImage;
 
-  ArabiyaImages(this.fullHDImage, this.thumbImage);
+  const ArabiyaImages(this.thumbImage, this.fullHDImage);
 
-  static List<ArabiyaImages> fromJson(dynamic m) {
-    var l = <ArabiyaImages>[];
-    for(var i in m) {
-      l.add(ArabiyaImages(i, ""));
-    }
-    return l;
+  factory ArabiyaImages.fromJson(JsonMap json) {
+    // TODO : disable temporarly
+    // assert(json.length == 1);
+    if(json.isEmpty) return ArabiyaImages('', '');
+    final thumb = json.keys.elementAt(0);
+    return ArabiyaImages(thumb, json[thumb]);
   }
+
+  @override
+  List<Object?> get props => [thumbImage, fullHDImage];
 }

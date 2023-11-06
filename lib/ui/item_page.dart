@@ -19,6 +19,7 @@ class ItemPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(),
       body: Builder(
@@ -52,6 +53,8 @@ class ItemView extends StatelessWidget {
   ItemView({super.key, required this.item});
 
   final sizeProvider = StateProvider<String?>((ref) => null);
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -138,8 +141,8 @@ class ItemView extends StatelessWidget {
               ],
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 

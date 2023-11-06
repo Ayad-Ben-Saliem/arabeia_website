@@ -22,7 +22,7 @@ class ItemCard extends StatelessWidget {
         children: [
           Column(
             children: [
-              if (item.images2.isNotEmpty) ImageCarousel(images: item.images2),
+              if (item.images.isNotEmpty) ImageCarousel(images: item.images),
               Row(
                 children: [
                   Padding(
@@ -91,6 +91,36 @@ class ItemCard extends StatelessWidget {
               footer(),
             ],
           ),
+          SizedBox(
+            width: 32,
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                isExpanded: true,
+                items: const [
+                  DropdownMenuItem(
+                    value: 'edit',
+                    child: Text('تعديل'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'delete',
+                    child: Text('حذف'),
+                  ),
+                ],
+                onChanged: (action) {
+                  switch (action) {
+                    case 'edit':
+                      Navigator.pushNamed(context, '/edit-item',
+                          arguments: item);
+                      break;
+                    case 'delete':
+                      deleteItemConfirmationDialog(context);
+                      break;
+                  }
+                },
+                icon: const Icon(Icons.more_vert),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -109,13 +139,13 @@ class ItemCard extends StatelessWidget {
               return ElevatedButton(
                 onPressed: (ref.watch(sizeProvider) != null)
                     ? () =>
-                        ref.read(CartNotifier.itemsProvider.notifier).addItem(
-                              CartItem(
-                                item: item,
-                                size: ref.read(sizeProvider)!,
-                                quantity: 1,
-                              ),
-                            )
+                    ref.read(CartNotifier.itemsProvider.notifier).addItem(
+                      CartItem(
+                        item: item,
+                        size: ref.read(sizeProvider)!,
+                        quantity: 1,
+                      ),
+                    )
                     : null,
                 child: const Text('إضافة للسلة'),
               );
@@ -151,6 +181,34 @@ class ItemCard extends StatelessWidget {
       );
     }
   }
+
+  void deleteItemConfirmationDialog(
+      BuildContext context,
+      ) {
+    showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('هل أنت متأكد من أنك تريد حذف هذا العنصر؟'),
+          content: Text(item.name),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Database.deleteItem(item);
+                // TODO: remove from current data
+                Navigator.pop(context);
+              },
+              child: const Text('نعم'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('لا'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
 
 class ImageCarousel extends StatefulWidget {
@@ -181,12 +239,42 @@ class _ImageCarouselState extends State<ImageCarousel> {
           child: CarouselSlider(
             items: [
               //fullHD are keys
-              for (final image in widget.images.values)
-                CachedNetworkImage(
-                  imageUrl: image,
-                  fit: BoxFit.fill,
-                  placeholder: (context, url) =>
-                      const Center(child: CircularProgressIndicator()),
+              for (final image in widget.images)
+                GestureDetector(
+                  onTap: (){
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Dialog(
+                          backgroundColor: Colors.transparent,
+                          child: Stack(
+                            children: [
+                              CachedNetworkImage(
+                                imageUrl: image.fullHDImage,
+                                fit: BoxFit.contain,
+                              ),
+                              Positioned(
+                                top: 8.0,
+                                right: 8.0,
+                                child: IconButton(
+                                  icon: const Icon(Icons.cancel),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                  child: CachedNetworkImage(
+                    imageUrl: image.fullHDImage,
+                    fit: BoxFit.fill,
+                    placeholder: (context, url) =>
+                    const Center(child: CircularProgressIndicator()),
+                  ),
                 )
             ],
             carouselController: _controller,
@@ -198,41 +286,38 @@ class _ImageCarouselState extends State<ImageCarousel> {
             ),
           ),
         ),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final thumbs = widget.images.keys;
-            return SizedBox(
-              height: 36,
-              width: constraints.maxWidth,
-              child: Center(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: thumbs.length,
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) {
-                    final thumb = thumbs.elementAt(index);
-                    return GestureDetector(
-                      onTap: () => _controller.animateToPage(index),
-                      child: Padding(
-                        padding: const EdgeInsets.all(2.0),
-                        child: CircleAvatar(
-                          backgroundColor: Colors.black,
-                          radius: _getIndicatorSize(index),
-                          child: Padding(
-                            padding: EdgeInsets.all(index == _current ? 2 : 1),
-                            child: CircleAvatar(
-                              backgroundImage: NetworkImage(thumb),
-                            ),
+        LayoutBuilder(builder: (context, constraints) {
+          return SizedBox(
+            height: 36,
+            width: constraints.maxWidth,
+            child: Center(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: widget.images.length,
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (context, index) {
+                  final image = widget.images.elementAt(index);
+                  return GestureDetector(
+                    onTap: () => _controller.animateToPage(index),
+                    child: Padding(
+                      padding: const EdgeInsets.all(2.0),
+                      child: CircleAvatar(
+                        backgroundColor: Colors.black,
+                        radius: _getIndicatorSize(index),
+                        child: Padding(
+                          padding: EdgeInsets.all(index == _current ? 2 : 1),
+                          child: CircleAvatar(
+                            backgroundImage: NetworkImage(image.thumbImage),
                           ),
                         ),
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
+            ),
+          );
+        }),
       ],
     );
   }
