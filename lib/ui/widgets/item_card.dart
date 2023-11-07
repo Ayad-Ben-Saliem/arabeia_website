@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
+import 'full_screen_image_dialog.dart';
+
 class ItemCard extends StatelessWidget {
   final Item item;
 
@@ -245,27 +247,7 @@ class _ImageCarouselState extends State<ImageCarousel> {
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
-                        return Dialog(
-                          backgroundColor: Colors.transparent,
-                          child: Stack(
-                            children: [
-                              CachedNetworkImage(
-                                imageUrl: image.fullHDImage,
-                                fit: BoxFit.contain,
-                              ),
-                              Positioned(
-                                top: 8.0,
-                                right: 8.0,
-                                child: IconButton(
-                                  icon: const Icon(Icons.cancel),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
+                        return FullScreenImageDialog(images: widget.images,initialImage: image);
                       },
                     );
                   },

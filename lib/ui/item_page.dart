@@ -60,84 +60,89 @@ class ItemView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    return SingleChildScrollView(
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 20.0),
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height*1.2,
-            width: MediaQuery.of(context).size.width*0.5,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (item.images.isNotEmpty)
-                    ImageCarousel(images: item.images),
-                  Align(
-                    alignment: Alignment.center,
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Text(
-                        item.name,
-                        style: const TextStyle(fontSize: 18),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: constraints.maxHeight,
+                maxHeight: double.infinity,
+                maxWidth: 720,
+              ),
+              child: IntrinsicHeight(
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (item.images.isNotEmpty)
+                      ImageCarousel(images: item.images),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Text(
+                          item.name,
+                          style: const TextStyle(fontSize: 18),
+                        ),
                       ),
                     ),
-                  ),
-                  if (item.description?.isNotEmpty == true)
+                    if (item.description?.isNotEmpty == true)
+                      Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Text(
+                          item.description!,
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      ),
+                    Expanded(child: Container()),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8),
+                      child: Text(
+                        'الحجم',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
                     Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Text(
-                        item.description!,
-                        style: const TextStyle(fontSize: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Wrap(
+                        spacing: 4.0,
+                        children: [
+                          for (final size in item.sizes)
+                            Consumer(
+                              builder: (context, ref, widget) {
+                                final selected = size == ref.watch(sizeProvider);
+                                return ActionChip(
+                                  label: Text(
+                                    size,
+                                    style: TextStyle(
+                                      color: selected
+                                          ? Theme.of(context).colorScheme.onPrimary
+                                          : null,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                  backgroundColor: selected
+                                      ? Theme.of(context).colorScheme.primary
+                                      : null,
+                                  onPressed: () {
+                                    ref.read(sizeProvider.notifier).state = size;
+                                  },
+                                );
+                              },
+                            ),
+                        ],
                       ),
                     ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Text(
-                      'الحجم',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Wrap(
-                      spacing: 4.0,
-                      children: [
-                        for (final size in item.sizes)
-                          Consumer(
-                            builder: (context, ref, widget) {
-                              final selected = size == ref.watch(sizeProvider);
-                              return ActionChip(
-                                label: Text(
-                                  size,
-                                  style: TextStyle(
-                                    color: selected
-                                        ? Theme.of(context).colorScheme.onPrimary
-                                        : null,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                                backgroundColor: selected
-                                    ? Theme.of(context).colorScheme.primary
-                                    : null,
-                                onPressed: () {
-                                  ref.read(sizeProvider.notifier).state = size;
-                                },
-                              );
-                            },
-                          ),
-                      ],
-                    ),
-                  ),
-                  const Divider(),
-                  footer(),
-                ],
+                    const Divider(),
+                    footer(),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      }
     );
   }
 
