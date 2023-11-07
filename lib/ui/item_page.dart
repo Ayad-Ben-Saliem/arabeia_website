@@ -33,6 +33,7 @@ class ItemPage extends StatelessWidget {
                   if (snapshot.hasData) {
                     return ItemView(item: snapshot.requireData!);
                   }
+
                 } else if (snapshot.connectionState ==
                     ConnectionState.waiting) {
                   return const CircularProgressIndicator();
