@@ -7,8 +7,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-
-import 'full_screen_image_dialog.dart';
+import 'full_screen_dialog.dart';
 
 class ItemCard extends StatelessWidget {
   final Item item;
@@ -247,7 +246,7 @@ class _ImageCarouselState extends State<ImageCarousel> {
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
-                        return FullScreenImageDialog(images: widget.images,initialImage: image);
+                        return FullScreenDialog(images: widget.images,initialImage: image);
                       },
                     );
                   },

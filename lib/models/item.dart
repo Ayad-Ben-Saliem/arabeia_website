@@ -111,7 +111,7 @@ class ArabiyaImages extends Equatable {
 
   const ArabiyaImages(this.thumbImage, this.fullHDImage);
 
-  factory ArabiyaImages.fromJson(JsonMap json) {
+ factory ArabiyaImages.fromJson(JsonMap json) {
     // TODO : disable temporarly
     // assert(json.length == 1);
     if (json.isEmpty) return ArabiyaImages('', '');
