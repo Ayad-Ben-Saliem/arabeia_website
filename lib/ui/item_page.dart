@@ -33,7 +33,6 @@ class ItemPage extends StatelessWidget {
                   if (snapshot.hasData) {
                     return ItemView(item: snapshot.requireData!);
                   }
-
                 } else if (snapshot.connectionState ==
                     ConnectionState.waiting) {
                   return const CircularProgressIndicator();
@@ -59,6 +58,7 @@ class ItemView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
@@ -112,24 +112,16 @@ class ItemView extends StatelessWidget {
                                 size,
                                 style: TextStyle(
                                   color: selected
-                                      ? Theme
-                                      .of(context)
-                                      .colorScheme
-                                      .onPrimary
+                                      ? Theme.of(context).colorScheme.onPrimary
                                       : null,
                                   fontWeight: FontWeight.w400,
                                 ),
                               ),
                               backgroundColor: selected
-                                  ? Theme
-                                  .of(context)
-                                  .colorScheme
-                                  .primary
+                                  ? Theme.of(context).colorScheme.primary
                                   : null,
                               onPressed: () {
-                                ref
-                                    .read(sizeProvider.notifier)
-                                    .state = size;
+                                ref.read(sizeProvider.notifier).state = size;
                               },
                             );
                           },
@@ -142,8 +134,8 @@ class ItemView extends StatelessWidget {
               ],
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
