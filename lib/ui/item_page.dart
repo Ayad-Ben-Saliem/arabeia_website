@@ -33,7 +33,6 @@ class ItemPage extends StatelessWidget {
                   if (snapshot.hasData) {
                     return ItemView(item: snapshot.requireData!);
                   }
-
                 } else if (snapshot.connectionState ==
                     ConnectionState.waiting) {
                   return const CircularProgressIndicator();
@@ -55,94 +54,85 @@ class ItemView extends StatelessWidget {
 
   final sizeProvider = StateProvider<String?>((ref) => null);
 
-
-
   @override
   Widget build(BuildContext context) {
-
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: constraints.maxHeight,
-                maxHeight: double.infinity,
-                maxWidth: 720,
-              ),
-              child: IntrinsicHeight(
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (item.images.isNotEmpty)
-                      ImageCarousel(images: item.images),
-                    Align(
-                      alignment: Alignment.center,
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Text(
-                          item.name,
-                          style: const TextStyle(fontSize: 18),
-                        ),
-                      ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: constraints.maxHeight,
+              maxWidth: 720,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (item.images.isNotEmpty) ImageCarousel(images: item.images),
+                Align(
+                  alignment: Alignment.center,
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Text(
+                      item.name,
+                      style: const TextStyle(fontSize: 18),
                     ),
-                    if (item.description?.isNotEmpty == true)
-                      Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Text(
-                          item.description!,
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                      ),
-                    Expanded(child: Container()),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8),
-                      child: Text(
-                        'الحجم',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Wrap(
-                        spacing: 4.0,
-                        children: [
-                          for (final size in item.sizes)
-                            Consumer(
-                              builder: (context, ref, widget) {
-                                final selected = size == ref.watch(sizeProvider);
-                                return ActionChip(
-                                  label: Text(
-                                    size,
-                                    style: TextStyle(
-                                      color: selected
-                                          ? Theme.of(context).colorScheme.onPrimary
-                                          : null,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                  backgroundColor: selected
-                                      ? Theme.of(context).colorScheme.primary
-                                      : null,
-                                  onPressed: () {
-                                    ref.read(sizeProvider.notifier).state = size;
-                                  },
-                                );
-                              },
-                            ),
-                        ],
-                      ),
-                    ),
-                    const Divider(),
-                    footer(),
-                  ],
+                  ),
                 ),
-              ),
+                if (item.description?.isNotEmpty == true)
+                  Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Text(
+                      item.description!,
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ),
+                const Spacer(),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    'الحجم',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Wrap(
+                    spacing: 4.0,
+                    children: [
+                      for (final size in item.sizes)
+                        Consumer(
+                          builder: (context, ref, widget) {
+                            final selected = size == ref.watch(sizeProvider);
+                            return ActionChip(
+                              label: Text(
+                                size,
+                                style: TextStyle(
+                                  color: selected
+                                      ? Theme.of(context).colorScheme.onPrimary
+                                      : null,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              backgroundColor: selected
+                                  ? Theme.of(context).colorScheme.primary
+                                  : null,
+                              onPressed: () {
+                                ref.read(sizeProvider.notifier).state = size;
+                              },
+                            );
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+                const Divider(),
+                footer(),
+              ],
             ),
           ),
         );
-      }
+      },
     );
   }
 
@@ -159,13 +149,13 @@ class ItemView extends StatelessWidget {
               return ElevatedButton(
                 onPressed: (ref.watch(sizeProvider) != null)
                     ? () =>
-                    ref.read(CartNotifier.itemsProvider.notifier).addItem(
-                      CartItem(
-                        item: item,
-                        size: ref.read(sizeProvider)!,
-                        quantity: 1,
-                      ),
-                    )
+                        ref.read(CartNotifier.itemsProvider.notifier).addItem(
+                              CartItem(
+                                item: item,
+                                size: ref.read(sizeProvider)!,
+                                quantity: 1,
+                              ),
+                            )
                     : null,
                 child: const Text('إضافة للسلة'),
               );

@@ -73,8 +73,8 @@ class Item extends Equatable {
         images = List.unmodifiable([
           for (final jsonMap in json['images']) ArabiyaImages.fromJson(jsonMap)
         ]),
-        price = json['price'] ?? 0.0,
-        discount = json['discount'] == null ? null : json['discount'] ?? 0.0;
+        price = json['price'].toDouble(),
+        discount = json['discount']?.toDouble();
 
   JsonMap get toJson => {
         'id': id,
@@ -82,12 +82,7 @@ class Item extends Equatable {
         'order': order,
         'description': description,
         'sizes': sizes,
-        'images': images
-            .map((image) => {
-                  'fullHDImage': image.fullHDImage,
-                  'thumbImage': image.thumbImage,
-                })
-            .toList(),
+        'images': images.map((image) => image.toJson).toList(),
         'price': price,
         'discount': discount,
       };
@@ -119,10 +114,12 @@ class ArabiyaImages extends Equatable {
  factory ArabiyaImages.fromJson(JsonMap json) {
     // TODO : disable temporarly
     // assert(json.length == 1);
-    if(json.isEmpty) return ArabiyaImages('', '');
+    if (json.isEmpty) return ArabiyaImages('', '');
     final thumb = json.keys.elementAt(0);
     return ArabiyaImages(thumb, json[thumb]);
   }
+
+  JsonMap get toJson => {thumbImage: fullHDImage};
 
   @override
   List<Object?> get props => [thumbImage, fullHDImage];
