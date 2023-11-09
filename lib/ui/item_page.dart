@@ -17,9 +17,9 @@ class ItemPage extends StatelessWidget {
     this.item,
   }) : assert(id != null || item != null);
 
+
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(),
       body: Builder(
