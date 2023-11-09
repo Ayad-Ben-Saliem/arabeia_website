@@ -1,18 +1,12 @@
-
-
-
 import 'package:arabiya/models/item.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-
-final zoomStateProvider = StateProvider<double>((ref) => 1.0);
-final showZoomTools = StateProvider<bool>((ref) => false);
+final zoomScale = StateProvider<double>((ref) => 1.0);
+final showZoomTools = StateProvider<bool>((ref) => true);
 
 final currentImage = StateProvider((ref) => const ArabiyaImages('', ''));
-
-
 
 class FullScreenImageDialog extends ConsumerWidget {
   final List<ArabiyaImages> images;
@@ -26,10 +20,9 @@ class FullScreenImageDialog extends ConsumerWidget {
 
   @override
   Widget build(context, ref) {
-    final isToggleOn = ref.watch(showZoomTools.notifier).state;
+    final isToggleOn = ref.watch(showZoomTools);
 
-    final zoomScale = ref.watch(zoomStateProvider);
-
+    final zoom = ref.watch(zoomScale);
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       ref.read(currentImage.notifier).state = initialImage;
@@ -41,19 +34,20 @@ class FullScreenImageDialog extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Expanded(
-            child: Consumer(builder: (context, ref, child) {
-              return Align(
-                alignment: Alignment.center,
-                child: Stack(
+            child: Consumer(
+              builder: (context, ref, child) {
+                return Align(
+                  alignment: Alignment.center,
+                  child: Stack(
                     children: [
                       GestureDetector(
-                        onTap:(){
-
-                          ref.refresh(showZoomTools.notifier).state = true;
-              },
+                        onTap: () {
+                          final zoomTools = ref.read(showZoomTools.notifier);
+                          zoomTools.state = !zoomTools.state;
+                        },
                         onDoubleTap: () {
-                          final zoomState = ref.read(zoomStateProvider.notifier);
-                          zoomState.state = (zoomState.state == 1.0) ? 2.0 : 1.0;
+                          final zoom = ref.read(zoomScale.notifier);
+                          zoom.state = (zoom.state == 1.0) ? 2.0 : 1.0;
                         },
                         child: InteractiveViewer(
                           boundaryMargin: const EdgeInsets.all(double.infinity),
@@ -62,7 +56,11 @@ class FullScreenImageDialog extends ConsumerWidget {
                           scaleEnabled: true,
                           panEnabled: true,
                           transformationController: TransformationController()
-                            ..value = Matrix4.diagonal3Values(zoomScale, zoomScale, 1),
+                            ..value = Matrix4.diagonal3Values(
+                              zoom,
+                              zoom,
+                              1,
+                            ),
                           child: Stack(
                             children: [
                               CachedNetworkImage(
@@ -73,7 +71,8 @@ class FullScreenImageDialog extends ConsumerWidget {
                           ),
                         ),
                       ),
-                      if (zoomScale != 1.0 && ref.read(showZoomTools.notifier).state == true)
+                      if (zoomScale != 1.0 &&
+                          ref.read(showZoomTools.notifier).state == true)
                         Positioned(
                           top: 50.0,
                           left: 8,
@@ -82,21 +81,21 @@ class FullScreenImageDialog extends ConsumerWidget {
                             child: IconButton(
                               icon: const Icon(Icons.zoom_out),
                               onPressed: () {
-                                final zoomState = ref.read(zoomStateProvider.notifier);
-                                zoomState.state = zoomState.state - 0.5;
+                                final zoom = ref.read(zoomScale.notifier);
+                                zoom.state = zoom.state - 0.5;
                               },
                             ),
                           ),
                         ),
-                      if (zoomScale < 4.0 && ref.read(showZoomTools.notifier).state == true)
+                      if (zoom < 4.0 && ref.read(showZoomTools) == true)
                         Positioned(
                           top: 8.0,
                           left: 8,
                           child: IconButton(
                             icon: const Icon(Icons.zoom_in),
                             onPressed: () {
-                              final zoomState = ref.read(zoomStateProvider.notifier);
-                              zoomState.state = zoomState.state + 0.5;
+                              final zoom = ref.read(zoomScale.notifier);
+                              zoom.state = zoom.state + 0.5;
                             },
                           ),
                         ),
@@ -107,46 +106,46 @@ class FullScreenImageDialog extends ConsumerWidget {
                           icon: const Icon(Icons.cancel),
                           onPressed: () {
                             Navigator.pop(context);
-                            ref.read(zoomStateProvider.notifier).state = 1.0;
+                            ref.read(zoomScale.notifier).state = 1.0;
                             ref.refresh(showZoomTools.notifier).state = false;
                           },
                         ),
                       ),
-                    ]
-                ),
-              );
-            }),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Wrap(
-              children: [
-                for (final image in images)
-                  GestureDetector(
-                      onTap: () {
-                       ref.read(currentImage.notifier).state = image;
-                        ref.read(zoomStateProvider.notifier).state = 1.0;
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                borderRadius: BorderRadius.circular(5),
-                                border: Border.all(color: Colors.grey,width: 2)
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(5),
-                              child: CachedNetworkImage(
-                                imageUrl: image.thumbImage,
-                                fit: BoxFit.cover,
-                              ),
-                            )),
-                      ))
-              ],
+                    ],
+                  ),
+                );
+              },
             ),
+          ),
+          Wrap(
+            children: [
+              for (final image in images)
+                GestureDetector(
+                  onTap: () {
+                    ref.read(currentImage.notifier).state = image;
+                    ref.read(zoomScale.notifier).state = 1.0;
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(color: Colors.grey, width: 2),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(5),
+                        child: CachedNetworkImage(
+                          imageUrl: image.thumbImage,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+            ],
           ),
         ],
       ),

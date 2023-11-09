@@ -141,13 +141,13 @@ class ItemCard extends StatelessWidget {
               return ElevatedButton(
                 onPressed: (ref.watch(sizeProvider) != null)
                     ? () =>
-                    ref.read(CartNotifier.itemsProvider.notifier).addItem(
-                      CartItem(
-                        item: item,
-                        size: ref.read(sizeProvider)!,
-                        quantity: 1,
-                      ),
-                    )
+                        ref.read(CartNotifier.itemsProvider.notifier).addItem(
+                              CartItem(
+                                item: item,
+                                size: ref.read(sizeProvider)!,
+                                quantity: 1,
+                              ),
+                            )
                     : null,
                 child: const Text('إضافة للسلة'),
               );
@@ -184,9 +184,7 @@ class ItemCard extends StatelessWidget {
     }
   }
 
-  void deleteItemConfirmationDialog(
-      BuildContext context,
-      ) {
+  void deleteItemConfirmationDialog(BuildContext context) {
     showDialog<bool>(
       context: context,
       builder: (context) {
@@ -243,19 +241,23 @@ class _ImageCarouselState extends State<ImageCarousel> {
               //fullHD are keys
               for (final image in widget.images)
                 GestureDetector(
-                  onTap: (){
+                  onTap: () {
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
-                        return FullScreenImageDialog(images: widget.images,initialImage: image);
+                        return FullScreenImageDialog(
+                          images: widget.images,
+                          initialImage: image,
+                        );
                       },
                     );
                   },
                   child: CachedNetworkImage(
                     imageUrl: image.fullHDImage,
                     fit: BoxFit.fill,
-                    placeholder: (context, url) =>
-                    const Center(child: CircularProgressIndicator()),
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator(),
+                    ),
                   ),
                 )
             ],
