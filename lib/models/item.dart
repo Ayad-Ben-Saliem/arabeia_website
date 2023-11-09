@@ -111,7 +111,7 @@ class ArabiyaImages extends Equatable {
 
   const ArabiyaImages(this.thumbImage, this.fullHDImage);
 
-  factory ArabiyaImages.fromJson(Jso- Fix a bug in item.dart (int doesn't cast to double implicit, using toDouble() method to convert it)nMap json) {
+  factory ArabiyaImages.fromJson(JsonMap json) {
     // TODO : disable temporarly
     // assert(json.length == 1);
     if (json.isEmpty) return ArabiyaImages('', '');
