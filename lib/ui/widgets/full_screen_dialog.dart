@@ -31,7 +31,11 @@ class _FullScreenDialogState extends ConsumerState<FullScreenDialog> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      ref.read(currentImage.notifier).state = widget.initialImage  ;
+    });
     controller = PhotoViewController();
+
   }
 
   @override
@@ -42,9 +46,7 @@ class _FullScreenDialogState extends ConsumerState<FullScreenDialog> {
 
   @override
   Widget build(context) {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      ref.read(currentImage.notifier).state = widget.initialImage;
-    });
+
     return Dialog(
       alignment: Alignment.center,
       backgroundColor: Colors.transparent,
@@ -59,9 +61,11 @@ class _FullScreenDialogState extends ConsumerState<FullScreenDialog> {
                   Consumer(builder: (context, ref, child) {
                     return PhotoView(
                       imageProvider:
-                          NetworkImage(ref.watch(currentImage).fullHDImage),
+                      NetworkImage(ref
+                          .watch(currentImage)
+                          .fullHDImage),
                       backgroundDecoration:
-                          const BoxDecoration(color: Colors.transparent),
+                      const BoxDecoration(color: Colors.transparent),
                       controller: controller,
                       scaleStateChangedCallback: (scaleState) {
                         double scale = scaleBarSize / 100.0;
@@ -103,6 +107,7 @@ class _FullScreenDialogState extends ConsumerState<FullScreenDialog> {
                         color: Colors.redAccent,
                       ),
                       onPressed: () {
+                        ref.read(currentImage.notifier).state = widget.initialImage;
                         scaleNotifier.value = 50;
                         Navigator.pop(context);
                       },
@@ -112,44 +117,50 @@ class _FullScreenDialogState extends ConsumerState<FullScreenDialog> {
               ),
             ),
           ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Wrap(
-              children: [
-                for (final image in widget.images)
-                  InkWell(
-                      onTap: () {
-                        scaleNotifier.value = 50;
-                        controller.scale = scaleNotifier.value / 100.0;
-                        ref.read(currentImage.notifier).state = image;
-                      },
-                      child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child:
-                               Container(
-                                width: _getSize(image),
-                                height: _getSize(image),
-                                decoration: BoxDecoration(
-                                    color: Colors.transparent,
-                                    borderRadius: BorderRadius.circular(5),
-                                    border: Border.all(
-                                        color: Colors.grey, width: 2)),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(5),
-                                  child: CachedNetworkImage(
-                                    imageUrl: image.thumbImage,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                           ))
-              ],
-            ),
-          ),
+    Consumer(builder: (context, ref, child) {
+    return     Align(
+      alignment: Alignment.bottomCenter,
+      child: Wrap(
+        children: [
+          for (final image in widget.images)
+            InkWell(
+                onTap: () {
+                  setState(() {
+                    scaleNotifier.value = 50;
+                    controller.scale = scaleNotifier.value / 100.0;
+                    ref.watch(currentImage.notifier).state = image;
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child:
+                  Container(
+                    width: _getSize(image),
+                    height: _getSize(image),
+                    decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(
+                            color: Colors.grey, width: 2)),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(5),
+                      child: CachedNetworkImage(
+                        imageUrl: image.thumbImage,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ))
+        ],
+      ),
+    );
+    }),
+
         ],
       ),
     );
   }
+
   double _getSize(ArabiyaImages image) {
     return image == ref.read(currentImage.notifier).state ? 60 : 50;
   }
