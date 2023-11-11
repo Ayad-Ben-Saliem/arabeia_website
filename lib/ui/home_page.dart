@@ -46,53 +46,53 @@ class HomePage extends StatelessWidget {
         children: [
           Expanded(
             child: FutureBuilder(
-                future: getItemsFuture,
-                builder: (context, snapshot) {
-                  if (!getItemsCompleter.isCompleted) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (snapshot.hasError) {
-                    return Center(
-                      child: Text('${snapshot.error}'),
-                    );
-                  }
+              future: getItemsFuture,
+              builder: (context, snapshot) {
+                if (!getItemsCompleter.isCompleted) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text('${snapshot.error}'),
+                  );
+                }
 
-                  if (snapshot.data == null) {
-                    return const Center(
-                      child: Text('لا توجد بيانات!!!'),
-                    );
-                  }
+                if (snapshot.data == null) {
+                  return const Center(
+                    child: Text('لا توجد بيانات!!!'),
+                  );
+                }
 
-                   final items = snapshot.data!;
+                final items = snapshot.data!;
 
-                  return LayoutBuilder(
-                    builder: (context, constraints) {
-                      int crossAxisCount(BoxConstraints constraints) {
-                        return (constraints.maxWidth / 500).ceil();
-                      }
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    int crossAxisCount(BoxConstraints constraints) {
+                      return (constraints.maxWidth / 500).ceil();
+                    }
 
-                      double aspectRatio(BoxConstraints constraints) {
-                        final width =
-                            constraints.maxWidth / crossAxisCount(constraints);
+                    double aspectRatio(BoxConstraints constraints) {
+                      final width =
+                          constraints.maxWidth / crossAxisCount(constraints);
 
-                        // image carousel + carousel indicators + name and footer
-                        // final height = width / (16 / 9) + 36 + 128 + 118;
-                        final height = width / (16 / 9) + 36 + 128 + 128;
-                        return width / height;
-                      }
+                      // image carousel + carousel indicators + name and footer
+                      // final height = width / (16 / 9) + 36 + 128 + 118;
+                      final height = width / (16 / 9) + 36 + 128 + 128;
+                      return width / height;
+                    }
 
-                      return GridView(
+                    return GridView(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: crossAxisCount(constraints),
                           childAspectRatio: aspectRatio(constraints),
                         ),
                         shrinkWrap: true,
                         physics: const ClampingScrollPhysics(),
-                        children: items.map((e) => ItemCard(item: e)).toList()
-                      );
-                    },
-                  );
-                }),
+                        children: items.map((e) => ItemCard(item: e)).toList());
+                  },
+                );
+              },
+            ),
           ),
           Row(
             children: [
