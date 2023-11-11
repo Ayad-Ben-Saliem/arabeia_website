@@ -245,15 +245,27 @@ class _ImageCarouselState extends State<ImageCarousel> {
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
-                        return FullScreenDialog(images: widget.images,initialImage: image);
+                        return FullScreenDialog(
+                          images: widget.images,
+                          initialImage: image,
+                        );
                       },
                     );
                   },
                   child: CachedNetworkImage(
                     imageUrl: image.fullHDImage,
                     fit: BoxFit.fill,
-                    placeholder: (context, url) => const Center(
-                      child: CircularProgressIndicator(),
+                    placeholder: (context, url) => Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        IntrinsicHeight(
+                          child: CachedNetworkImage(
+                            imageUrl: image.thumbImage,
+                            fit: BoxFit.fill,
+                          ),
+                        ),
+                        const CircularProgressIndicator(),
+                      ],
                     ),
                   ),
                 )
