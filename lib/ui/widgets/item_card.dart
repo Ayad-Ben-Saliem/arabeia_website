@@ -61,6 +61,7 @@ class ItemCard extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Wrap(
                   spacing: 4.0,
+                  runSpacing: 4.0,
                   children: [
                     for (final size in item.sizes)
                       Consumer(
