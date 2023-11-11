@@ -79,7 +79,6 @@ class AddEditItemPage extends ConsumerWidget {
 class _AddEditItemPage extends StatelessWidget {
   const _AddEditItemPage();
 
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -88,14 +87,17 @@ class _AddEditItemPage extends StatelessWidget {
         appBar: AppBar(
           actions: [
             Consumer(builder: (context, ref, child) {
-
               return IconButton(
                 onPressed: ref.watch(_canSave)
-                    ? ()  =>  {
-                   Database.addUpdateItem(ref.read(_currentItem)),
-                  ref.read(_originalItem.notifier).state = ref.read(_currentItem)   ,
-                  showDialog(context: context, builder: (context)=> successDialog(context),)
-                }
+                    ? () => {
+                          Database.addUpdateItem(ref.read(_currentItem)),
+                          ref.read(_originalItem.notifier).state =
+                              ref.read(_currentItem),
+                          showDialog(
+                            context: context,
+                            builder: (context) => successDialog(context),
+                          )
+                        }
                     : null,
                 icon: const Icon(Icons.check),
               );
@@ -120,32 +122,39 @@ class _AddEditItemPage extends StatelessWidget {
 
   successDialog(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)), //this right here
-      child: SizedBox(
-        width: 300.0,
-        height: 200,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 500),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
+          mainAxisSize: MainAxisSize.min,
+          children: [
             const Padding(
-              padding: EdgeInsets.all(15.0),
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 50),
               child: Text('تمت العملية بنجاح'),
             ),
-            const Padding(padding: EdgeInsets.only(top: 50.0)),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Expanded(
-                  child: TextButton(onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                      child: const Text('متابعة التعديل', style: TextStyle(color: Colors.blueAccent),)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('متابعة التعديل')),
+                  ),
                 ),
                 Expanded(
-                  child: TextButton(onPressed: () {
-                    Navigator.pushNamed(context, '/');
-                  },
-                      child: const Text('عودة للصفحة الرئيسية', style: TextStyle(color: Colors.redAccent),)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                        onPressed: () => Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              '/',
+                              (route) => false,
+                            ),
+                        child: const Text('عودة للصفحة الرئيسية')),
+                  ),
                 ),
               ],
             )
@@ -251,8 +260,7 @@ class _VisualFormItem extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(4.0),
                       child: TextButton(
-                        onPressed: () {
-                          },
+                        onPressed: () {},
                         child: const Icon(Icons.add),
                       ),
                     ),
