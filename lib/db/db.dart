@@ -35,7 +35,6 @@ class Database {
   }
 
   static Future<Item> addUpdateItem(Item item) async {
-
     if (item.id == null) {
       return addItem(item);
     } else {
