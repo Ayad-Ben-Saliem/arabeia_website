@@ -109,7 +109,7 @@ class ArabiyaImages extends Equatable {
   final String thumbImage;
   final String fullHDImage;
 
-  const ArabiyaImages(this.thumbImage, this.fullHDImage);
+  const ArabiyaImages({required this.thumbImage, required this.fullHDImage});
 
   ArabiyaImages.fromJson(JsonMap json)
       : thumbImage = json['thumbImage'],
