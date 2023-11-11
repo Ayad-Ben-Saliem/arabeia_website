@@ -4,7 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_view/photo_view.dart';
 
-final currentImage = StateProvider((ref) => const ArabiyaImages('', ''));
+final currentImage = StateProvider(
+  (ref) => const ArabiyaImages(
+    thumbImage: 'https://i.postimg.cc/bd3c6dQ9/Arabeia-Logo-2.jpg',
+    fullHDImage: 'https://i.postimg.cc/Gh1LmytV/Arabeia-Logo-2.jpg',
+  ),
+);
 
 final controller = AutoDisposeProvider((ref) => PhotoViewController());
 
