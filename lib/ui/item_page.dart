@@ -59,77 +59,79 @@ class ItemView extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: constraints.maxHeight,
-              maxWidth: 720,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (item.images.isNotEmpty) ImageCarousel(images: item.images),
-                Align(
-                  alignment: Alignment.center,
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Text(
-                      item.name,
-                      style: const TextStyle(fontSize: 18),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: constraints.maxHeight,
+                maxWidth: 720,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (item.images.isNotEmpty) ImageCarousel(images: item.images),
+                  Align(
+                    alignment: Alignment.center,
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Text(
+                        item.name,
+                        style: const TextStyle(fontSize: 18),
+                      ),
                     ),
                   ),
-                ),
-                if (item.description?.isNotEmpty == true)
+                  if (item.description?.isNotEmpty == true)
+                    Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Text(
+                        item.description!,
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ),
+                  const Spacer(),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Text(
+                      'الحجم',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
                   Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Text(
-                      item.description!,
-                      style: const TextStyle(fontSize: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Wrap(
+                      spacing: 4.0,
+                      runSpacing: 4.0,
+                      children: [
+                        for (final size in item.sizes)
+                          Consumer(
+                            builder: (context, ref, widget) {
+                              final selected = size == ref.watch(sizeProvider);
+                              return ActionChip(
+                                label: Text(
+                                  size,
+                                  style: TextStyle(
+                                    color: selected
+                                        ? Theme.of(context).colorScheme.onPrimary
+                                        : null,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                backgroundColor: selected
+                                    ? Theme.of(context).colorScheme.primary
+                                    : null,
+                                onPressed: () {
+                                  ref.read(sizeProvider.notifier).state = size;
+                                },
+                              );
+                            },
+                          ),
+                      ],
                     ),
                   ),
-                const Spacer(),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8),
-                  child: Text(
-                    'الحجم',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Wrap(
-                    spacing: 4.0,
-                    runSpacing: 4.0,
-                    children: [
-                      for (final size in item.sizes)
-                        Consumer(
-                          builder: (context, ref, widget) {
-                            final selected = size == ref.watch(sizeProvider);
-                            return ActionChip(
-                              label: Text(
-                                size,
-                                style: TextStyle(
-                                  color: selected
-                                      ? Theme.of(context).colorScheme.onPrimary
-                                      : null,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                              backgroundColor: selected
-                                  ? Theme.of(context).colorScheme.primary
-                                  : null,
-                              onPressed: () {
-                                ref.read(sizeProvider.notifier).state = size;
-                              },
-                            );
-                          },
-                        ),
-                    ],
-                  ),
-                ),
-                const Divider(),
-                footer(),
-              ],
+                  const Divider(),
+                  footer(),
+                ],
+              ),
             ),
           ),
         );
