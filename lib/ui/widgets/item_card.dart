@@ -279,38 +279,42 @@ class _ImageCarouselState extends State<ImageCarousel> {
             ),
           ),
         ),
-        LayoutBuilder(builder: (context, constraints) {
-          return SizedBox(
-            height: 36,
-            width: constraints.maxWidth,
-            child: Center(
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: widget.images.length,
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (context, index) {
-                  final image = widget.images.elementAt(index);
-                  return GestureDetector(
-                    onTap: () => _controller.animateToPage(index),
-                    child: Padding(
-                      padding: const EdgeInsets.all(2.0),
-                      child: CircleAvatar(
-                        backgroundColor: Colors.black,
-                        radius: _getIndicatorSize(index),
-                        child: Padding(
-                          padding: EdgeInsets.all(index == _current ? 2 : 1),
-                          child: CircleAvatar(
-                            backgroundImage: NetworkImage(image.thumbImage),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            return SizedBox(
+              height: 36,
+              width: constraints.maxWidth,
+              child: Center(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: widget.images.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    final image = widget.images.elementAt(index);
+                    return GestureDetector(
+                      onTap: () => _controller.animateToPage(index),
+                      child: Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: CircleAvatar(
+                          backgroundColor: Colors.black,
+                          radius: _getIndicatorSize(index),
+                          child: Padding(
+                            padding: EdgeInsets.all(index == _current ? 2 : 1),
+                            child: CircleAvatar(
+                              backgroundImage: CachedNetworkImageProvider(
+                                image.thumbImage,
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-            ),
-          );
-        }),
+            );
+          },
+        ),
       ],
     );
   }
