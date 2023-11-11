@@ -26,26 +26,31 @@ class ItemCard extends StatelessWidget {
               if (item.images.isNotEmpty) ImageCarousel(images: item.images),
               Row(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Align(
-                      alignment: Alignment.centerRight,
+                  Expanded(
+                    flex: 5,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Text(
                         item.name,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
                         style: const TextStyle(fontSize: 18),
                       ),
                     ),
                   ),
                   const Spacer(),
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pushNamed(
-                        context,
-                        '/item/${item.id}',
-                        arguments: item,
-                      );
-                    },
-                    icon: const Icon(Icons.open_in_new),
+                  Expanded(
+                    flex: 1,
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.pushNamed(
+                          context,
+                          '/item/${item.id}',
+                          arguments: item,
+                        );
+                      },
+                      icon: const Icon(Icons.open_in_new),
+                    ),
                   ),
                 ],
               ),
