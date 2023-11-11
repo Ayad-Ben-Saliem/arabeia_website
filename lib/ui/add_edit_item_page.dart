@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:arabiya/db/db.dart';
 import 'package:arabiya/models/item.dart';
 import 'package:arabiya/utils.dart';
@@ -80,6 +79,7 @@ class AddEditItemPage extends ConsumerWidget {
 class _AddEditItemPage extends StatelessWidget {
   const _AddEditItemPage();
 
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -88,9 +88,14 @@ class _AddEditItemPage extends StatelessWidget {
         appBar: AppBar(
           actions: [
             Consumer(builder: (context, ref, child) {
+
               return IconButton(
                 onPressed: ref.watch(_canSave)
-                    ? () => Database.addUpdateItem(ref.read(_currentItem))
+                    ? ()  =>  {
+                   Database.addUpdateItem(ref.read(_currentItem)),
+                  ref.read(_originalItem.notifier).state = ref.read(_currentItem)   ,
+                  showDialog(context: context, builder: (context)=> successDialog(context),)
+                }
                     : null,
                 icon: const Icon(Icons.check),
               );
@@ -107,6 +112,43 @@ class _AddEditItemPage extends StatelessWidget {
           children: [
             _JsonFormItem(),
             _VisualFormItem(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  successDialog(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)), //this right here
+      child: SizedBox(
+        width: 300.0,
+        height: 200,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Padding(
+              padding: EdgeInsets.all(15.0),
+              child: Text('تمت العملية بنجاح'),
+            ),
+            const Padding(padding: EdgeInsets.only(top: 50.0)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(
+                  child: TextButton(onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                      child: const Text('متابعة التعديل', style: TextStyle(color: Colors.blueAccent),)),
+                ),
+                Expanded(
+                  child: TextButton(onPressed: () {
+                    Navigator.pushNamed(context, '/');
+                  },
+                      child: const Text('عودة للصفحة الرئيسية', style: TextStyle(color: Colors.redAccent),)),
+                ),
+              ],
+            )
           ],
         ),
       ),
