@@ -42,9 +42,9 @@ class App extends ConsumerWidget {
         '/checkout': (ctx, match, settings) => const CheckoutPage(),
         '/add-item': (ctx, match, settings) => const AddEditItemPage(),
         '/edit-item': (ctx, match, settings) => AddEditItemPage(
-              item: settings.arguments as Item?,
-              id: match!.parameters['id'],
-            ),
+          item: settings.arguments as Item?,
+          id: match!.parameters['id'],
+        ),
         '/item/{id}': (ctx, match, settings) {
           return ItemPage(
             item: settings.arguments as Item?,
@@ -54,12 +54,6 @@ class App extends ConsumerWidget {
         },
         '/': (ctx, match, settings) => const HomePage(),
       }).get,
-      builder: (context, child) {
-        return Directionality(
-          textDirection: TextDirection.rtl,
-          child: child!,
-        );
-      },
 
     );
   }
