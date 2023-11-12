@@ -7,6 +7,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'full_screen_dialog.dart';
 
 class ItemCard extends StatelessWidget {
   final Item item;
@@ -25,26 +26,31 @@ class ItemCard extends StatelessWidget {
               if (item.images.isNotEmpty) ImageCarousel(images: item.images),
               Row(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Align(
-                      alignment: Alignment.centerRight,
+                  Expanded(
+                    flex: 5,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Text(
                         item.name,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
                         style: const TextStyle(fontSize: 18),
                       ),
                     ),
                   ),
                   const Spacer(),
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pushNamed(
-                        context,
-                        '/item/${item.id}',
-                        arguments: item,
-                      );
-                    },
-                    icon: const Icon(Icons.open_in_new),
+                  Expanded(
+                    flex: 1,
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.pushNamed(
+                          context,
+                          '/item/${item.id}',
+                          arguments: item,
+                        );
+                      },
+                      icon: const Icon(Icons.open_in_new),
+                    ),
                   ),
                 ],
               ),
@@ -53,13 +59,14 @@ class ItemCard extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 8),
                 child: Align(
                   alignment: Alignment.centerRight,
-                  child: Text('الحجم'),
-                ),
+                 child: Text('الحجم'),
+               ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Wrap(
                   spacing: 4.0,
+                  runSpacing: 4.0,
                   children: [
                     for (final size in item.sizes)
                       Consumer(
@@ -182,9 +189,7 @@ class ItemCard extends StatelessWidget {
     }
   }
 
-  void deleteItemConfirmationDialog(
-    BuildContext context,
-  ) {
+  void deleteItemConfirmationDialog(BuildContext context) {
     showDialog<bool>(
       context: context,
       builder: (context) {
@@ -212,7 +217,7 @@ class ItemCard extends StatelessWidget {
 }
 
 class ImageCarousel extends StatefulWidget {
-  final List<String> images;
+  final List<ArabiyaImages> images;
 
   const ImageCarousel({super.key, required this.images});
 
@@ -238,12 +243,36 @@ class _ImageCarouselState extends State<ImageCarousel> {
           ),
           child: CarouselSlider(
             items: [
+              //fullHD are keys
               for (final image in widget.images)
-                CachedNetworkImage(
-                  imageUrl: image,
-                  fit: BoxFit.fill,
-                  placeholder: (context, url) =>
-                      const Center(child: CircularProgressIndicator()),
+                GestureDetector(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return FullScreenDialog(
+                          images: widget.images,
+                          initialImage: image,
+                        );
+                      },
+                    );
+                  },
+                  child: CachedNetworkImage(
+                    imageUrl: image.fullHDImage,
+                    fit: BoxFit.fill,
+                    placeholder: (context, url) => Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        IntrinsicHeight(
+                          child: CachedNetworkImage(
+                            imageUrl: image.thumbImage,
+                            fit: BoxFit.fill,
+                          ),
+                        ),
+                        const CircularProgressIndicator(),
+                      ],
+                    ),
+                  ),
                 )
             ],
             carouselController: _controller,
@@ -255,29 +284,42 @@ class _ImageCarouselState extends State<ImageCarousel> {
             ),
           ),
         ),
-        SizedBox(
-          height: 36,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: widget.images.asMap().entries.map((entry) {
-              return GestureDetector(
-                onTap: () => _controller.animateToPage(entry.key),
-                child: Padding(
-                  padding: const EdgeInsets.all(2.0),
-                  child: CircleAvatar(
-                    backgroundColor: Colors.black,
-                    radius: _getIndicatorSize(entry.key),
-                    child: Padding(
-                      padding: EdgeInsets.all(entry.key == _current ? 2 : 1),
-                      child: CircleAvatar(
-                        backgroundImage: NetworkImage(entry.value),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            return SizedBox(
+              height: 36,
+              width: constraints.maxWidth,
+              child: Center(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: widget.images.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    final image = widget.images.elementAt(index);
+                    return GestureDetector(
+                      onTap: () => _controller.animateToPage(index),
+                      child: Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: CircleAvatar(
+                          backgroundColor: Colors.black,
+                          radius: _getIndicatorSize(index),
+                          child: Padding(
+                            padding: EdgeInsets.all(index == _current ? 2 : 1),
+                            child: CircleAvatar(
+                              backgroundImage: CachedNetworkImageProvider(
+                                image.thumbImage,
+                              ),
+                            ),
+                          ),
+                        ),
+
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
-              );
-            }).toList(),
-          ),
+              ),
+            );
+          },
         ),
       ],
     );

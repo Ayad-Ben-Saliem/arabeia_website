@@ -1,19 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:arabiya/db/db.dart';
 import 'package:arabiya/models/item.dart';
 import 'package:arabiya/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'add_image.dart';
-
 const _emptyItem = Item(
   name: '',
   sizes: [],
   images: [],
-  images2: {},
   price: 0.0,
 );
 
@@ -93,7 +89,15 @@ class _AddEditItemPage extends StatelessWidget {
             Consumer(builder: (context, ref, child) {
               return IconButton(
                 onPressed: ref.watch(_canSave)
-                    ? () => Database.addUpdateItem(ref.read(_currentItem))
+                    ? () => {
+                          Database.addUpdateItem(ref.read(_currentItem)),
+                          ref.read(_originalItem.notifier).state =
+                              ref.read(_currentItem),
+                          showDialog(
+                            context: context,
+                            builder: (context) => successDialog(context),
+                          )
+                        }
                     : null,
                 icon: const Icon(Icons.check),
               );
@@ -110,6 +114,50 @@ class _AddEditItemPage extends StatelessWidget {
           children: [
             _JsonFormItem(),
             _VisualFormItem(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  successDialog(BuildContext context) {
+    return Dialog(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 500),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 50),
+              child: Text('تمت العملية بنجاح'),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('متابعة التعديل')),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                        onPressed: () => Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              '/',
+                              (route) => false,
+                            ),
+                        child: const Text('عودة للصفحة الرئيسية')),
+                  ),
+                ),
+              ],
+            )
           ],
         ),
       ),
@@ -207,15 +255,12 @@ class _VisualFormItem extends StatelessWidget {
                     for (var image in images)
                       Padding(
                         padding: const EdgeInsets.all(4.0),
-                        child: Image.network(image),
+                        child: Image.network(image.fullHDImage),
                       ),
                     Padding(
                       padding: const EdgeInsets.all(4.0),
                       child: TextButton(
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=> AddImage()));
-                          
-                        },
+                        onPressed: () {},
                         child: const Icon(Icons.add),
                       ),
                     ),
