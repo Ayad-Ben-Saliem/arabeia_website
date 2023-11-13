@@ -27,7 +27,6 @@ class ItemCard extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    flex: 5,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Text(
@@ -38,19 +37,15 @@ class ItemCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const Spacer(),
-                  Expanded(
-                    flex: 1,
-                    child: IconButton(
-                      onPressed: () {
-                        Navigator.pushNamed(
-                          context,
-                          '/item/${item.id}',
-                          arguments: item,
-                        );
-                      },
-                      icon: const Icon(Icons.open_in_new),
-                    ),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pushNamed(
+                        context,
+                        '/item/${item.id}',
+                        arguments: item,
+                      );
+                    },
+                    icon: const Icon(Icons.open_in_new),
                   ),
                 ],
               ),
