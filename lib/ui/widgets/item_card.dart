@@ -1,10 +1,13 @@
-import 'package:arabiya/models/cart_item.dart';
+import 'package:arabiya/db/db.dart';
 import 'package:arabiya/models/item.dart';
+import 'package:arabiya/models/cart_item.dart';
 import 'package:arabiya/ui/cart_notifier.dart';
 import 'package:arabiya/ui/home_page.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'full_screen_dialog.dart';
 
 class ItemCard extends StatelessWidget {
   final Item item;
@@ -16,72 +19,115 @@ class ItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: Column(
+      child: Stack(
         children: [
-          if (item.images.isNotEmpty) ImageCarousel(images: item.images),
-          Row(
+          Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
+              if (item.images.isNotEmpty) ImageCarousel(images: item.images),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 5,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Text(
+                        item.name,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                    ),
+                  ),
+                  const Spacer(),
+                  Expanded(
+                    flex: 1,
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.pushNamed(
+                          context,
+                          '/item/${item.id}',
+                          arguments: item,
+                        );
+                      },
+                      icon: const Icon(Icons.open_in_new),
+                    ),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
                 child: Align(
                   alignment: Alignment.centerRight,
-                  child: Text(
-                    item.name,
-                    style: const TextStyle(fontSize: 18),
-                  ),
+                 child: Text('الحجم'),
+               ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Wrap(
+                  spacing: 4.0,
+                  runSpacing: 4.0,
+                  children: [
+                    for (final size in item.sizes)
+                      Consumer(
+                        builder: (context, ref, widget) {
+                          final selected = size == ref.watch(sizeProvider);
+                          return ActionChip(
+                            label: Text(
+                              size,
+                              style: TextStyle(
+                                color: selected
+                                    ? Theme.of(context).colorScheme.onPrimary
+                                    : null,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            backgroundColor: selected
+                                ? Theme.of(context).colorScheme.primary
+                                : null,
+                            onPressed: () {
+                              ref.read(sizeProvider.notifier).state = size;
+                            },
+                          );
+                        },
+                      ),
+                  ],
                 ),
               ),
               const Spacer(),
-              IconButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/item/${item.id}',
-                      arguments: item);
-                },
-                icon: const Icon(Icons.open_in_new),
-              ),
+              footer(),
             ],
           ),
-          const Spacer(),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8),
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: Text('الحجم'),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Wrap(
-              spacing: 4.0,
-              children: [
-                for (final size in item.sizes)
-                  Consumer(
-                    builder: (context, ref, widget) {
-                      final selected = size == ref.watch(sizeProvider);
-                      return ActionChip(
-                        label: Text(
-                          size,
-                          style: TextStyle(
-                            color: selected
-                                ? Theme.of(context).colorScheme.onPrimary
-                                : null,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        backgroundColor: selected
-                            ? Theme.of(context).colorScheme.primary
-                            : null,
-                        onPressed: () {
-                          ref.read(sizeProvider.notifier).state = size;
-                        },
-                      );
-                    },
+          SizedBox(
+            width: 32,
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                isExpanded: true,
+                items: const [
+                  DropdownMenuItem(
+                    value: 'edit',
+                    child: Text('تعديل'),
                   ),
-              ],
+                  DropdownMenuItem(
+                    value: 'delete',
+                    child: Text('حذف'),
+                  ),
+                ],
+                onChanged: (action) {
+                  switch (action) {
+                    case 'edit':
+                      Navigator.pushNamed(context, '/edit-item',
+                          arguments: item);
+                      break;
+                    case 'delete':
+                      deleteItemConfirmationDialog(context);
+                      break;
+                  }
+                },
+                icon: const Icon(Icons.more_vert),
+              ),
             ),
           ),
-          const Spacer(),
-          footer(),
         ],
       ),
     );
@@ -142,10 +188,36 @@ class ItemCard extends StatelessWidget {
       );
     }
   }
+
+  void deleteItemConfirmationDialog(BuildContext context) {
+    showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('هل أنت متأكد من أنك تريد حذف هذا العنصر؟'),
+          content: Text(item.name),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Database.deleteItem(item);
+                // TODO: remove from current data
+                Navigator.pop(context);
+              },
+              child: const Text('نعم'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('لا'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
 
 class ImageCarousel extends StatefulWidget {
-  final List<String> images;
+  final List<ArabiyaImages> images;
 
   const ImageCarousel({super.key, required this.images});
 
@@ -171,8 +243,37 @@ class _ImageCarouselState extends State<ImageCarousel> {
           ),
           child: CarouselSlider(
             items: [
+              //fullHD are keys
               for (final image in widget.images)
-                Image.network(image, fit: BoxFit.fill),
+                GestureDetector(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return FullScreenDialog(
+                          images: widget.images,
+                          initialImage: image,
+                        );
+                      },
+                    );
+                  },
+                  child: CachedNetworkImage(
+                    imageUrl: image.fullHDImage,
+                    fit: BoxFit.fill,
+                    placeholder: (context, url) => Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        IntrinsicHeight(
+                          child: CachedNetworkImage(
+                            imageUrl: image.thumbImage,
+                            fit: BoxFit.fill,
+                          ),
+                        ),
+                        const CircularProgressIndicator(),
+                      ],
+                    ),
+                  ),
+                )
             ],
             carouselController: _controller,
             options: CarouselOptions(
@@ -183,29 +284,42 @@ class _ImageCarouselState extends State<ImageCarousel> {
             ),
           ),
         ),
-        SizedBox(
-          height: 36,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: widget.images.asMap().entries.map((entry) {
-              return GestureDetector(
-                onTap: () => _controller.animateToPage(entry.key),
-                child: Padding(
-                  padding: const EdgeInsets.all(2.0),
-                  child: CircleAvatar(
-                    backgroundColor: Colors.black,
-                    radius: _getIndicatorSize(entry.key),
-                    child: Padding(
-                      padding: EdgeInsets.all(entry.key == _current ? 2 : 1),
-                      child: CircleAvatar(
-                        backgroundImage: NetworkImage(entry.value),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            return SizedBox(
+              height: 36,
+              width: constraints.maxWidth,
+              child: Center(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: widget.images.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    final image = widget.images.elementAt(index);
+                    return GestureDetector(
+                      onTap: () => _controller.animateToPage(index),
+                      child: Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: CircleAvatar(
+                          backgroundColor: Colors.black,
+                          radius: _getIndicatorSize(index),
+                          child: Padding(
+                            padding: EdgeInsets.all(index == _current ? 2 : 1),
+                            child: CircleAvatar(
+                              backgroundImage: CachedNetworkImageProvider(
+                                image.thumbImage,
+                              ),
+                            ),
+                          ),
+                        ),
+
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
-              );
-            }).toList(),
-          ),
+              ),
+            );
+          },
         ),
       ],
     );

@@ -12,30 +12,32 @@ class ItemPage extends StatelessWidget {
   final Item? item;
 
   const ItemPage({
-    super.key,
+    Key? key,
     this.id,
     this.item,
   }) : assert(id != null || item != null);
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Builder(builder: (context) {
-        if (item != null) return ItemView(item: item!);
-        return Center(
-          child: FutureBuilder<Item?>(
-            future: Database.getItem(id!),
-            builder: (ctx, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                if (snapshot.hasData) {
-                  return ItemView(item: snapshot.requireData!);
+      body: Builder(
+        builder: (context) {
+          if (item != null) return ItemView(item: item!);
+          return Center(
+            child: FutureBuilder<Item?>(
+              future: Database.getItem(id!),
+              builder: (ctx, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.hasData) {
+                    return ItemView(item: snapshot.requireData!);
+                  }
+                } else if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
                 }
-              } else if (snapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator();
-              }
-              return Text('Error!! ${snapshot.error}');
-            },
+                return Text('Error!! ${snapshot.error}');
+              },
           ),
         );
       }),
@@ -52,22 +54,20 @@ class ItemView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      return SingleChildScrollView(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: constraints.copyWith(
-              minHeight: constraints.maxHeight,
-              maxHeight: double.infinity,
-              maxWidth: 720,
-            ),
-            child: IntrinsicHeight(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: constraints.maxHeight,
+                maxWidth: 720,
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (item.images.isNotEmpty)
-                    ImageCarousel(images: item.images),
+                  if (item.images.isNotEmpty) ImageCarousel(images: item.images),
                   Align(
                     alignment: Alignment.center,
                     child: Padding(
@@ -86,7 +86,7 @@ class ItemView extends StatelessWidget {
                         style: const TextStyle(fontSize: 12),
                       ),
                     ),
-                  Expanded(child: Container()),
+                  const Spacer(),
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8),
                     child: Text(
@@ -98,6 +98,7 @@ class ItemView extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Wrap(
                       spacing: 4.0,
+                      runSpacing: 4.0,
                       children: [
                         for (final size in item.sizes)
                           Consumer(
@@ -108,9 +109,7 @@ class ItemView extends StatelessWidget {
                                   size,
                                   style: TextStyle(
                                     color: selected
-                                        ? Theme.of(context)
-                                            .colorScheme
-                                            .onPrimary
+                                        ? Theme.of(context).colorScheme.onPrimary
                                         : null,
                                     fontWeight: FontWeight.w400,
                                   ),
@@ -133,9 +132,9 @@ class ItemView extends StatelessWidget {
               ),
             ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
   }
 
   Widget footer() {

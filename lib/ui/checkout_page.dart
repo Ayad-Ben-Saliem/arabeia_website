@@ -4,7 +4,6 @@ import 'package:arabiya/models/bill.dart';
 import 'package:arabiya/pdf/reporting.dart';
 import 'package:arabiya/ui/cart_notifier.dart';
 import 'package:arabiya/ui/user_address_page.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -73,38 +72,61 @@ class CheckoutPage extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  onPressed: () async {
-                    if (pdfBytes != null) {
-                      final filename =
-                          '${DateTime.now().millisecondsSinceEpoch.toRadixString(16)}-'
-                          '${Random().nextInt(256).toRadixString(16)}.pdf';
+                child: Consumer(
+                  builder: (context, ref, child) {
+                    return ElevatedButton(
+                      onPressed: () async {
+                        if (pdfBytes != null) {
+                          final filename =
+                              '${DateTime.now().millisecondsSinceEpoch.toRadixString(16)}-'
+                              '${Random().nextInt(256).toRadixString(16)}.pdf';
 
-                      // await Share.shareXFiles(
-                      //   [
-                      //     XFile.fromData(
-                      //       pdfBytes!,
-                      //       mimeType: 'application/pdf',
-                      //       name: 'invoce.pdf',
-                      //     ),
-                      //   ],
-                      //
-                      // );
+                          // await Share.shareXFiles(
+                          //   [
+                          //     XFile.fromData(
+                          //       pdfBytes!,
+                          //       mimeType: 'application/pdf',
+                          //       name: 'invoce.pdf',
+                          //     ),
+                          //   ],
+                          //
+                          // );
 
-                      final url = await savePdf(pdfBytes!, filename);
-                      final text =
-                          'مرحبا!! أريد طلب المنتجات الموجودة في هذه الفاتورة : $url';
-                      // launchUrlString('https://wa.me/+218910215272/?text=$text');
-                      launchUrlString(
-                        'whatsapp://send?phone=+218910215272&text=$text',
-                      );
+                          final url = await savePdf(pdfBytes!, filename);
+                          final text =
+                              'مرحبا!! أريد طلب المنتجات الموجودة في هذه الفاتورة : $url';
+                          // launchUrlString('https://wa.me/+218910215272/?text=$text');
+                          launchUrlString(
+                            'whatsapp://send?phone=+218910215272&text=$text',
+                          );
 
-                      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                        Navigator.pop(context);
-                        Navigator.pop(context);
-                        Navigator.pop(context);
-                      });
-                    }
+                          ServicesBinding.instance.addPostFrameCallback(
+                            (_) {
+                              // TODO restore all providers
+                              ref
+                                  .read(CartNotifier.itemsProvider.notifier)
+                                  .empty();
+                              ref.read(nameProvider.notifier).state = '';
+                              ref.read(phoneProvider.notifier).state = '';
+                              ref.read(addressProvider.notifier).state = '';
+
+                              Navigator.popUntil(
+                                context,
+                                ModalRoute.withName('/'),
+                              );
+                            },
+                          );
+                        }
+                      },
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('إرسال'),
+                          SizedBox(width: 8),
+                          Icon(Icons.send),
+                        ],
+                      ),
+                    );
                   },
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,

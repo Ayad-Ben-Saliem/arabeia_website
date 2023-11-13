@@ -66,4 +66,8 @@ class CartNotifier extends StateNotifier<List<CartItem>> {
   }
 
   void setQuantity(CartItem item, int quantity) {}
+
+  void empty() {
+    state = [];
+  }
 }

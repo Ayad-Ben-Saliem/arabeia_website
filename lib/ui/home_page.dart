@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:arabiya/ui/cart_notifier.dart';
 import 'package:arabiya/ui/widgets/item_card.dart';
 import 'package:badges/badges.dart' as badges;
@@ -32,10 +31,22 @@ class HomePage extends StatelessWidget {
         .catchError(getItemsCompleter.completeError);
 
     return Scaffold(
+      appBar: AppBar(),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            ListTile(
+              title: const Text('إضافة صنف'),
+              onTap: () => Navigator.popAndPushNamed(context, '/add-item'),
+            )
+          ],
+        ),
+      ),
       body: Column(
         children: [
           Expanded(
             child: FutureBuilder(
+
                 future: getItemsFuture,
                 builder: (context, snapshot) {
                   if (!getItemsCompleter.isCompleted) {
@@ -53,39 +64,36 @@ class HomePage extends StatelessWidget {
                     );
                   }
 
-                  final items = snapshot.data!;
+                final items = snapshot.data!;
 
-                  return LayoutBuilder(
-                    builder: (context, constraints) {
-                      int crossAxisCount(BoxConstraints constraints) {
-                        return (constraints.maxWidth / 500).ceil();
-                      }
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    int crossAxisCount(BoxConstraints constraints) {
+                      return (constraints.maxWidth / 500).ceil();
+                    }
 
-                      double aspectRatio(BoxConstraints constraints) {
-                        final width =
-                            constraints.maxWidth / crossAxisCount(constraints);
+                    double aspectRatio(BoxConstraints constraints) {
+                      final width =
+                          constraints.maxWidth / crossAxisCount(constraints);
 
-                        // image carousel + carousel indicators + name and footer
-                        // final height = width / (16 / 9) + 36 + 128 + 118;
-                        final height = width / (16 / 9) + 36 + 128 + 128;
-                        return width / height;
-                      }
+                      // image carousel + carousel indicators + name and footer
+                      // final height = width / (16 / 9) + 36 + 128 + 118;
+                      final height = width / (16 / 9) + 36 + 128 + 128;
+                      return width / height;
+                    }
 
-                      return GridView(
+                    return GridView(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: crossAxisCount(constraints),
                           childAspectRatio: aspectRatio(constraints),
                         ),
                         shrinkWrap: true,
-                        // todo comment this out and check the result
                         physics: const ClampingScrollPhysics(),
-                        children: [
-                          for (final item in items) ItemCard(item: item)
-                        ],
-                      );
-                    },
-                  );
-                }),
+                        children: items.map((e) => ItemCard(item: e)).toList());
+                  },
+                );
+              },
+            ),
           ),
           Row(
             children: [

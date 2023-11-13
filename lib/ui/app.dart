@@ -1,4 +1,5 @@
 import 'package:arabiya/models/item.dart';
+import 'package:arabiya/ui/add_edit_item_page.dart';
 import 'package:arabiya/ui/cart_page.dart';
 import 'package:arabiya/ui/checkout_page.dart';
 import 'package:arabiya/ui/home_page.dart';
@@ -17,6 +18,8 @@ class App extends ConsumerWidget {
   Widget build(BuildContext context, ref) {
     return MaterialApp(
       title: 'عربية',
+      debugShowCheckedModeBanner: false,
+
       theme: ThemeData(
         colorScheme: ref.watch(darkMode)
             ? const ColorScheme.dark(primary: Colors.white)
@@ -25,24 +28,33 @@ class App extends ConsumerWidget {
       ),
       locale: const Locale('ar'),
       initialRoute: '/',
+
       builder: (context, child) {
         return Directionality(
           textDirection: TextDirection.rtl,
           child: child!,
         );
       },
+
       onGenerateRoute: FRouter.Router({
         '/cart': (ctx, match, settings) => const CartPage(),
         '/address': (ctx, match, settings) => const UserAddressPage(),
         '/checkout': (ctx, match, settings) => const CheckoutPage(),
+        '/add-item': (ctx, match, settings) => const AddEditItemPage(),
+        '/edit-item': (ctx, match, settings) => AddEditItemPage(
+              item: settings.arguments as Item?,
+              id: match!.parameters['id'],
+            ),
         '/item/{id}': (ctx, match, settings) {
           return ItemPage(
             item: settings.arguments as Item?,
-            id: match!.parameters['id']!,
+            id: match!.parameters['id'],
+
           );
         },
         '/': (ctx, match, settings) => const HomePage(),
       }).get,
+
     );
   }
 }
