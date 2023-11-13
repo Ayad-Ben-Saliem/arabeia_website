@@ -35,7 +35,7 @@ class HomePage extends StatelessWidget {
         preferredSize: const Size.fromHeight(40),
         child: AppBar(
           flexibleSpace: Container(
-            color: Colors.grey[300],
+            color: Colors.grey[200],
             child: const Padding(
               padding: EdgeInsets.all(8.0),
               child: Center(
