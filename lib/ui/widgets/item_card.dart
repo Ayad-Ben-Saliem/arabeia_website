@@ -1,4 +1,3 @@
-import 'package:arabiya/db/db.dart';
 import 'package:arabiya/models/item.dart';
 import 'package:arabiya/models/cart_item.dart';
 import 'package:arabiya/ui/cart_notifier.dart';
@@ -93,36 +92,6 @@ class ItemCard extends StatelessWidget {
               footer(),
             ],
           ),
-          SizedBox(
-            width: 32,
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                isExpanded: true,
-                items: const [
-                  DropdownMenuItem(
-                    value: 'edit',
-                    child: Text('تعديل'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'delete',
-                    child: Text('حذف'),
-                  ),
-                ],
-                onChanged: (action) {
-                  switch (action) {
-                    case 'edit':
-                      Navigator.pushNamed(context, '/edit-item',
-                          arguments: item);
-                      break;
-                    case 'delete':
-                      deleteItemConfirmationDialog(context);
-                      break;
-                  }
-                },
-                icon: const Icon(Icons.more_vert),
-              ),
-            ),
-          ),
         ],
       ),
     );
@@ -182,32 +151,6 @@ class ItemCard extends StatelessWidget {
         style: const TextStyle(fontSize: 18),
       );
     }
-  }
-
-  void deleteItemConfirmationDialog(BuildContext context) {
-    showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('هل أنت متأكد من أنك تريد حذف هذا العنصر؟'),
-          content: Text(item.name),
-          actions: [
-            ElevatedButton(
-              onPressed: () {
-                Database.deleteItem(item);
-                // TODO: remove from current data
-                Navigator.pop(context);
-              },
-              child: const Text('نعم'),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('لا'),
-            ),
-          ],
-        );
-      },
-    );
   }
 }
 
