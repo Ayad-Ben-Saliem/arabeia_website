@@ -45,15 +45,9 @@ abstract class Reporting {
                       SizedBox(height: 32),
                       footer(bill),
                       Spacer(),
-                      Container(
+                      Align(
                         alignment: Alignment.bottomLeft,
-                        padding: EdgeInsets.all(16),
-                        child: Text(
-                          'المستلم : ...........',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: Text('المستلم: . . . . . . . . . . . . . . . .'),
                       ),
                     ],
                   ),
