@@ -19,6 +19,7 @@ class App extends ConsumerWidget {
     return MaterialApp(
       title: 'عربية',
       debugShowCheckedModeBanner: false,
+
       theme: ThemeData(
         colorScheme: ref.watch(darkMode)
             ? const ColorScheme.dark(primary: Colors.white)
@@ -27,6 +28,14 @@ class App extends ConsumerWidget {
       ),
       locale: const Locale('ar'),
       initialRoute: '/',
+
+      builder: (context, child) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: child!,
+        );
+      },
+
       onGenerateRoute: FRouter.Router({
         '/cart': (ctx, match, settings) => const CartPage(),
         '/address': (ctx, match, settings) => const UserAddressPage(),
@@ -40,16 +49,12 @@ class App extends ConsumerWidget {
           return ItemPage(
             item: settings.arguments as Item?,
             id: match!.parameters['id'],
+
           );
         },
         '/': (ctx, match, settings) => const HomePage(),
       }).get,
-      builder: (context, child) {
-        return Directionality(
-          textDirection: TextDirection.rtl,
-          child: child!,
-        );
-      },
+
     );
   }
 }

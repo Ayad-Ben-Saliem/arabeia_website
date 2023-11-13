@@ -46,22 +46,23 @@ class HomePage extends StatelessWidget {
         children: [
           Expanded(
             child: FutureBuilder(
-              future: getItemsFuture,
-              builder: (context, snapshot) {
-                if (!getItemsCompleter.isCompleted) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text('${snapshot.error}'),
-                  );
-                }
 
-                if (snapshot.data == null) {
-                  return const Center(
-                    child: Text('لا توجد بيانات!!!'),
-                  );
-                }
+                future: getItemsFuture,
+                builder: (context, snapshot) {
+                  if (!getItemsCompleter.isCompleted) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text('${snapshot.error}'),
+                    );
+                  }
+
+                  if (snapshot.data == null) {
+                    return const Center(
+                      child: Text('لا توجد بيانات!!!'),
+                    );
+                  }
 
                 final items = snapshot.data!;
 

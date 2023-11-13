@@ -54,8 +54,8 @@ class ItemCard extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 8),
                 child: Align(
                   alignment: Alignment.centerRight,
-                  child: Text('الحجم'),
-                ),
+                 child: Text('الحجم'),
+               ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -307,6 +307,7 @@ class _ImageCarouselState extends State<ImageCarousel> {
                             ),
                           ),
                         ),
+
                       ),
                     );
                   },

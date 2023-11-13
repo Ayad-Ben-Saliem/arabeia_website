@@ -128,6 +128,14 @@ class CheckoutPage extends StatelessWidget {
                       ),
                     );
                   },
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('إرسال'),
+                      SizedBox(width: 8),
+                      Icon(Icons.send),
+                    ],
+                  ),
                 ),
               )
             ],

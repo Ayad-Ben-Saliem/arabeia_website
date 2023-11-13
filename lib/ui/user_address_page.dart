@@ -137,7 +137,8 @@ class LocationMap extends StatelessWidget {
         ),
         builder: (context, snapshot) {
           // if (snapshot.hasError) {
-          //   return Center(child: Text('${snapshot.error}');
+//   return Center(child: Text('${snapshot.error}');
+
           // }
 
           if (snapshot.hasData) {
@@ -170,6 +171,7 @@ class LocationMap extends StatelessWidget {
                   children: [
                     Icon(Icons.pin_drop_outlined),
                     Text('مكان التوصيل'),
+
                   ],
                 ),
               ),
