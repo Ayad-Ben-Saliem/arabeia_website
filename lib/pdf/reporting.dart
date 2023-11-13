@@ -44,6 +44,17 @@ abstract class Reporting {
                       table(bill),
                       SizedBox(height: 32),
                       footer(bill),
+                      Spacer(),
+                      Container(
+                        alignment: Alignment.bottomLeft,
+                        padding: EdgeInsets.all(16),
+                        child: Text(
+                          'المستلم : ...........',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
