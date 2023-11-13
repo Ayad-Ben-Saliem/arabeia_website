@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "arabeia",
     "source": ".",
     "ignore": [
       "firebase.json",
