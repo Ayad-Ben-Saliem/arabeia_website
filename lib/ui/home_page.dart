@@ -31,25 +31,9 @@ class HomePage extends StatelessWidget {
         .catchError(getItemsCompleter.completeError);
 
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(40),
-        child: AppBar(
-          flexibleSpace: Container(
-            color: Colors.grey[200],
-            child: const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Center(
-                child: Text(
-                  'نسخة تجريبية',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
+      appBar: AppBar(
+        centerTitle: true,
+        title: const Text('نسخة تجريبية'),
       ),
       body: Column(
         children: [
@@ -72,7 +56,7 @@ class HomePage extends StatelessWidget {
                     );
                   }
 
-                   final items = snapshot.data!;
+                  final items = snapshot.data!;
 
                   return LayoutBuilder(
                     builder: (context, constraints) {
@@ -91,14 +75,15 @@ class HomePage extends StatelessWidget {
                       }
 
                       return GridView(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: crossAxisCount(constraints),
-                          childAspectRatio: aspectRatio(constraints),
-                        ),
-                        shrinkWrap: true,
-                        physics: const ClampingScrollPhysics(),
-                        children: items.map((e) => ItemCard(item: e)).toList()
-                      );
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: crossAxisCount(constraints),
+                            childAspectRatio: aspectRatio(constraints),
+                          ),
+                          shrinkWrap: true,
+                          physics: const ClampingScrollPhysics(),
+                          children:
+                              items.map((e) => ItemCard(item: e)).toList());
                     },
                   );
                 }),
