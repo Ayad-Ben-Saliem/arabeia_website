@@ -1,5 +1,4 @@
 import 'package:arabiya/models/item.dart';
-import 'package:arabiya/ui/add_edit_item_page.dart';
 import 'package:arabiya/ui/cart_page.dart';
 import 'package:arabiya/ui/checkout_page.dart';
 import 'package:arabiya/ui/home_page.dart';
@@ -40,11 +39,6 @@ class App extends ConsumerWidget {
         '/cart': (ctx, match, settings) => const CartPage(),
         '/address': (ctx, match, settings) => const UserAddressPage(),
         '/checkout': (ctx, match, settings) => const CheckoutPage(),
-        '/add-item': (ctx, match, settings) => const AddEditItemPage(),
-        '/edit-item': (ctx, match, settings) => AddEditItemPage(
-              item: settings.arguments as Item?,
-              id: match!.parameters['id'],
-            ),
         '/item/{id}': (ctx, match, settings) {
           return ItemPage(
             item: settings.arguments as Item?,
