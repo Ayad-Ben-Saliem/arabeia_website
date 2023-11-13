@@ -37,19 +37,17 @@ class FullScreenDialog extends ConsumerWidget {
           Expanded(
             child: Stack(
               children: [
-                Consumer(
-                  builder: (context, ref, child) {
-                    return PhotoView(
-                      imageProvider: CachedNetworkImageProvider(
-                        ref.watch(currentImage).fullHDImage,
-                      ),
-                      backgroundDecoration: const BoxDecoration(
-                        color: Colors.transparent,
-                      ),
-                      controller: ref.read(controller),
-                    );
-                  }
-                ),
+                Consumer(builder: (context, ref, child) {
+                  return PhotoView(
+                    imageProvider: CachedNetworkImageProvider(
+                      ref.watch(currentImage).fullHDImage,
+                    ),
+                    backgroundDecoration: const BoxDecoration(
+                      color: Colors.transparent,
+                    ),
+                    controller: ref.read(controller),
+                  );
+                }),
                 Align(
                   alignment: Alignment.topRight,
                   child: Padding(
