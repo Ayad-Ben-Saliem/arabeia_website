@@ -77,24 +77,35 @@ class FullScreenDialog extends ConsumerWidget {
                           ref.read(currentImage.notifier).state = image;
                           ref.read(controller).scale = 1;
                         },
-                        child: Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: Colors.transparent,
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(
-                              color: _getColor(ref, image),
-                              width: 2,
+                        child: Stack(
+                          children: [
+                            Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                border: Border.all(
+                                  color: _getBorderColor(ref, image),
+                                  width: 2,
+                                ),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(5),
+                                child: CachedNetworkImage(
+                                  imageUrl: image.thumbImage,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                             ),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(5),
-                            child: CachedNetworkImage(
-                              imageUrl: image.thumbImage,
-                              fit: BoxFit.cover,
+                            Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: _getOverlayColor(ref, image),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
                     )
@@ -107,7 +118,13 @@ class FullScreenDialog extends ConsumerWidget {
     );
   }
 
-  Color _getColor(WidgetRef ref, ArabiyaImages image) {
-    return image == ref.watch(currentImage) ? Colors.red : Colors.grey;
+  Color _getBorderColor(WidgetRef ref, ArabiyaImages image) {
+    return image == ref.watch(currentImage) ? Colors.black : Colors.grey;
+  }
+
+  Color _getOverlayColor(WidgetRef ref, ArabiyaImages image) {
+    return image == ref.watch(currentImage)
+        ? Colors.transparent
+        : Colors.grey.withOpacity(0.5);
   }
 }
