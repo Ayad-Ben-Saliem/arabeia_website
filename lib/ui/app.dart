@@ -17,6 +17,7 @@ class App extends ConsumerWidget {
   Widget build(BuildContext context, ref) {
     return MaterialApp(
       title: 'عربية',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ref.watch(darkMode)
             ? const ColorScheme.dark(primary: Colors.white)
