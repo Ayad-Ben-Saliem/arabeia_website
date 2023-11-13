@@ -31,6 +31,26 @@ class HomePage extends StatelessWidget {
         .catchError(getItemsCompleter.completeError);
 
     return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(40),
+        child: AppBar(
+          flexibleSpace: Container(
+            color: Colors.grey[300],
+            child: const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Center(
+                child: Text(
+                  'نسخة تجريبية',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
       body: Column(
         children: [
           Expanded(
