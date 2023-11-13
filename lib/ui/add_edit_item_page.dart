@@ -140,20 +140,32 @@ class _AddEditItemPage extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: const Text('متابعة التعديل')),
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Center(
+                        child: Text(
+                          'متابعة التعديل',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
-                        onPressed: () => Navigator.pushNamedAndRemoveUntil(
-                              context,
-                              '/',
-                              (route) => false,
-                            ),
-                        child: const Text('عودة للصفحة الرئيسية')),
+                      onPressed: () => Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        '/',
+                        (route) => false,
+                      ),
+                      child: const Center(
+                        child: Text(
+                          'عودة للصفحة الرئيسية',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ],
