@@ -12,11 +12,10 @@ class ItemPage extends StatelessWidget {
   final Item? item;
 
   const ItemPage({
-    Key? key,
+    super.key,
     this.id,
     this.item,
   }) : assert(id != null || item != null);
-
 
   @override
   Widget build(BuildContext context) {
@@ -33,14 +32,16 @@ class ItemPage extends StatelessWidget {
                   if (snapshot.hasData) {
                     return ItemView(item: snapshot.requireData!);
                   }
-                } else if (snapshot.connectionState == ConnectionState.waiting) {
+                } else if (snapshot.connectionState ==
+                    ConnectionState.waiting) {
                   return const CircularProgressIndicator();
                 }
                 return Text('Error!! ${snapshot.error}');
               },
-          ),
-        );
-      }),
+            ),
+          );
+        },
+      ),
     );
   }
 }
@@ -60,23 +61,25 @@ class ItemView extends StatelessWidget {
           child: Center(
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                maxHeight: constraints.maxHeight,
+                minHeight: constraints.maxHeight,
                 maxWidth: 720,
               ),
               child: Column(
-                mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  if (item.images.isNotEmpty) ImageCarousel(images: item.images),
-                  Align(
-                    alignment: Alignment.center,
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Text(
-                        item.name,
-                        style: const TextStyle(fontSize: 18),
+                  Column(
+                    children: [
+                      if (item.images.isNotEmpty)
+                        ImageCarousel(images: item.images),
+                      Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Text(
+                          item.name,
+                          style: const TextStyle(fontSize: 18),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                   if (item.description?.isNotEmpty == true)
                     Padding(
@@ -86,48 +89,56 @@ class ItemView extends StatelessWidget {
                         style: const TextStyle(fontSize: 12),
                       ),
                     ),
-                  const Spacer(),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Text(
-                      'الحجم',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Wrap(
-                      spacing: 4.0,
-                      runSpacing: 4.0,
-                      children: [
-                        for (final size in item.sizes)
-                          Consumer(
-                            builder: (context, ref, widget) {
-                              final selected = size == ref.watch(sizeProvider);
-                              return ActionChip(
-                                label: Text(
-                                  size,
-                                  style: TextStyle(
-                                    color: selected
-                                        ? Theme.of(context).colorScheme.onPrimary
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8),
+                        child: Text(
+                          'الحجم',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Wrap(
+                          spacing: 4.0,
+                          runSpacing: 4.0,
+                          children: [
+                            for (final size in item.sizes)
+                              Consumer(
+                                builder: (context, ref, widget) {
+                                  final selected =
+                                      size == ref.watch(sizeProvider);
+                                  return ActionChip(
+                                    label: Text(
+                                      size,
+                                      style: TextStyle(
+                                        color: selected
+                                            ? Theme.of(context)
+                                                .colorScheme
+                                                .onPrimary
+                                            : null,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                    backgroundColor: selected
+                                        ? Theme.of(context).colorScheme.primary
                                         : null,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                                backgroundColor: selected
-                                    ? Theme.of(context).colorScheme.primary
-                                    : null,
-                                onPressed: () {
-                                  ref.read(sizeProvider.notifier).state = size;
+                                    onPressed: () {
+                                      ref.read(sizeProvider.notifier).state =
+                                          size;
+                                    },
+                                  );
                                 },
-                              );
-                            },
-                          ),
-                      ],
-                    ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      const Divider(height: 32),
+                      footer(),
+                    ],
                   ),
-                  const Divider(),
-                  footer(),
                 ],
               ),
             ),
