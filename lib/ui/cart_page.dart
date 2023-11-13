@@ -49,8 +49,8 @@ class CartPage extends StatelessWidget {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.pushNamed(context, '/address'),
+                    child:  ElevatedButton(
+                      onPressed:cartItems.isNotEmpty ? () => Navigator.pushNamed(context, '/address'):null,
                       child: const Text('التالي'),
                     ),
                   ),
