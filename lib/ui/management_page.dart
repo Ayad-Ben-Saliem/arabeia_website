@@ -34,7 +34,9 @@ final _canSave = StateProvider(
           final originalData = json.decode(ref.watch(_originalHomePageData));
           final currentData = json.decode(ref.watch(_currentHomePageData));
           return json.encode(originalData) != json.encode(currentData);
-        } on FormatException catch (e) {}
+        } on FormatException {
+          // Do nothing
+        }
       } else if (ref.watch(_currentWidget) is ItemsView) {}
     }
     return false;
@@ -47,6 +49,7 @@ class ManagementPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       body: Row(
         children: [
           ConstrainedBox(
@@ -145,7 +148,6 @@ class HomePageView extends ConsumerWidget {
                                 } on FormatException catch (exception, stackTrace) {
                                   ref.read(_jsonError.notifier).state =
                                       _JsonError(exception, stackTrace);
-                                  print(exception);
                                 }
                               },
                             );
@@ -168,7 +170,9 @@ class HomePageView extends ConsumerWidget {
                           final data = json.decode(notifier.state);
                           notifier.state = Utils.getPrettyString(data);
                           ref.read(_currentDataChangedOutside.notifier).state++;
-                        } on FormatException catch (e) {}
+                        } on FormatException {
+                          // Do nothing
+                        }
                       },
                       icon: const Icon(Icons.refresh),
                     ),
