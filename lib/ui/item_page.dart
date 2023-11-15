@@ -89,7 +89,7 @@ class ItemView extends StatelessWidget {
                       padding: const EdgeInsets.all(24),
                       child: Text(
                         item.description!,
-                        style: const TextStyle(fontSize: 12),
+                        style: const TextStyle(fontSize: 15),
                       ),
                     ),
                   Column(
