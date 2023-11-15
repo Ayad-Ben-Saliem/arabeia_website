@@ -3,6 +3,7 @@ import 'package:arabiya/ui/add_edit_item_page.dart';
 import 'package:arabiya/ui/cart_page.dart';
 import 'package:arabiya/ui/checkout_page.dart';
 import 'package:arabiya/ui/home_page.dart';
+import 'package:arabiya/ui/management_page.dart';
 import 'package:arabiya/ui/item_page.dart';
 import 'package:arabiya/ui/user_address_page.dart';
 import 'package:flutter/material.dart';
@@ -52,6 +53,7 @@ class App extends ConsumerWidget {
 
           );
         },
+        '/management': (ctx, match, settings) => const ManagementPage(),
         '/': (ctx, match, settings) => const HomePage(),
       }).get,
 

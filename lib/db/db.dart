@@ -7,6 +7,9 @@ class Database {
   static final CollectionReference<Map<String, dynamic>> _itemsRef =
       _db.collection('Items');
 
+  static final CollectionReference<Map<String, dynamic>> _managementRef =
+      _db.collection('management');
+
   static Future<Iterable<Item>> getItems() async {
     final query = await _itemsRef.get();
 
@@ -61,5 +64,14 @@ class Database {
     for (var item in items) {
       deleteItem(item);
     }
+  }
+
+  static Future<JsonMap> getHomePageData() async {
+    final doc = await _managementRef.doc('home-page').get();
+    return doc.data()!;
+  }
+
+  static Future<void> updateHomePageData(JsonMap homePageData) async {
+    await _managementRef.doc('home-page').update(homePageData);
   }
 }

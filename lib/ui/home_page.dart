@@ -38,6 +38,10 @@ class HomePage extends StatelessWidget {
             ListTile(
               title: const Text('إضافة صنف'),
               onTap: () => Navigator.popAndPushNamed(context, '/add-item'),
+            ),
+            ListTile(
+              title: const Text('الإدارة'),
+              onTap: () => Navigator.popAndPushNamed(context, '/management'),
             )
           ],
         ),
