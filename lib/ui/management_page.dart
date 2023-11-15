@@ -2,13 +2,44 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:arabiya/db/db.dart';
+import 'package:arabiya/ui/widgets/items_grid_view.dart';
 import 'package:arabiya/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final currentWidget = StateProvider<Widget>((ref) => Container());
+final _currentWidget = StateProvider<Widget>((ref) => const HomePageView());
 
-final _currentChangedOutside = StateProvider((ref) => 0);
+final _currentDataChangedOutside = StateProvider((ref) => 0);
+
+final _originalHomePageData = StateProvider((ref) => '');
+
+final _currentHomePageData = StateProvider(
+  (ref) => ref.watch(_originalHomePageData),
+);
+
+class _JsonError {
+  final FormatException exception;
+  final StackTrace stackTrace;
+
+  _JsonError(this.exception, this.stackTrace);
+}
+
+final _jsonError = StateProvider<_JsonError?>((ref) => null);
+
+final _canSave = StateProvider(
+  (ref) {
+    if (ref.watch(_jsonError) == null) {
+      if (ref.watch(_currentWidget) is HomePageView) {
+        try {
+          final originalData = json.decode(ref.watch(_originalHomePageData));
+          final currentData = json.decode(ref.watch(_currentHomePageData));
+          return json.encode(originalData) != json.encode(currentData);
+        } on FormatException catch (e) {}
+      } else if (ref.watch(_currentWidget) is ItemsView) {}
+    }
+    return false;
+  },
+);
 
 class ManagementPage extends StatelessWidget {
   const ManagementPage({super.key});
@@ -25,17 +56,17 @@ class ManagementPage extends StatelessWidget {
                 return ListView(
                   children: [
                     ListTile(
-                      title: const Text('Items'),
+                      title: const Text('الصفحة الرئيسية'),
                       onTap: () {
-                        ref.read(currentWidget.notifier).state =
-                            const ItemsView();
+                        ref.read(_currentWidget.notifier).state =
+                            const HomePageView();
                       },
                     ),
                     ListTile(
-                      title: const Text('Home Page'),
+                      title: const Text('المنتجات'),
                       onTap: () {
-                        ref.read(currentWidget.notifier).state =
-                            const HomePageView();
+                        ref.read(_currentWidget.notifier).state =
+                            const ItemsView();
                       },
                     ),
                   ],
@@ -46,7 +77,7 @@ class ManagementPage extends StatelessWidget {
           const VerticalDivider(width: 0),
           Expanded(
             child: Consumer(
-              builder: (context, ref, child) => ref.watch(currentWidget),
+              builder: (context, ref, child) => ref.watch(_currentWidget),
             ),
           ),
         ],
@@ -54,43 +85,6 @@ class ManagementPage extends StatelessWidget {
     );
   }
 }
-
-class ItemsView extends StatelessWidget {
-  const ItemsView({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Items'));
-  }
-}
-
-final _originalHomePage = StateProvider((ref) => '');
-
-final _currentHomePage = StateProvider((ref) => ref.watch(_originalHomePage));
-
-class _JsonError {
-  final FormatException exception;
-  final StackTrace stackTrace;
-
-  _JsonError(this.exception, this.stackTrace);
-}
-
-final _jsonError = StateProvider<_JsonError?>((ref) => null);
-
-final _canSave = StateProvider(
-  (ref) {
-    if (ref.watch(_jsonError) == null) {
-      if (ref.watch(currentWidget) is HomePageView) {
-        try {
-          final originalData = json.decode(ref.watch(_originalHomePage));
-          final currentData = json.decode(ref.watch(_currentHomePage));
-          return json.encode(originalData) != json.encode(currentData);
-        } on FormatException catch (e) {}
-      } else if (ref.watch(currentWidget) is ItemsView) {}
-    }
-    return false;
-  },
-);
 
 class HomePageView extends ConsumerWidget {
   const HomePageView({super.key});
@@ -106,7 +100,7 @@ class HomePageView extends ConsumerWidget {
         if (snapshot.connectionState == ConnectionState.done) {
           final data = Utils.getPrettyString(snapshot.requireData);
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            ref.read(_originalHomePage.notifier).state = data;
+            ref.read(_originalHomePageData.notifier).state = data;
           });
           controller.text = data;
           return Column(
@@ -118,8 +112,8 @@ class HomePageView extends ConsumerWidget {
                     textDirection: TextDirection.ltr,
                     child: Consumer(
                       builder: (context, ref, child) {
-                        if (ref.watch(_currentChangedOutside) > 0) {
-                          controller.text = ref.read(_currentHomePage);
+                        if (ref.watch(_currentDataChangedOutside) > 0) {
+                          controller.text = ref.read(_currentHomePageData);
                         }
 
                         return TextField(
@@ -141,7 +135,8 @@ class HomePageView extends ConsumerWidget {
                             timer = Timer(
                               const Duration(milliseconds: 100),
                               () {
-                                ref.read(_currentHomePage.notifier).state = txt;
+                                ref.read(_currentHomePageData.notifier).state =
+                                    txt;
                                 try {
                                   json.decode(txt);
 
@@ -167,11 +162,12 @@ class HomePageView extends ConsumerWidget {
                   children: [
                     IconButton(
                       onPressed: () {
-                        final notifier = ref.read(_currentHomePage.notifier);
+                        final notifier =
+                            ref.read(_currentHomePageData.notifier);
                         try {
                           final data = json.decode(notifier.state);
                           notifier.state = Utils.getPrettyString(data);
-                          ref.read(_currentChangedOutside.notifier).state++;
+                          ref.read(_currentDataChangedOutside.notifier).state++;
                         } on FormatException catch (e) {}
                       },
                       icon: const Icon(Icons.refresh),
@@ -182,11 +178,13 @@ class HomePageView extends ConsumerWidget {
                           return ElevatedButton(
                             onPressed: ref.watch(_canSave)
                                 ? () {
-                                    final txtData = ref.read(_currentHomePage);
+                                    final txtData =
+                                        ref.read(_currentHomePageData);
                                     final data = json.decode(txtData);
                                     Database.updateHomePageData(data);
-                                    ref.read(_originalHomePage.notifier).state =
-                                        ref.read(_currentHomePage);
+                                    ref
+                                        .read(_originalHomePageData.notifier)
+                                        .state = ref.read(_currentHomePageData);
                                     showDialog(
                                       context: context,
                                       builder: (context) =>
@@ -207,6 +205,32 @@ class HomePageView extends ConsumerWidget {
         }
         return const Center(child: CircularProgressIndicator());
       },
+    );
+  }
+}
+
+class ItemsView extends StatelessWidget {
+  const ItemsView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: FutureBuilder(
+        future: Database.getItems(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasData) {
+              return ItemsGridView(items: snapshot.requireData, editable: true);
+            }
+            return const Center(child: Text('لا توجد بيانات!!!'));
+          }
+
+          if (snapshot.hasError) {
+            return Center(child: Text('${snapshot.error}'));
+          }
+          return const Center(child: CircularProgressIndicator());
+        },
+      ),
     );
   }
 }

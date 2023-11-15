@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 
 class ItemsGridView extends StatelessWidget {
   final Iterable<Item> items;
+  final bool editable;
 
-  const ItemsGridView({super.key, required this.items});
+  const ItemsGridView({super.key, required this.items, this.editable = false});
 
   @override
   Widget build(BuildContext context) {
@@ -24,14 +25,29 @@ class ItemsGridView extends StatelessWidget {
           return width / height;
         }
 
-        return GridView(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount(constraints),
-              childAspectRatio: aspectRatio(constraints),
+        final List<Widget> cards = [
+          if (editable)
+            Card(
+              child: InkWell(
+                onTap: () => Navigator.pushNamed(context, '/add-item'),
+                child: const FittedBox(
+                  fit: BoxFit.contain,
+                  child: Icon(Icons.add),
+                ),
+              ),
             ),
-            shrinkWrap: true,
-            physics: const ClampingScrollPhysics(),
-            children: items.map((e) => ItemCard(item: e)).toList());
+          ...items.map((item) => ItemCard(item: item, editable: editable)),
+        ];
+
+        return GridView(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount(constraints),
+            childAspectRatio: aspectRatio(constraints),
+          ),
+          shrinkWrap: true,
+          physics: const ClampingScrollPhysics(),
+          children: cards,
+        );
       },
     );
   }

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:arabiya/ui/cart_notifier.dart';
-import 'package:arabiya/ui/widgets/item_card.dart';
 import 'package:arabiya/ui/widgets/items_grid_view.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:arabiya/db/db.dart';
@@ -36,10 +35,6 @@ class HomePage extends StatelessWidget {
       drawer: Drawer(
         child: ListView(
           children: [
-            ListTile(
-              title: const Text('إضافة صنف'),
-              onTap: () => Navigator.popAndPushNamed(context, '/add-item'),
-            ),
             ListTile(
               title: const Text('الإدارة'),
               onTap: () => Navigator.popAndPushNamed(context, '/management'),

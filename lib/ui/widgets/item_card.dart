@@ -11,118 +11,104 @@ import 'full_screen_dialog.dart';
 
 class ItemCard extends StatelessWidget {
   final Item item;
+  final bool editable;
 
   final sizeProvider = StateProvider<String?>((ref) => null);
 
-  ItemCard({super.key, required this.item});
+  ItemCard({super.key, required this.item, this.editable = false});
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: Stack(
+      child: Column(
         children: [
-          Column(
+          if (item.images.isNotEmpty) ImageCarousel(images: item.images),
+          Row(
             children: [
-              if (item.images.isNotEmpty) ImageCarousel(images: item.images),
-              Row(
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Text(
-                        item.name,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                    ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    item.name,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                    style: const TextStyle(fontSize: 18),
                   ),
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pushNamed(
-                        context,
-                        '/item/${item.id}',
-                        arguments: item,
-                      );
-                    },
-                    icon: const Icon(Icons.open_in_new),
-                  ),
-                ],
-              ),
-              const Spacer(),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8),
-                child: Align(
-                  alignment: Alignment.centerRight,
-                 child: Text('الحجم'),
-               ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Wrap(
-                  spacing: 4.0,
-                  runSpacing: 4.0,
-                  children: [
-                    for (final size in item.sizes)
-                      Consumer(
-                        builder: (context, ref, widget) {
-                          final selected = size == ref.watch(sizeProvider);
-                          return ActionChip(
-                            label: Text(
-                              size,
-                              style: TextStyle(
-                                color: selected
-                                    ? Theme.of(context).colorScheme.onPrimary
-                                    : null,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                            backgroundColor: selected
-                                ? Theme.of(context).colorScheme.primary
-                                : null,
-                            onPressed: () {
-                              ref.read(sizeProvider.notifier).state = size;
-                            },
-                          );
-                        },
-                      ),
-                  ],
                 ),
               ),
-              const Spacer(),
-              footer(),
+              if (!editable)
+                IconButton(
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/item/${item.id}',
+                      arguments: item,
+                    );
+                  },
+                  icon: const Icon(Icons.open_in_new),
+                ),
+              if (editable)
+                IconButton(
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/edit-item',
+                      arguments: item,
+                    );
+                  },
+                  icon: const Icon(Icons.edit_outlined),
+                ),
+              if (editable)
+                IconButton(
+                  onPressed: () {
+                    deleteItemConfirmationDialog(context);
+                  },
+                  icon: const Icon(Icons.delete_outline),
+                ),
             ],
           ),
-          SizedBox(
-            width: 32,
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                isExpanded: true,
-                items: const [
-                  DropdownMenuItem(
-                    value: 'edit',
-                    child: Text('تعديل'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'delete',
-                    child: Text('حذف'),
-                  ),
-                ],
-                onChanged: (action) {
-                  switch (action) {
-                    case 'edit':
-                      Navigator.pushNamed(context, '/edit-item',
-                          arguments: item);
-                      break;
-                    case 'delete':
-                      deleteItemConfirmationDialog(context);
-                      break;
-                  }
-                },
-                icon: const Icon(Icons.more_vert),
-              ),
+          const Spacer(),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: Text('الحجم'),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Wrap(
+              spacing: 4.0,
+              runSpacing: 4.0,
+              children: [
+                for (final size in item.sizes)
+                  Consumer(
+                    builder: (context, ref, widget) {
+                      final selected = size == ref.watch(sizeProvider);
+                      return ActionChip(
+                        label: Text(
+                          size,
+                          style: TextStyle(
+                            color: selected
+                                ? Theme.of(context).colorScheme.onPrimary
+                                : null,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        backgroundColor: selected
+                            ? Theme.of(context).colorScheme.primary
+                            : null,
+                        onPressed: () {
+                          ref.read(sizeProvider.notifier).state = size;
+                        },
+                      );
+                    },
+                  ),
+              ],
+            ),
+          ),
+          const Spacer(),
+          footer(),
         ],
       ),
     );
@@ -307,7 +293,6 @@ class _ImageCarouselState extends State<ImageCarousel> {
                             ),
                           ),
                         ),
-
                       ),
                     );
                   },
