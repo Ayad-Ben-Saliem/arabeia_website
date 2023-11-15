@@ -1,6 +1,6 @@
 # arabiya
 
-E-Commerce website for arabiya.ly
+عَربِيَّة، شركة تهتم بالزي العربي ... الليبي على وجه التحديد.
 
 ## Getting Started
 
