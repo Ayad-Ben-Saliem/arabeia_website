@@ -192,7 +192,7 @@ class HomePageView extends ConsumerWidget {
                                     showDialog(
                                       context: context,
                                       builder: (context) =>
-                                          const _SuccessDialog(),
+                                          const SuccessDialog(),
                                     );
                                   }
                                 : null,
@@ -239,8 +239,8 @@ class ItemsView extends StatelessWidget {
   }
 }
 
-class _SuccessDialog extends StatelessWidget {
-  const _SuccessDialog();
+class SuccessDialog extends StatelessWidget {
+  const SuccessDialog({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -267,6 +267,24 @@ class _SuccessDialog extends StatelessWidget {
                       child: const Center(
                         child: Text(
                           'متابعة التعديل',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        '/management',
+                            (route) => false,
+                      ),
+                      child: const Center(
+                        child: Text(
+                          'عودة لصفحة الإدارة',
                           textAlign: TextAlign.center,
                         ),
                       ),

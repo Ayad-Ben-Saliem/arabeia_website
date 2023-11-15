@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:arabiya/db/db.dart';
 import 'package:arabiya/models/item.dart';
+import 'package:arabiya/ui/management_page.dart';
 import 'package:arabiya/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -95,7 +96,7 @@ class _AddEditItemPage extends StatelessWidget {
                               ref.read(_currentItem),
                           showDialog(
                             context: context,
-                            builder: (context) => successDialog(context),
+                            builder: (context) => const SuccessDialog(),
                           )
                         }
                     : null,
@@ -114,62 +115,6 @@ class _AddEditItemPage extends StatelessWidget {
           children: [
             _JsonFormItem(),
             _VisualFormItem(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  successDialog(BuildContext context) {
-    return Dialog(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 500),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 50),
-              child: Text('تمت العملية بنجاح'),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: const Center(
-                        child: Text(
-                          'متابعة التعديل',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        '/',
-                        (route) => false,
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'عودة للصفحة الرئيسية',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            )
           ],
         ),
       ),
