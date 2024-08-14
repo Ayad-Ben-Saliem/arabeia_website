@@ -211,7 +211,7 @@ class ImageCarousel extends StatefulWidget {
 class _ImageCarouselState extends State<ImageCarousel> {
   int _current = 0;
 
-  final CarouselController _controller = CarouselController();
+  final _controller = CarouselSliderController();
 
   @override
   Widget build(BuildContext context) {
@@ -222,47 +222,86 @@ class _ImageCarouselState extends State<ImageCarousel> {
             color: Colors.grey,
             borderRadius: BorderRadius.all(Radius.circular(8)),
           ),
-          child: CarouselSlider(
-            items: [
-              //fullHD are keys
-              for (final image in widget.images)
-                GestureDetector(
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return FullScreenDialog(
-                          images: widget.images,
-                          initialImage: image,
+          child: Builder(
+            builder: (context) {
+              // return CarouselView(
+              //   itemExtent: 1,
+              //   children: [
+              //     for (final image in widget.images)
+              //       GestureDetector(
+              //         onTap: () {
+              //           showDialog(
+              //             context: context,
+              //             builder: (BuildContext context) {
+              //               return FullScreenDialog(
+              //                 images: widget.images,
+              //                 initialImage: image,
+              //               );
+              //             },
+              //           );
+              //         },
+              //         child: CachedNetworkImage(
+              //           imageUrl: image.fullHDImage,
+              //           fit: BoxFit.fill,
+              //           placeholder: (context, url) => Stack(
+              //             alignment: Alignment.center,
+              //             children: [
+              //               IntrinsicHeight(
+              //                 child: CachedNetworkImage(
+              //                   imageUrl: image.thumbImage,
+              //                   fit: BoxFit.fill,
+              //                 ),
+              //               ),
+              //               const CircularProgressIndicator(),
+              //             ],
+              //           ),
+              //         ),
+              //       ),
+              //   ],
+              // );
+
+              return CarouselSlider(
+                items: [
+                  //fullHD are keys
+                  for (final image in widget.images)
+                    GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return FullScreenDialog(
+                              images: widget.images,
+                              initialImage: image,
+                            );
+                          },
                         );
                       },
-                    );
-                  },
-                  child: CachedNetworkImage(
-                    imageUrl: image.fullHDImage,
-                    fit: BoxFit.fill,
-                    placeholder: (context, url) => Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        IntrinsicHeight(
-                          child: CachedNetworkImage(
-                            imageUrl: image.thumbImage,
-                            fit: BoxFit.fill,
-                          ),
+                      child: CachedNetworkImage(
+                        imageUrl: image.fullHDImage,
+                        fit: BoxFit.fill,
+                        placeholder: (context, url) => Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            IntrinsicHeight(
+                              child: CachedNetworkImage(
+                                imageUrl: image.thumbImage,
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                            const CircularProgressIndicator(),
+                          ],
                         ),
-                        const CircularProgressIndicator(),
-                      ],
-                    ),
-                  ),
-                )
-            ],
-            carouselController: _controller,
-            options: CarouselOptions(
-              enlargeCenterPage: true,
-              viewportFraction: 1,
-              onPageChanged: (index, reason) =>
-                  setState(() => _current = index),
-            ),
+                      ),
+                    )
+                ],
+                carouselController: _controller,
+                options: CarouselOptions(
+                  enlargeCenterPage: true,
+                  viewportFraction: 1,
+                  onPageChanged: (index, reason) => setState(() => _current = index),
+                ),
+              );
+            },
           ),
         ),
         LayoutBuilder(
