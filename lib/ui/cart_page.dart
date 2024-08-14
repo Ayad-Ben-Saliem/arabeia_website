@@ -11,9 +11,7 @@ class CartPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('سلة المشتريات'),
-      ),
+      appBar: AppBar(title: const Text('سلة المشتريات')),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1024),
@@ -32,9 +30,7 @@ class CartPage extends StatelessWidget {
                           for (final cartItem in cartItems)
                             Padding(
                               padding: const EdgeInsets.all(4.0),
-                              child: isVertical
-                                  ? vCard(cartItem)
-                                  : hCard(cartItem),
+                              child: isVertical ? vCard(cartItem) : hCard(cartItem),
                             ),
                         ],
                       );
@@ -50,7 +46,7 @@ class CartPage extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
-                      onPressed: () => Navigator.pushNamed(context, '/address'),
+                      onPressed: () => Navigator.pushNamed(context, '/address') ,
                       child: const Text('التالي'),
                     ),
                   ),
@@ -181,9 +177,7 @@ class CartPage extends StatelessWidget {
                 if (cartItem.quantity == 1) {
                   removeItemConfirmationDialog(context, ref, cartItem);
                 } else {
-                  ref
-                      .read(CartNotifier.itemsProvider.notifier)
-                      .removeItem(cartItem.copyWith(quantity: 1));
+                  ref.read(CartNotifier.itemsProvider.notifier).removeItem(cartItem.copyWith(quantity: 1));
                 }
               },
               icon: const Icon(Icons.remove),
@@ -208,9 +202,7 @@ class CartPage extends StatelessWidget {
           actions: [
             ElevatedButton(
               onPressed: () {
-                ref
-                    .read(CartNotifier.itemsProvider.notifier)
-                    .removeItem(cartItem);
+                ref.read(CartNotifier.itemsProvider.notifier).removeItem(cartItem);
                 Navigator.pop(context);
               },
               child: const Text('نعم'),

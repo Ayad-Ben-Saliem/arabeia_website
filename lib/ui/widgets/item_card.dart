@@ -126,14 +126,13 @@ class ItemCard extends StatelessWidget {
             builder: (context, ref, child) {
               return ElevatedButton(
                 onPressed: (ref.watch(sizeProvider) != null)
-                    ? () =>
-                        ref.read(CartNotifier.itemsProvider.notifier).addItem(
-                              CartItem(
-                                item: item,
-                                size: ref.read(sizeProvider)!,
-                                quantity: 1,
-                              ),
-                            )
+                    ? () => ref.read(CartNotifier.itemsProvider.notifier).addItem(
+                          CartItem(
+                            item: item,
+                            size: ref.read(sizeProvider)!,
+                            quantity: 1,
+                          ),
+                        )
                     : null,
                 child: const Text('إضافة للسلة'),
               );
