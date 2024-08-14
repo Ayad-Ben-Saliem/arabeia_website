@@ -70,15 +70,11 @@ class ItemCard extends StatelessWidget {
                             label: Text(
                               size,
                               style: TextStyle(
-                                color: selected
-                                    ? Theme.of(context).colorScheme.onPrimary
-                                    : null,
+                                color: selected ? Theme.of(context).colorScheme.onPrimary : null,
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
-                            backgroundColor: selected
-                                ? Theme.of(context).colorScheme.primary
-                                : null,
+                            backgroundColor: selected ? Theme.of(context).colorScheme.primary : null,
                             onPressed: () {
                               ref.read(sizeProvider.notifier).state = size;
                             },
@@ -109,14 +105,13 @@ class ItemCard extends StatelessWidget {
             builder: (context, ref, child) {
               return ElevatedButton(
                 onPressed: (ref.watch(sizeProvider) != null)
-                    ? () =>
-                        ref.read(CartNotifier.itemsProvider.notifier).addItem(
-                              CartItem(
-                                item: item,
-                                size: ref.read(sizeProvider)!,
-                                quantity: 1,
-                              ),
-                            )
+                    ? () => ref.read(CartNotifier.itemsProvider.notifier).addItem(
+                          CartItem(
+                            item: item,
+                            size: ref.read(sizeProvider)!,
+                            quantity: 1,
+                          ),
+                        )
                     : null,
                 child: const Text('إضافة للسلة'),
               );
