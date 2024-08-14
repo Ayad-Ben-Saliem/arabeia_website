@@ -45,3 +45,5 @@ android
 windows
 macos
 linux
+
+pubspec.lock
