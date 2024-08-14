@@ -26,6 +26,7 @@ class App extends ConsumerWidget {
             ? const ColorScheme.dark(primary: Colors.white)
             : const ColorScheme.light(primary: Colors.black),
         fontFamily: 'HacenTunisia',
+        useMaterial3: false,
       ),
       locale: const Locale('ar'),
       initialRoute: '/',
