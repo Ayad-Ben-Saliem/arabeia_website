@@ -4,11 +4,10 @@ import 'package:arabiya/models/bill.dart';
 import 'package:arabiya/pdf/reporting.dart';
 import 'package:arabiya/ui/cart_notifier.dart';
 import 'package:arabiya/ui/user_address_page.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'package:pdfrx/pdfrx.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:url_launcher/url_launcher_string.dart';
@@ -50,22 +49,18 @@ class CheckoutPage extends StatelessWidget {
                       // ),
                       future: Reporting.createPdfBill(bill),
                       builder: (context, snapshot) {
-                        if (snapshot.hasError) {
-                          return Text('${snapshot.error}');
-                        }
-                        if (!snapshot.hasData) {
-                          return const SizedBox(
-                            height: 32,
-                            width: 32,
-                            child: Center(
-                                child: CircularProgressIndicator(
-                              color: Colors.red,
-                            )),
-                          );
+                        // if (snapshot.hasError) {
+                        //   return Text('${snapshot.error}');
+                        // }
+
+                        if (snapshot.hasData) {
+                          return PdfViewer.data(snapshot.requireData, sourceName: "فاتورة");
                         }
 
-                        pdfBytes = snapshot.data;
-                        return SfPdfViewer.memory(pdfBytes!);
+                        return const SizedBox.square(
+                          dimension: 32,
+                          child: Center(child: CircularProgressIndicator(color: Colors.red)),
+                        );
                       },
                     );
                   },
@@ -76,8 +71,7 @@ class CheckoutPage extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () async {
                     if (pdfBytes != null) {
-                      final filename =
-                          '${DateTime.now().millisecondsSinceEpoch.toRadixString(16)}-'
+                      final filename = '${DateTime.now().millisecondsSinceEpoch.toRadixString(16)}-'
                           '${Random().nextInt(256).toRadixString(16)}.pdf';
 
                       // await Share.shareXFiles(
@@ -92,8 +86,7 @@ class CheckoutPage extends StatelessWidget {
                       // );
 
                       final url = await savePdf(pdfBytes!, filename);
-                      final text =
-                          'مرحبا!! أريد طلب المنتجات الموجودة في هذه الفاتورة : $url';
+                      final text = 'مرحبا!! أريد طلب المنتجات الموجودة في هذه الفاتورة : $url';
                       // launchUrlString('https://wa.me/+218910215272/?text=$text');
                       launchUrlString(
                         'whatsapp://send?phone=+218910215272&text=$text',
