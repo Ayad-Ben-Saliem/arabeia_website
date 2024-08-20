@@ -7,7 +7,7 @@ import 'package:arabiya/ui/user_address_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'package:pdfrx/pdfrx.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:url_launcher/url_launcher_string.dart';
@@ -49,22 +49,18 @@ class CheckoutPage extends StatelessWidget {
                       // ),
                       future: Reporting.createPdfBill(bill),
                       builder: (context, snapshot) {
-                        if (snapshot.hasError) {
-                          return Text('${snapshot.error}');
-                        }
-                        if (!snapshot.hasData) {
-                          return const SizedBox(
-                            height: 32,
-                            width: 32,
-                            child: Center(
-                                child: CircularProgressIndicator(
-                              color: Colors.red,
-                            )),
-                          );
+                        // if (snapshot.hasError) {
+                        //   return Text('${snapshot.error}');
+                        // }
+
+                        if (snapshot.hasData) {
+                          return PdfViewer.data(snapshot.requireData, sourceName: "فاتورة");
                         }
 
-                        pdfBytes = snapshot.data;
-                        return SfPdfViewer.memory(pdfBytes!);
+                        return const SizedBox.square(
+                          dimension: 32,
+                          child: Center(child: CircularProgressIndicator(color: Colors.red)),
+                        );
                       },
                     );
                   },
