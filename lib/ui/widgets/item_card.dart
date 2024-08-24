@@ -1,6 +1,6 @@
 import 'package:arabiya/db/db.dart';
 import 'package:arabiya/models/item.dart';
-import 'package:arabiya/models/cart_item.dart';
+import 'package:arabiya/models/invoice_item.dart';
 import 'package:arabiya/ui/cart_notifier.dart';
 import 'package:arabiya/ui/home_page.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -9,11 +9,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'full_screen_dialog.dart';
 
+final resetSizeProvider = StateProvider((ref) => 0);
+
 class ItemCard extends StatelessWidget {
   final Item item;
   final bool editable;
 
-  final sizeProvider = StateProvider<String?>((ref) => null);
+  final sizeProvider = StateProvider<String?>((ref) {
+    ref.watch(resetSizeProvider);
+    return null;
+  });
 
   ItemCard({super.key, required this.item, this.editable = false});
 
@@ -99,7 +104,11 @@ class ItemCard extends StatelessWidget {
                             ? Theme.of(context).colorScheme.primary
                             : null,
                         onPressed: () {
-                          ref.read(sizeProvider.notifier).state = size;
+                          if (ref.read(sizeProvider) == size) {
+                                ref.read(sizeProvider.notifier).state = null;
+                              } else {
+                                ref.read(sizeProvider.notifier).state = size;
+                              }
                         },
                       );
                     },
@@ -127,7 +136,7 @@ class ItemCard extends StatelessWidget {
               return ElevatedButton(
                 onPressed: (ref.watch(sizeProvider) != null)
                     ? () => ref.read(CartNotifier.itemsProvider.notifier).addItem(
-                          CartItem(
+                          InvoiceItem(
                             item: item,
                             size: ref.read(sizeProvider)!,
                             quantity: 1,
@@ -156,7 +165,7 @@ class ItemCard extends StatelessWidget {
             ),
           ),
           Text(
-            '${item.effectivePrice} $currency',
+            '${item.discountedPrice} $currency',
             style: const TextStyle(fontSize: 18),
           ),
         ],
@@ -278,6 +287,7 @@ class _ImageCarouselState extends State<ImageCarousel> {
                       child: CachedNetworkImage(
                         imageUrl: image.fullHDImage,
                         fit: BoxFit.fill,
+                        errorWidget: (context, url, error) => const Icon(Icons.error),
                         placeholder: (context, url) => Stack(
                           alignment: Alignment.center,
                           children: [
@@ -285,6 +295,15 @@ class _ImageCarouselState extends State<ImageCarousel> {
                               child: CachedNetworkImage(
                                 imageUrl: image.thumbImage,
                                 fit: BoxFit.fill,
+                                placeholder: (context, url) => const CircularProgressIndicator(),
+                                errorWidget: (context, url, error) => const Icon(Icons.error),
+                                //
+                                // errorWidget: (context, url, error) {
+                                //   return Image.asset(
+                                //     '/images/logo.webp',
+                                //     fit: BoxFit.fill,
+                                //   );
+                                // },
                               ),
                             ),
                             const CircularProgressIndicator(),

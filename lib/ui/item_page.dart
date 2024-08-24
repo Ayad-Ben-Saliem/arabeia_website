@@ -1,5 +1,5 @@
 import 'package:arabiya/db/db.dart';
-import 'package:arabiya/models/cart_item.dart';
+import 'package:arabiya/models/invoice_item.dart';
 import 'package:arabiya/models/item.dart';
 import 'package:arabiya/ui/cart_notifier.dart';
 import 'package:arabiya/ui/home_page.dart';
@@ -162,7 +162,7 @@ class ItemView extends StatelessWidget {
                 onPressed: (ref.watch(sizeProvider) != null)
                     ? () =>
                         ref.read(CartNotifier.itemsProvider.notifier).addItem(
-                              CartItem(
+                              InvoiceItem(
                                 item: item,
                                 size: ref.read(sizeProvider)!,
                                 quantity: 1,
@@ -191,7 +191,7 @@ class ItemView extends StatelessWidget {
             ),
           ),
           Text(
-            '${item.effectivePrice} $currency',
+            '${item.discountedPrice} $currency',
             style: const TextStyle(fontSize: 18),
           ),
         ],

@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_router/flutter_router.dart' as FRouter;
 
+import 'invoice_page.dart';
+
 final darkMode = StateProvider((ref) => false);
 
 class App extends ConsumerWidget {
@@ -22,12 +24,10 @@ class App extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
 
       theme: ThemeData(
-        colorScheme: ref.watch(darkMode)
-            ? const ColorScheme.dark(primary: Colors.white)
-            : const ColorScheme.light(primary: Colors.black),
-        fontFamily: 'HacenTunisia',
-        useMaterial3: false,
-      ),
+          colorScheme: ref.watch(darkMode) ? const ColorScheme.dark(primary: Colors.white) : const ColorScheme.light(primary: Colors.black),
+          fontFamily: 'HacenTunisia',
+          useMaterial3: false,
+          appBarTheme: const AppBarTheme(centerTitle: true)),
       locale: const Locale('ar'),
       initialRoute: '/',
 
@@ -47,6 +47,9 @@ class App extends ConsumerWidget {
           item: settings.arguments as Item?,
           id: match!.parameters['id'],
         ),
+        '/invoices/{invoiceId}': (ctx, match, settings) {
+          return InvoicePage(invoiceId: match!.parameters['invoiceId']!);
+        },
         '/item/{id}': (ctx, match, settings) {
           return ItemPage(
             item: settings.arguments as Item?,

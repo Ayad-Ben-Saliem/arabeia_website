@@ -31,7 +31,7 @@ class HomePage extends StatelessWidget {
         .catchError(getItemsCompleter.completeError);
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(title: const Text('نسخة تجريبية')),
       drawer: Drawer(
         child: ListView(
           children: [
@@ -71,10 +71,7 @@ class HomePage extends StatelessWidget {
                   child: Consumer(
                     builder: (context, ref, widget) {
                       return ElevatedButton(
-                        onPressed:
-                            ref.watch(CartNotifier.itemsProvider).isNotEmpty
-                                ? () => Navigator.pushNamed(context, '/cart')
-                                : null,
+                        onPressed: ref.watch(CartNotifier.itemsProvider).isNotEmpty ? () => Navigator.pushNamed(context, '/cart') : null,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -88,24 +85,18 @@ class HomePage extends StatelessWidget {
                                       start: 30,
                                       top: -3,
                                     ),
-                                    badgeAnimation:
-                                        const badges.BadgeAnimation.scale(
-                                      disappearanceFadeAnimationDuration:
-                                          Duration(milliseconds: 100),
+                                    badgeAnimation: const badges.BadgeAnimation.scale(
+                                      disappearanceFadeAnimationDuration: Duration(milliseconds: 100),
                                       curve: Curves.easeInCubic,
                                     ),
                                     showBadge: true,
                                     badgeStyle: badges.BadgeStyle(
-                                      badgeColor: ref.watch(darkMode)
-                                          ? Colors.black
-                                          : Colors.white,
+                                      badgeColor: ref.watch(darkMode) ? Colors.black : Colors.white,
                                     ),
                                     badgeContent: Text(
                                       '${ref.watch(cartCount)}',
                                       style: TextStyle(
-                                        color: ref.watch(darkMode)
-                                            ? Colors.white
-                                            : Colors.black,
+                                        color: ref.watch(darkMode) ? Colors.white : Colors.black,
                                       ),
                                     ),
                                     child: const Icon(

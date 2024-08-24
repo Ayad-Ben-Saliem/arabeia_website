@@ -1,4 +1,4 @@
-import 'package:arabiya/models/cart_item.dart';
+import 'package:arabiya/models/invoice_item.dart';
 import 'package:arabiya/models/item.dart';
 import 'package:arabiya/ui/cart_notifier.dart';
 import 'package:arabiya/ui/home_page.dart';
@@ -17,7 +17,7 @@ class CartPage extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 1024),
           child: Consumer(
             builder: (context, ref, widget) {
-              final cartItems = ref.watch(CartNotifier.groupedItemsProvider);
+              final invoiceItems = ref.watch(CartNotifier.groupedItemsProvider);
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -27,7 +27,7 @@ class CartPage extends StatelessWidget {
                       final isVertical = constraints.maxWidth < 300;
                       return ListView(
                         children: [
-                          for (final cartItem in cartItems)
+                          for (final cartItem in invoiceItems)
                             Padding(
                               padding: const EdgeInsets.all(4.0),
                               child: isVertical ? vCard(cartItem) : hCard(cartItem),
@@ -40,13 +40,13 @@ class CartPage extends StatelessWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: Align(
                       alignment: Alignment.centerLeft,
-                      child: Text('${total(cartItems)} $currency'),
+                      child: Text('${total(invoiceItems)} $currency'),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
-                      onPressed: () => Navigator.pushNamed(context, '/address') ,
+                      onPressed: invoiceItems.isNotEmpty ? () => Navigator.pushNamed(context, '/address') : null,
                       child: const Text('التالي'),
                     ),
                   ),
@@ -59,7 +59,7 @@ class CartPage extends StatelessWidget {
     );
   }
 
-  Widget vCard(CartItem cartItem) {
+  Widget vCard(InvoiceItem cartItem) {
     return Card(
       child: Column(
         children: [
@@ -112,7 +112,7 @@ class CartPage extends StatelessWidget {
     );
   }
 
-  Widget hCard(CartItem cartItem) {
+  Widget hCard(InvoiceItem cartItem) {
     return ConstrainedBox(
       constraints: const BoxConstraints(maxHeight: 128),
       child: Card(
@@ -160,14 +160,14 @@ class CartPage extends StatelessWidget {
     );
   }
 
-  Widget qtyWidget(CartItem cartItem) {
+  Widget qtyWidget(InvoiceItem cartItem) {
     return Consumer(
       builder: (context, ref, widget) {
         return Row(
           children: [
             IconButton(
               onPressed: () {
-                ref.read(CartNotifier.itemsProvider.notifier).addItem(cartItem);
+                ref.read(CartNotifier.itemsProvider.notifier).addItem(cartItem.copyWith(quantity: 1));
               },
               icon: const Icon(Icons.add),
             ),
@@ -191,7 +191,7 @@ class CartPage extends StatelessWidget {
   void removeItemConfirmationDialog(
     BuildContext context,
     WidgetRef ref,
-    CartItem cartItem,
+    InvoiceItem cartItem,
   ) {
     showDialog<bool>(
       context: context,
@@ -217,9 +217,9 @@ class CartPage extends StatelessWidget {
     );
   }
 
-  double total(Iterable<CartItem> cartItems) {
+  double total(Iterable<InvoiceItem> invoiceItems) {
     var total = 0.0;
-    for (final cartItem in cartItems) {
+    for (final cartItem in invoiceItems) {
       total += cartItem.totalPrice;
     }
     return total;
@@ -235,10 +235,10 @@ class CartPage extends StatelessWidget {
             '${item.price} $currency',
             style: const TextStyle(decoration: TextDecoration.lineThrough),
           ),
-          Text('${item.effectivePrice} $currency'),
+          Text('${item.discountedPrice} $currency'),
         ],
       );
     }
-    return Text('${item.effectivePrice} $currency');
+    return Text('${item.discountedPrice} $currency');
   }
 }
