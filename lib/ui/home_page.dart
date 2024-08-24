@@ -25,12 +25,6 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final getItemsFuture = Database.getItems();
-    final getItemsCompleter = Completer<Iterable<Item>>();
-    getItemsFuture
-        .then(getItemsCompleter.complete)
-        .catchError(getItemsCompleter.completeError);
-
     return Scaffold(
       appBar: AppBar(title: const Text('نسخة تجريبية')),
       drawer: Drawer(
@@ -47,20 +41,23 @@ class HomePage extends StatelessWidget {
         children: [
           Expanded(
             child: FutureBuilder(
-              future: getItemsFuture,
+              future: Database.getHomePageItems(),
               builder: (context, snapshot) {
-                if (!getItemsCompleter.isCompleted) {
+                if (snapshot.connectionState == ConnectionState.waiting || snapshot.connectionState == ConnectionState.active) {
                   return const Center(child: CircularProgressIndicator());
                 }
-                if (snapshot.hasError) {
-                  return Center(child: Text('${snapshot.error}'));
+                if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.hasError) {
+                    return Center(child: Text('${snapshot.error}'));
+                  }
+                  if (snapshot.hasData) {
+                    if (snapshot.data == null) {
+                      return const Center(child: Text('لا توجد بيانات!!!'));
+                    }
+                    return ItemsGridView(items: snapshot.requireData);
+                  }
                 }
-
-                if (snapshot.data == null) {
-                  return const Center(child: Text('لا توجد بيانات!!!'));
-                }
-
-                return ItemsGridView(items: snapshot.data!);
+                return Container();
               },
             ),
           ),
