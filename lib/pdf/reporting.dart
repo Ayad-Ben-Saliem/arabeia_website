@@ -1,13 +1,13 @@
-import 'package:arabiya/models/bill.dart';
+import 'package:arabiya/models/invoice.dart';
 import 'package:arabiya/models/item.dart';
-import 'package:arabiya/pdf/pdf.dart';
+import 'package:arabiya/utils.dart';
 import 'package:flutter/services.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/widgets.dart';
 import 'package:pdf/pdf.dart';
 
 abstract class Reporting {
-  static Future<Uint8List> createPdfBill(Bill bill) async {
+  static Future<Uint8List> createPdfInvoice(Invoice invoice) async {
     // final font = await PdfGoogleFonts.robotoRegular();
     final font = await fontFromAssetBundle(
       'assets/fonts/HacenTunisia/Regular.ttf',
@@ -29,26 +29,35 @@ abstract class Reporting {
           ),
           textDirection: TextDirection.rtl,
         ),
-        // textDirection: TextDirection.rtl,
         build: (context) {
           return LayoutBuilder(
             builder: (context, constraints) {
               return Center(
                 child: Container(
                   width: constraints?.maxWidth ?? 480,
-                  child: CustomColumn(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Column(
                     children: [
-                      header(bill, logo),
+                      header(invoice, logo),
                       SizedBox(height: 32),
-                      table(bill),
+                      table(invoice),
                       SizedBox(height: 32),
-                      footer(bill),
+                      footer(invoice),
                       Spacer(),
                       Align(
                         alignment: Alignment.bottomLeft,
                         child: Text('المستلم: . . . . . . . . . . . . . . . .'),
                       ),
+                      SizedBox(height: 32),
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Text(
+                          'Created by Manassa Ltd - manassa.ly',
+                          style: const TextStyle(
+                            color: PdfColors.grey,
+                            fontSize: 10
+                          ),
+                        ),
+                      )
                     ],
                   ),
                 ),
@@ -62,42 +71,37 @@ abstract class Reporting {
     return pdf.save();
   }
 
-  static Widget header(Bill bill, ImageProvider logo) {
-    return CustomRow(
-      textDirection: TextDirection.rtl,
+  static Widget header(Invoice invoice, ImageProvider logo) {
+    return Row(
       children: [
-        CustomColumn(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            CustomText('اســم المستلم'),
-            CustomText('رقــم الهـاتـف'),
-            CustomText('عنوان المستلم'),
-            CustomText('التـــــــــاريــــخ'),
+            Text('اســم المستلم'),
+            Text('رقــم الهـاتـف'),
+            Text('عنوان المستلم'),
+            Text('التـــــــــاريــــخ'),
           ],
         ),
-        CustomColumn(
+        Column(
           children: [
-            CustomText(' :'),
-            CustomText(' :'),
-            CustomText(' :'),
-            CustomText(' :'),
+            Text('  :'),
+            Text('  :'),
+            Text('  :'),
+            Text('  :'),
           ],
         ),
-        CustomColumn(
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CustomText(bill.recipientName),
-            CustomText(bill.recipientPhone),
-            CustomText(bill.recipientAddress),
-            CustomText(format(bill.createAt)),
+            Text(invoice.recipientName),
+            Text(invoice.recipientPhone),
+            Text(invoice.recipientAddress),
+            Text(format(invoice.createAt)),
           ],
         ),
         Spacer(),
-        SizedBox(
-          height: 64,
-          width: 64,
-          child: Image(logo),
-        ),
+        SizedBox.square(dimension: 64, child: Image(logo)),
       ],
     );
   }
@@ -109,16 +113,16 @@ abstract class Reporting {
     final hour = dateTime.hour;
     final minute = dateTime.minute;
     return '$year-${month.padLeft(2, '0')}-${day.padLeft(2, '0')} '
-        '${hour % 12}:$minute ${hour < 12 ? 'AM' : 'PM'}';
+        '${hour % 12}:$minute ${hour < 12 ? 'ص' : 'م'}';
   }
 
-  static Widget table(Bill bill) {
-    final cartItems = bill.cartItems;
+  static Widget table(Invoice invoice) {
+    final invoiceItems = invoice.invoiceItems;
 
     return Table(
       columnWidths: {
-        0: const FixedColumnWidth(60),
-        1: const FixedColumnWidth(80),
+        0: const FixedColumnWidth(50),
+        1: const FixedColumnWidth(60),
         2: const FixedColumnWidth(40),
         3: const FixedColumnWidth(40),
         4: const FractionColumnWidth(0.5),
@@ -126,85 +130,100 @@ abstract class Reporting {
       children: [
         TableRow(
           children: [
-            CustomText('المجموع (د.ل)'),
-            CustomText('سعر الوحدة (د.ل)'),
-            CustomText('الكمية'),
-            CustomText('الحجم'),
-            CustomText('اسم الصنف'),
+            Text('المجموع', textAlign: TextAlign.center),
+            Text('سعر الوحدة', textAlign: TextAlign.center),
+            Text('الكمية', textAlign: TextAlign.center),
+            Text('الحجم', textAlign: TextAlign.center),
+            Text('اسم الصنف', textAlign: TextAlign.center),
           ],
         ),
-        TableRow(
-          children: [for (int i = 0; i < 5; i++) Divider()],
-        ),
-        for (int i = 0; i < cartItems.length; i++) ...[
+        TableRow(children: [for (int i = 0; i < 5; i++) Divider(height: 1, thickness: 1)]),
+        for (int i = 0; i < invoiceItems.length; i++) ...[
           TableRow(
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 2),
-                child: CustomText('${cartItems.elementAt(i).totalPrice}'),
+                child: Text('${invoiceItems.elementAt(i).totalPrice}', textAlign: TextAlign.center),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 1),
-                child: priceWidget(cartItems.elementAt(i).item),
+                child: priceWidget(invoiceItems.elementAt(i).item),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 1),
-                child: CustomText('${cartItems.elementAt(i).quantity}'),
+                child: Text('${invoiceItems.elementAt(i).quantity}', textAlign: TextAlign.center),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 1),
-                child: CustomText(cartItems.elementAt(i).size),
+                child: Column(
+                  // Use column to fill all available vertical space
+                  children: [Text(invoiceItems.elementAt(i).size, textAlign: TextAlign.center)],
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 1),
-                child: CustomText(cartItems.elementAt(i).item.name),
+                child: Text(invoiceItems.elementAt(i).item.name),
               ),
             ],
           ),
-          TableRow(
-            children: [for (int i = 0; i < 5; i++) Divider(thickness: 0.25)],
-          ),
+          TableRow(children: [for (int i = 0; i < 5; i++) Divider(height: 0.25, thickness: 0.25)]),
         ],
       ],
     );
   }
 
   static Widget priceWidget(Item item) {
-    // if (item.discount != null) {
-    //   return CustomColumn(
-    //     crossAxisAlignment: CrossAxisAlignment.start,
-    //     children: [
-    //       CustomText(
-    //         '${item.price}',
-    //         style: const TextStyle(
-    //           decoration: TextDecoration.lineThrough,
-    //         ),
-    //       ),
-    //       CustomText('${item.effectivePrice}'),
-    //     ],
-    //   );
-    // }
-    return CustomText('${item.effectivePrice}');
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        if (item.discount != null)
+          Text(
+            '${item.price}',
+            style: const TextStyle(decoration: TextDecoration.lineThrough, color: PdfColors.grey),
+          ),
+        Text('${item.discountedPrice}'),
+      ],
+    );
   }
 
-  static Widget footer(Bill bill) {
+  static Widget footer(Invoice invoice) {
     const googleMapUrl = 'https://www.google.com/maps/';
-    return CustomRow(
+    return Row(
       children: [
-        CustomColumn(children: [
-          BarcodeWidget(
-            data: '$googleMapUrl@${bill.latitude},${bill.longitude},15z',
-            barcode: Barcode.qrCode(),
-            width: 64,
-            height: 64,
-          ),
-          Text('الموقع'),
-        ]),
+        Column(
+          children: [
+            BarcodeWidget(
+              data: '$googleMapUrl@${invoice.latitude},${invoice.longitude},15z',
+              barcode: Barcode.qrCode(),
+              width: 64,
+              height: 64,
+            ),
+            Text('الموقع'),
+          ],
+        ),
+        SizedBox(width: 64),
+        Column(
+          children: [
+            BarcodeWidget(
+              data: '$baseUrl/invoices/${invoice.id}',
+              barcode: Barcode.qrCode(),
+              width: 64,
+              height: 64,
+            ),
+            Text('الفاتورة'),
+          ],
+        ),
         Spacer(),
-        Text(
-          'المجموع: ${bill.total} د.ل',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        )
+        Column(children: [
+          Text(
+            'الإجمالي: ${invoice.total} د.ل',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          Text(
+            'لقد ادخرت: ${invoice.savings} د.ل',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          )
+        ]),
       ],
     );
   }

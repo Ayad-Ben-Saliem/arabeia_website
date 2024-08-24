@@ -1,6 +1,5 @@
+import 'package:arabiya/utils.dart';
 import 'package:equatable/equatable.dart';
-
-typedef JsonMap = Map<String, dynamic>;
 
 class Item extends Equatable {
   final String? id;
@@ -76,21 +75,23 @@ class Item extends Equatable {
         price = json['price'].toDouble(),
         discount = json['discount']?.toDouble();
 
-  JsonMap get toJson => {
-        'id': id,
-        'name': name,
-        'order': order,
-        'description': description,
-        'sizes': sizes,
-        'images': images.map((image) => image.toJson).toList(),
-        'price': price,
-        'discount': discount,
-      };
+  JsonMap toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'order': order,
+      'description': description,
+      'sizes': sizes,
+      'images': images.map((image) => image.toJson()).toList(),
+      'price': price,
+      'discount': discount,
+    };
+  }
 
   @override
   String toString() => 'Item($name)';
 
-  double get effectivePrice => price - (discount ?? 0);
+  double get discountedPrice => price - (discount ?? 0);
 
   @override
   List<Object?> get props => [
@@ -101,7 +102,7 @@ class Item extends Equatable {
         ...images,
         price,
         discount,
-        effectivePrice,
+        discountedPrice,
       ];
 }
 
@@ -115,11 +116,15 @@ class ArabiyaImages extends Equatable {
       : thumbImage = json['thumbImage'],
         fullHDImage = json['fullHDImage'];
 
-  JsonMap get toJson => {
-        'thumbImage': thumbImage,
-        'fullHDImage': fullHDImage,
-      };
+  JsonMap toJson() {
+    return  {
+      'thumbImage': thumbImage,
+      'fullHDImage': fullHDImage,
+    };
+  }
 
   @override
   List<Object?> get props => [thumbImage, fullHDImage];
+
+
 }

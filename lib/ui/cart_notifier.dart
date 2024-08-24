@@ -1,37 +1,37 @@
-import 'package:arabiya/models/cart_item.dart';
+import 'package:arabiya/models/invoice_item.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CartNotifier extends StateNotifier<List<CartItem>> {
+class CartNotifier extends StateNotifier<List<InvoiceItem>> {
   CartNotifier() : super([]);
 
   static final itemsProvider =
-      StateNotifierProvider<CartNotifier, List<CartItem>>(
+      StateNotifierProvider<CartNotifier, List<InvoiceItem>>(
     (ref) => CartNotifier(),
   );
 
-  static final groupedItemsProvider = StateProvider<List<CartItem>>(
+  static final groupedItemsProvider = StateProvider<List<InvoiceItem>>(
     (ref) {
       final items = ref.watch(CartNotifier.itemsProvider);
 
-      final cartItems = <CartItem>[];
+      final invoiceItems = <InvoiceItem>[];
       for (int index = items.length - 1; index >= 0; index--) {
         final item = items[index];
         var cartItem = item.copyWith();
-        for (CartItem cartItem0 in cartItems) {
+        for (InvoiceItem cartItem0 in invoiceItems) {
           if (cartItem0 == item) {
             cartItem = cartItem0.increase(1);
 
-            cartItems.remove(cartItem0);
+            invoiceItems.remove(cartItem0);
             break;
           }
         }
-        cartItems.add(cartItem);
+        invoiceItems.add(cartItem);
       }
-      return cartItems;
+      return invoiceItems;
     },
   );
 
-  void addItem(CartItem cartItem) {
+  void addItem(InvoiceItem cartItem) {
     final index = state.indexWhere(
       (cartItem0) =>
           cartItem.item == cartItem0.item && cartItem.size == cartItem0.size,
@@ -41,13 +41,13 @@ class CartNotifier extends StateNotifier<List<CartItem>> {
       state = [...state, cartItem.copyWith()];
     } else {
       final currentItem = state[index].increase(cartItem.quantity);
-      final items = List<CartItem>.from(state);
+      final items = List<InvoiceItem>.from(state);
       items.replaceRange(index, index + 1, [currentItem]);
       state = items;
     }
   }
   
-  void removeItem(CartItem cartItem) {
+  void removeItem(InvoiceItem cartItem) {
     final index = state.indexWhere(
           (cartItem0) =>
       cartItem.item == cartItem0.item && cartItem.size == cartItem0.size,
@@ -55,7 +55,7 @@ class CartNotifier extends StateNotifier<List<CartItem>> {
 
     if(index != -1) {
       final currentItem = state[index].decrease(cartItem.quantity);
-      final items = List<CartItem>.from(state);
+      final items = List<InvoiceItem>.from(state);
       if(currentItem.quantity > 0) {
         items.replaceRange(index, index + 1, [currentItem]);
       } else {
@@ -65,5 +65,9 @@ class CartNotifier extends StateNotifier<List<CartItem>> {
     }
   }
 
-  void setQuantity(CartItem item, int quantity) {}
+  void setQuantity(InvoiceItem item, int quantity) {}
+
+  void empty() {
+    state = [];
+  }
 }
