@@ -1,9 +1,7 @@
-import 'dart:async';
 import 'package:arabiya/ui/cart_notifier.dart';
 import 'package:arabiya/ui/widgets/items_grid_view.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:arabiya/db/db.dart';
-import 'package:arabiya/models/item.dart';
 import 'package:arabiya/ui/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
