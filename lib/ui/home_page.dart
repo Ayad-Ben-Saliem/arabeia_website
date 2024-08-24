@@ -22,28 +22,29 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final getItemsFuture = Database.getItems();
-
     return Scaffold(
       appBar: AppBar(title: const Text('نسخة تجريبية')),
       body: Column(
         children: [
           Expanded(
             child: FutureBuilder(
-              future: getItemsFuture,
+              future: Database.getHomePageItems(),
               builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting || snapshot.connectionState == ConnectionState.active) {
+                  return const Center(child: CircularProgressIndicator());
+                }
                 if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.hasError) {
+                    return Center(child: Text('${snapshot.error}'));
+                  }
                   if (snapshot.hasData) {
-                    return ItemsGridView(items: snapshot.data!);
-                  } else {
-                    return const Center(child: Text('لا توجد بيانات!!!'));
+                    if (snapshot.data == null) {
+                      return const Center(child: Text('لا توجد بيانات!!!'));
+                    }
+                    return ItemsGridView(items: snapshot.requireData);
                   }
                 }
-                if (snapshot.hasError) {
-                  return Center(child: Text('${snapshot.error}'));
-                }
-
-                return const Center(child: CircularProgressIndicator());
+                return Container();
               },
             ),
           ),

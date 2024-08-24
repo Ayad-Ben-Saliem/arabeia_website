@@ -1,23 +1,32 @@
+import 'package:arabiya/models/invoice.dart';
 import 'package:arabiya/models/item.dart';
+import 'package:arabiya/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import '../models/invoice.dart';
 
 class Database {
   static final _db = FirebaseFirestore.instance;
 
-  static final CollectionReference<Map<String, dynamic>> _itemsRef =
-      _db.collection('Items');
+  static final CollectionReference<Map<String, dynamic>> _itemsRef = _db.collection('Items');
 
   static final CollectionReference<Map<String, dynamic>> _invoicesRef = _db.collection('invoices');
 
+  static final CollectionReference<Map<String, dynamic>> _managementRef = _db.collection('management');
 
   static Future<Iterable<Item>> getItems() async {
     final query = await _itemsRef.get();
 
-    return query.docs.map(
-      (doc) => Item.fromJson({...doc.data(), 'id': doc.id}),
-    );
+    return query.docs.map((doc) => Item.fromJson({...doc.data(), 'id': doc.id}));
+  }
+
+  static Future<Iterable<Item>> getHomePageItems() async {
+    final homePageData = await getHomePageData();
+    final ids = homePageData['items'];
+
+    final query = await _itemsRef.where(FieldPath.documentId, whereIn: ids).get();
+
+    final docs = query.docs;
+    docs.sort((a, b) => ids.indexOf(a.id).compareTo(ids.indexOf(b.id)));
+    return docs.map((doc) => Item.fromJson({...doc.data(), 'id': doc.id}));
   }
 
   static Future<Item?> getItem(String id) async {
@@ -53,5 +62,10 @@ class Database {
 
   static void deleteInvoice(invoice) {
     _invoicesRef.doc(invoice.id).delete();
+  }
+
+  static Future<JsonMap> getHomePageData() async {
+    final doc = await _managementRef.doc('home-page').get();
+    return doc.data()!;
   }
 }
