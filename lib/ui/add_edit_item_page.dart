@@ -29,8 +29,7 @@ final _jsonError = StateProvider<_JsonError?>((ref) => null);
 
 final _canSave = StateProvider(
   (ref) {
-    return ref.watch(_originalItem) != ref.watch(_currentItem) &&
-        ref.watch(_jsonError) == null;
+    return ref.watch(_originalItem) != ref.watch(_currentItem) && ref.watch(_jsonError) == null;
   },
 );
 
@@ -92,8 +91,7 @@ class _AddEditItemPage extends StatelessWidget {
                 onPressed: ref.watch(_canSave)
                     ? () => {
                           Database.addUpdateItem(ref.read(_currentItem)),
-                          ref.read(_originalItem.notifier).state =
-                              ref.read(_currentItem),
+                          ref.read(_originalItem.notifier).state = ref.read(_currentItem),
                           showDialog(
                             context: context,
                             builder: (context) => const SuccessDialog(),
@@ -138,9 +136,7 @@ class _JsonFormItem extends StatelessWidget {
         child: Consumer(
           builder: (context, ref, child) {
             final selection = controller.selection;
-            controller.text = Utils.getPrettyString(
-              ref.watch(_currentItem).toJson,
-            );
+            controller.text = Utils.getPrettyString(ref.watch(_currentItem).toJson());
             try {
               controller.selection = selection;
             } catch (e) {
@@ -153,9 +149,7 @@ class _JsonFormItem extends StatelessWidget {
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     filled: true,
-                    fillColor: ref.watch(_jsonError) == null
-                        ? Colors.transparent
-                        : Colors.red.shade50,
+                    fillColor: ref.watch(_jsonError) == null ? Colors.transparent : Colors.red.shade50,
                   ),
                   scrollPadding: const EdgeInsets.all(8.0),
                   keyboardType: TextInputType.multiline,
@@ -173,8 +167,7 @@ class _JsonFormItem extends StatelessWidget {
                           // Reset _jsonError
                           ref.read(_jsonError.notifier).state = null;
                         } on FormatException catch (exception, stackTrace) {
-                          ref.read(_jsonError.notifier).state =
-                              _JsonError(exception, stackTrace);
+                          ref.read(_jsonError.notifier).state = _JsonError(exception, stackTrace);
                           print(exception);
                         }
                       },
