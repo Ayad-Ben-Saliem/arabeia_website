@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:html' as html;
 import 'dart:convert';
@@ -259,4 +260,69 @@ class DeviceType {
   static bool isPC(BuildContext context) {
     return MediaQuery.of(context).size.width >= 900;
   }
+}
+
+extension StringExtension on String {
+  bool containEachOther(String str) {
+    return contains(str) || str.contains(this);
+  }
+
+  bool containEachOtherIgnoreCase(String str) {
+    return toLowerCase().contains(str.toLowerCase()) ||
+        str.toLowerCase().contains(toLowerCase());
+  }
+
+  int similarity(String str) => levenshtein(this, str);
+
+  int similarityIgnoreCase(String str) => levenshtein(toLowerCase(), str.toLowerCase());
+
+  int smartSearch(String str) {
+    // TODO
+    return 0;
+  }
+
+  int smartSearchIgnoreCase(String str) {
+    // TODO
+    return 0;
+  }
+
+  int smartSearchEachOther(String str) {
+    // TODO
+    return 0;
+  }
+
+  int smartSearchEachOtherIgnoreCase(String str) {
+    // TODO
+    return 0;
+  }
+}
+
+
+int levenshtein(String s1, String s2) {
+  int len1 = s1.length;
+  int len2 = s2.length;
+  List<List<int>> d = List.generate(len1 + 1, (_) => List<int>.filled(len2 + 1, 0));
+
+  for (int i = 0; i <= len1; i++) {
+    d[i][0] = i;
+  }
+  for (int j = 0; j <= len2; j++) {
+    d[0][j] = j;
+  }
+  for (int i = 1; i <= len1; i++) {
+    for (int j = 1; j <= len2; j++) {
+      int cost = s1[i - 1] == s2[j - 1] ? 0 : 1;
+      d[i][j] = [
+        d[i - 1][j] + 1, // deletion
+        d[i][j - 1] + 1, // insertion
+        d[i - 1][j - 1] + cost // substitution
+      ].reduce((a, b) => a < b ? a : b);
+    }
+  }
+  return d[len1][len2];
+}
+
+
+void debug(Object? obj) {
+  if (kDebugMode) print(obj);
 }
