@@ -121,8 +121,6 @@ class FullScreenDialog extends ConsumerWidget {
   }
 
   Color _getOverlayColor(WidgetRef ref, ArabiyaImages image) {
-    return image == ref.watch(currentImage)
-        ? Colors.transparent
-        : Colors.grey.withOpacity(0.5);
+    return image == ref.watch(currentImage) ? Colors.transparent : Colors.grey.withOpacity(0.5);
   }
 }
