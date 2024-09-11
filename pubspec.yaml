@@ -59,6 +59,12 @@ dependencies:
   pdfrx: ^1.0.82
   intl: ^0.17.0
   pdf: ^3.11.1
+  resizable_widget: ^1.0.5
+  infinite_scroll_pagination: ^4.0.0
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+
+
 
 dev_dependencies:
   flutter_test:
