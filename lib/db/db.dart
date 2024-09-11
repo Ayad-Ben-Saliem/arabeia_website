@@ -21,7 +21,6 @@ class Database {
   static Future<Iterable<Item>> getHomePageItems() async {
     final homePageData = await getHomePageData();
     final ids = homePageData['items'];
-
     final query = await _itemsRef.where(FieldPath.documentId, whereIn: ids).get();
 
     final docs = query.docs;
@@ -57,6 +56,25 @@ class Database {
       final data = {...doc.data(), 'id': doc.id};
       return Invoice.fromJson(data);
     }).toList();
+    return invoices;
+  }
+
+  static Future<List<Invoice>> invoicesSearch({
+    String? searchText,
+    String? lastInvoiceId,
+    int limit = 0,
+  }) async {
+    Query query = _invoicesRef.orderBy('createAt').limit(limit);
+    if (lastInvoiceId != null) {
+      final lastDocument = await _invoicesRef.doc(lastInvoiceId).get();
+      query = query.startAfterDocument(lastDocument);
+    }
+    final querySnapshot = await query.get();
+    final invoices = querySnapshot.docs.map((doc) {
+      final Map<String, dynamic> data = {...doc.data()! as Map<String, dynamic>, 'id': doc.id};
+      return Invoice.fromJson(data);
+    }).toList();
+
     return invoices;
   }
 
