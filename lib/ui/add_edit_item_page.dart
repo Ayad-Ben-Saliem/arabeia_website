@@ -2,9 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:arabiya/db/db.dart';
 import 'package:arabiya/models/item.dart';
-import 'package:arabiya/ui/management_page.dart';
+import 'package:arabiya/ui/app.dart';
+import 'package:arabiya/ui/appearance_page.dart';
+import 'package:arabiya/ui/widgets/custom_indicator.dart';
 import 'package:arabiya/utils.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 const _emptyItem = Item(
@@ -61,7 +66,7 @@ class AddEditItemPage extends ConsumerWidget {
               return const _AddEditItemPage();
             }
           } else if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
+            return const CustomIndicator();
           }
           return Text('Error!! ${snapshot.error}');
         },
@@ -81,39 +86,53 @@ class _AddEditItemPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          actions: [
-            Consumer(builder: (context, ref, child) {
-              return IconButton(
-                onPressed: ref.watch(_canSave)
-                    ? () => {
-                          Database.addUpdateItem(ref.read(_currentItem)),
-                          ref.read(_originalItem.notifier).state = ref.read(_currentItem),
-                          showDialog(
-                            context: context,
-                            builder: (context) => const SuccessDialog(),
-                          )
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          appBar: AppBar(
+            actions: [
+              Consumer(builder: (context, ref, child) {
+                return IconButton(
+                  onPressed: ref.watch(_canSave)
+                      ? () {
+                          print(ref.read(_currentItem));
+                          final future = Database.addUpdateItem(ref.read(_currentItem));
+
+                          future.catchError((error, stacktrace) {
+                            // TODO: show an error message
+                          });
+
+                          future.then((item) {
+                            ref.read(_originalItem.notifier).state = item;
+                            ref.read(_currentItem.notifier).state = item;
+                            if (context.mounted) {
+                              showDialog(
+                                context: context,
+                                builder: (context) => const SuccessDialog(),
+                              );
+                            }
+                          });
                         }
-                    : null,
-                icon: const Icon(Icons.check),
-              );
-            }),
-          ],
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'JSON'),
-              Tab(text: 'Visual'),
+                      : null,
+                  icon: const Icon(Icons.check),
+                );
+              }),
+            ],
+            bottom: const TabBar(
+              tabs: [
+                Tab(text: 'مرئي'),
+                Tab(text: 'JSON'),
+              ],
+            ),
+          ),
+          body: const TabBarView(
+            children: [
+              _VisualFormItem(),
+              _JsonFormItem(),
             ],
           ),
-        ),
-        body: const TabBarView(
-          children: [
-            _JsonFormItem(),
-            _VisualFormItem(),
-          ],
         ),
       ),
     );
@@ -146,10 +165,10 @@ class _JsonFormItem extends StatelessWidget {
               builder: (context, ref, child) {
                 return TextField(
                   controller: controller,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     border: InputBorder.none,
                     filled: true,
-                    fillColor: ref.watch(_jsonError) == null ? Colors.transparent : Colors.red.shade50,
+                    // fillColor: ref.watch(_jsonError) == null ? Colors.transparent : Colors.red.shade50,
                   ),
                   scrollPadding: const EdgeInsets.all(8.0),
                   keyboardType: TextInputType.multiline,
@@ -168,7 +187,7 @@ class _JsonFormItem extends StatelessWidget {
                           ref.read(_jsonError.notifier).state = null;
                         } on FormatException catch (exception, stackTrace) {
                           ref.read(_jsonError.notifier).state = _JsonError(exception, stackTrace);
-                          print(exception);
+                          debug(exception);
                         }
                       },
                     );
@@ -188,87 +207,394 @@ class _VisualFormItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: SizedBox(
-            height: 128,
-            child: Consumer(
-              builder: (context, ref, child) {
-                final images = ref.watch(
-                  _currentItem.select((item) => item.images),
-                );
-                return ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    for (var image in images)
-                      Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: Image.network(image.fullHDImage),
-                      ),
-                    Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: TextButton(
-                        onPressed: () {},
-                        child: const Icon(Icons.add),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Consumer(
-            builder: (context, ref, child) {
-              return TextField(
-                controller: TextEditingController(
-                  text: ref.read(_currentItem.select((item) => item.name)),
-                ),
+    return Consumer(builder: (context, ref, child) {
+      final originalItem = ref.watch(_originalItem);
+      print(originalItem);
+      return SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Name Field
+              TextFormField(
+                key: GlobalKey(),
+                cursorErrorColor: Colors.red,
+                initialValue: originalItem.name,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'الإسم',
+                  filled: true,
                 ),
                 onChanged: (txt) {
                   final currentItem = ref.read(_currentItem);
-                  ref.read(_currentItem.notifier).state = currentItem.copyWith(
-                    name: txt,
-                  );
+                  ref.read(_currentItem.notifier).state = currentItem.copyWith(name: txt);
                 },
-              );
-            },
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Consumer(
-            builder: (context, ref, child) {
-              return TextField(
-                controller: TextEditingController(
-                  text: ref.read(
-                    _currentItem.select((item) => item.description),
-                  ),
+              ),
+              const SizedBox(height: 24),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 4.0),
+                child: Text('صور المنتج'),
+              ),
+              // List of images
+              SizedBox(
+                height: 160,
+                child: Consumer(
+                  builder: (context, ref, child) {
+                    final images = ref.watch(_currentItem.select((item) => item.images));
+                    return ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: TextButton(
+                            style: ButtonStyle(
+                              shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                                ),
+                              ),
+                              minimumSize: const WidgetStatePropertyAll(Size.square(160.0)),
+                            ),
+                            onPressed: () {
+                              _showImageDialog(
+                                context,
+                                image: null,
+                                onSave: (newImage) {
+                                  final currentItem = ref.read(_currentItem);
+                                  var updatedImages = [...images, newImage];
+                                  ref.read(_currentItem.notifier).state = currentItem.copyWith(
+                                    images: updatedImages,
+                                  );
+                                },
+                              );
+                            },
+                            child: const Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.add),
+                                Text("إضافة صورة جديدة"),
+                              ],
+                            ),
+                          ),
+                        ),
+                        for (var i = 0; i < images.length; i++)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                            child: IntrinsicWidth(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Theme.of(context).colorScheme.primary),
+                                  borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: ClipRRect(
+                                          borderRadius: const BorderRadius.all(Radius.circular(6.0)),
+                                          child: CachedNetworkImage(
+                                            imageUrl: images[i].thumbImage,
+                                            height: 100,
+                                            fit: BoxFit.scaleDown,
+                                            placeholder: (_, __) => const CustomIndicator(),
+                                            errorWidget: (context, error, stackTrace) {
+                                              return const SizedBox(
+                                                height: 100,
+                                                child: Center(
+                                                  child: Text(
+                                                    'خطأ في تحميل الصورة',
+                                                    style: TextStyle(color: Colors.red),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        TextButton(
+                                          onPressed: () {
+                                            _showImageDialog(
+                                              context,
+                                              image: images[i],
+                                              onSave: (updatedImage) {
+                                                final currentItem = ref.read(_currentItem);
+                                                var updatedImages = [...images];
+                                                updatedImages[i] = updatedImage;
+                                                ref.read(_currentItem.notifier).state = currentItem.copyWith(
+                                                  images: updatedImages,
+                                                );
+                                              },
+                                            );
+                                          },
+                                          child: const Text("تعديل"),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  title: const Text('تأكيد الحذف'),
+                                                  content: const Text('هل أنت متأكد أنك تريد حذف هذه الصورة؟'),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () => Navigator.of(context).pop(),
+                                                      child: const Text('إلغاء'),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        final currentItem = ref.read(_currentItem);
+                                                        var updatedImages = [...images];
+                                                        updatedImages.removeAt(i);
+                                                        ref.read(_currentItem.notifier).state = currentItem.copyWith(images: updatedImages);
+                                                        Navigator.of(context).pop();
+                                                      },
+                                                      child: const Text('حذف'),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          },
+                                          style: TextButton.styleFrom(foregroundColor: Colors.red),
+                                          child: const Text('حذف'),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
                 ),
+              ),
+              const Divider(height: 24.0),
+              // List of Sizes
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 4.0),
+                child: Text('الأحجام'),
+              ),
+              SizedBox(
+                height: 80,
+                child: Consumer(
+                  builder: (context, ref, child) {
+                    final sizes = ref.watch(_currentItem.select((item) => item.sizes));
+                    return ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: TextButton(
+                            style: ButtonStyle(
+                              shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                                ),
+                              ),
+                              minimumSize: const WidgetStatePropertyAll(Size.square(80.0)),
+                            ),
+                            onPressed: () {
+                              var updatedSizes = [...sizes, ''];
+                              ref.read(_currentItem.notifier).state = ref.read(_currentItem).copyWith(sizes: updatedSizes);
+                            },
+                            child: const Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.add),
+                                Text("إضافة حجم جديد"),
+                              ],
+                            ),
+                          ),
+                        ),
+                        for (var i = 0; i < sizes.length; i++)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                            child: Container(
+                              width: 100,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Theme.of(context).colorScheme.primary),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              child: Column(
+                                children: [
+                                  Expanded(
+                                    child: TextFormField(
+                                      initialValue: sizes[i],
+                                      textAlign: TextAlign.center,
+                                      textAlignVertical: TextAlignVertical.bottom,
+                                      decoration: const InputDecoration(border: InputBorder.none, filled: true),
+                                      onChanged: (txt) {
+                                        final currentItem = ref.read(_currentItem);
+                                        var updatedSizes = [...sizes];
+                                        updatedSizes[i] = txt;
+                                        ref.read(_currentItem.notifier).state = currentItem.copyWith(sizes: updatedSizes);
+                                      },
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      final currentItem = ref.read(_currentItem);
+                                      var updatedSizes = [...sizes];
+                                      updatedSizes.removeAt(i);
+                                      ref.read(_currentItem.notifier).state = currentItem.copyWith(
+                                        sizes: updatedSizes,
+                                      );
+                                    },
+                                    style: TextButton.styleFrom(foregroundColor: Colors.red),
+                                    child: const Text('حذف'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 24.0),
+
+              // Price and Discount Fields
+              Row(
+                children: [
+                  // Price Field
+                  Flexible(
+                    child: TextFormField(
+                      key: GlobalKey(),
+                      initialValue: originalItem.price != null && originalItem.price != 0 ? '${originalItem.price}' : null,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly],
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'سعر',
+                        alignLabelWithHint: true,
+                        filled: true,
+                        suffixIcon: Text(currency),
+                      ),
+                      onChanged: (txt) {
+                        ref.read(_currentItem.notifier).state = ref.read(_currentItem).copyWith(price: double.tryParse(txt));
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 8.0),
+                  // Discount Field and Switch
+                  Flexible(
+                    child: TextFormField(
+                      key: GlobalKey(),
+                      initialValue: originalItem.discount != null && originalItem.discount != 0 ? '${originalItem.discount}' : null,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly],
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'التخفيض',
+                        alignLabelWithHint: true,
+                        filled: true,
+                        suffixIcon: Text(currency),
+                        suffixStyle: TextStyle(fontSize: 20),
+                      ),
+                      onChanged: (txt) {
+                        ref.read(_currentItem.notifier).state = ref.read(_currentItem).copyWith(discount: double.tryParse(txt));
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24.0),
+
+              // Description Field
+              TextFormField(
+                initialValue: originalItem.description ?? '',
                 maxLines: 3,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'الوصف',
                   alignLabelWithHint: true,
+                  filled: true,
                 ),
                 onChanged: (txt) {
-                  final currentItem = ref.read(_currentItem);
-                  ref.read(_currentItem.notifier).state = currentItem.copyWith(
-                    description: txt,
-                  );
+                  ref.read(_currentItem.notifier).state = ref.read(_currentItem).copyWith(description: txt);
                 },
-              );
-            },
+              ),
+            ],
           ),
         ),
-      ],
+      );
+    });
+  }
+
+  Future<void> _showImageDialog(
+    BuildContext context, {
+    ArabiyaImages? image,
+    required void Function(ArabiyaImages) onSave,
+  }) async {
+    final TextEditingController thumbController = TextEditingController(
+      text: image?.thumbImage ?? '',
+    );
+    final TextEditingController fullHDController = TextEditingController(
+      text: image?.fullHDImage ?? '',
+    );
+
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: 200, // تحديد أقصى عرض للنافذة
+          ),
+          child: AlertDialog(
+            title: const Text('إضافة / تعديل صورة'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: thumbController,
+                  decoration: const InputDecoration(
+                    labelText: 'رابط الصورة المصغرة',
+                  ),
+                ),
+                TextField(
+                  controller: fullHDController,
+                  decoration: const InputDecoration(
+                    labelText: 'رابط الصورة عالية الدقة',
+                  ),
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('إلغاء'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: const Text('حفظ'),
+                onPressed: () {
+                  final updatedImage = ArabiyaImages(
+                    thumbImage: thumbController.text,
+                    fullHDImage: fullHDController.text,
+                  );
+                  onSave(updatedImage);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
