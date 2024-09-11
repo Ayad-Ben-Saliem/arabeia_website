@@ -58,9 +58,7 @@ class CheckoutPage extends ConsumerWidget {
                         final invoiceUrl = '$baseUrl/#/invoices/${savedInvoice.id}';
                         final text = 'مرحبا!! أريد طلب المنتجات الموجودة في هذه الفاتورة:\n\n$invoiceUrl';
                         launchUrlString('whatsapp://send?phone=+218913238833&text=${Uri.encodeComponent(text)}');
-
-                        _reset(ref
-                        );
+                        _reset(ref);
 
                         WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                           Navigator.popUntil(context, ModalRoute.withName('/'));
