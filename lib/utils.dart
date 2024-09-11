@@ -84,25 +84,23 @@ class Utils {
   }
 
   static bool equalsNotNull(dynamic obj1, dynamic obj2) {
-    return obj1 == null ||
-        obj2 == null ||
-        obj1 != null && obj2 != null && obj1 == obj2;
+    return obj1 == null || obj2 == null || obj1 != null && obj2 != null && obj1 == obj2;
   }
 
   static void removeRepeatedObjects<T>(
-      List<T> list1,
-      List<T> list2,
-      ) {
-    for(var element in list1){
+    List<T> list1,
+    List<T> list2,
+  ) {
+    for (var element in list1) {
       if (list2.remove(element)) list1.remove(element);
     }
   }
 
   static Iterable<T> replace<T>(
-      Iterable<T> iterable,
-      T object,
-      bool Function(T object) replaceCallback,
-      ) {
+    Iterable<T> iterable,
+    T object,
+    bool Function(T object) replaceCallback,
+  ) {
     final list = iterable.toList();
     for (int i = 0; i < list.length; i++) {
       if (replaceCallback(list.elementAt(i))) {
@@ -120,7 +118,7 @@ abstract class Enum {
   const Enum(this.str);
 
   @override
-  bool operator == (Object other) {
+  bool operator ==(Object other) {
     if (other is String && other == str) return true;
     return super == other;
   }
@@ -246,20 +244,30 @@ String double2String(double number, {int fractionDigits = 20}) {
   return result;
 }
 
+enum ScreenType {
+  // Relative to phone screen size
+  small,
 
-class DeviceType {
-  static bool isPhone(BuildContext context) {
-    return MediaQuery.of(context).size.width < 600;
+  // Relative to tablet screen size
+  middle,
+
+  // Relative to desktop screen size
+  large;
+
+  static ScreenType type(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    if (isSmall(width)) return ScreenType.small;
+    if (isMiddle(width)) return ScreenType.middle;
+    if (isLarge(width)) return ScreenType.large;
+
+    throw UnsupportedError('width is not supported ($width)');
   }
 
-  static bool isTablet(BuildContext context) {
-    return MediaQuery.of(context).size.width >= 600 &&
-        MediaQuery.of(context).size.width < 900;
-  }
+  static bool isSmall(double width) => width < 600;
 
-  static bool isPC(BuildContext context) {
-    return MediaQuery.of(context).size.width >= 900;
-  }
+  static bool isMiddle(double width) => width >= 600 && width < 900;
+
+  static bool isLarge(double width) => width >= 900;
 }
 
 extension StringExtension on String {
@@ -268,8 +276,7 @@ extension StringExtension on String {
   }
 
   bool containEachOtherIgnoreCase(String str) {
-    return toLowerCase().contains(str.toLowerCase()) ||
-        str.toLowerCase().contains(toLowerCase());
+    return toLowerCase().contains(str.toLowerCase()) || str.toLowerCase().contains(toLowerCase());
   }
 
   int similarity(String str) => levenshtein(this, str);
@@ -297,7 +304,6 @@ extension StringExtension on String {
   }
 }
 
-
 int levenshtein(String s1, String s2) {
   int len1 = s1.length;
   int len2 = s2.length;
@@ -322,7 +328,18 @@ int levenshtein(String s1, String s2) {
   return d[len1][len2];
 }
 
-
 void debug(Object? obj) {
   if (kDebugMode) print(obj);
+}
+
+extension MyExt on BoxConstraints {
+  bool get isPortrait => maxWidth > maxHeight;
+
+  bool get isLandscape => maxWidth < maxHeight;
+
+  bool get isSmall => ScreenType.isSmall(maxWidth);
+
+  bool get isMiddle => ScreenType.isMiddle(maxWidth);
+
+  bool get isLarge => ScreenType.isLarge(maxWidth);
 }
