@@ -1,7 +1,9 @@
 import 'package:arabiya/models/invoice_item.dart';
 import 'package:arabiya/models/item.dart';
+import 'package:arabiya/ui/app.dart';
 import 'package:arabiya/ui/cart_notifier.dart';
-import 'package:arabiya/ui/home_page.dart';
+import 'package:arabiya/ui/invoice_viewer.dart';
+import 'package:arabiya/ui/widgets/full_screen_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -23,18 +25,20 @@ class CartPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Expanded(
-                    child: LayoutBuilder(builder: (context, constraints) {
-                      final isVertical = constraints.maxWidth < 300;
-                      return ListView(
-                        children: [
-                          for (final cartItem in invoiceItems)
-                            Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child: isVertical ? vCard(cartItem) : hCard(cartItem),
-                            ),
-                        ],
-                      );
-                    }),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final isVertical = constraints.maxWidth < 600;
+                        return ListView(
+                          children: [
+                            for (final cartItem in invoiceItems)
+                              Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: isVertical ? vCard(cartItem) : hCard(cartItem),
+                              ),
+                          ],
+                        );
+                      },
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -61,101 +65,174 @@ class CartPage extends StatelessWidget {
 
   Widget vCard(InvoiceItem cartItem) {
     return Card(
-      child: Column(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxHeight: 128),
-                child: Image.network(cartItem.item.images[0].fullHDImage),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(cartItem.item.name, maxLines: 5),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Flexible(
+                  child: Consumer(
+                    builder: (BuildContext context, WidgetRef ref, Widget? child) {
+                      return InkWell(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return FullScreenDialog(
+                                images: cartItem.item.images,
+                                initialImage: cartItem.item.images[0],
+                              );
+                            },
+                          );
+                        },
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8.0),
+                          child: AspectRatio(
+                            aspectRatio: 1,
+                            child: Image.network(
+                              cartItem.item.images[0].fullHDImage,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    // child: InkWell(
+                    //   onTap: () {
+                    //     showDialog(
+                    //       context: context,
+                    //       builder: (BuildContext context) {
+                    //         return FullScreenDialog(
+                    //           images: widget.images,
+                    //           initialImage: image,
+                    //         );
+                    //       },
+                    //     );
+                    //   },
+                    //   child: ClipRRect(
+                    //     borderRadius: BorderRadius.circular(8.0),
+                    //     child: AspectRatio(
+                    //       aspectRatio: 1,
+                    //       child: Image.network(
+                    //         cartItem.item.images[0].fullHDImage,
+                    //         fit: BoxFit.cover,
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
+                  ),
                 ),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: priceWidget(cartItem.item),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        cartItem.item.name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 8),
+                      PriceWidget(
+                        price: cartItem.item.price,
+                        discount: cartItem.item.discount,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('الحجم'),
                     Text(cartItem.size),
                   ],
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
+                Column(
                   children: [
                     qtyWidget(cartItem),
                     const SizedBox(height: 8),
                     Text('(${cartItem.totalPrice}) $currency'),
                   ],
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget hCard(InvoiceItem cartItem) {
     return ConstrainedBox(
-      constraints: const BoxConstraints(maxHeight: 128),
-      child: Card(
-        child: Row(
-          children: [
-            Image.network(cartItem.item.images[0].fullHDImage),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Text(cartItem.item.name, maxLines: 5),
-                    ),
-                    Row(
+      constraints: const BoxConstraints(maxHeight: 256),
+      child: Builder(
+        builder: (context) {
+          final size = MediaQuery.of(context).size;
+          return Card(
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 0.25 * size.width,
+                  child: Image.network(cartItem.item.images[0].fullHDImage),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        priceWidget(cartItem.item),
-                        Column(
+                        Row(
                           children: [
-                            const Text('الحجم'),
+                            const SizedBox(width: 70, child: Text('الإسم')),
+                            const Text(':   '),
+                            Text(cartItem.item.name, maxLines: 5),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            const SizedBox(width: 70, child: Text('الحجم')),
+                            const Text(':   '),
                             Text(cartItem.size),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            const SizedBox(width: 70, child: Text('سعر الوحدة')),
+                            const Text(':   '),
+                            PriceWidget(price: cartItem.item.price, discount: cartItem.item.discount),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            const SizedBox(width: 70, child: Text('الكمية')),
+                            const Text(':   '),
+                            qtyWidget(cartItem),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            const SizedBox(width: 70, child: Text('الإجمالي')),
+                            const Text(':   '),
+                            PriceWidget(price: cartItem.originalPrice, discount: cartItem.totalDiscount),
                           ],
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  qtyWidget(cartItem),
-                  const Spacer(),
-                  Text('(${cartItem.totalPrice}) $currency'),
-                ],
-              ),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -223,22 +300,5 @@ class CartPage extends StatelessWidget {
       total += cartItem.totalPrice;
     }
     return total;
-  }
-
-  Widget priceWidget(Item item) {
-    if (item.discount != null) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            '${item.price} $currency',
-            style: const TextStyle(decoration: TextDecoration.lineThrough),
-          ),
-          Text('${item.discountedPrice} $currency'),
-        ],
-      );
-    }
-    return Text('${item.discountedPrice} $currency');
   }
 }
