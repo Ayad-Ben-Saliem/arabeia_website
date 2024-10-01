@@ -39,11 +39,15 @@ app.*.symbols
 app.*.map.json
 
 # Android Studio will place build artifacts here
-web
-ios
-android
-windows
-macos
-linux
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+windows/
+linux/
+macos/
+web/
+ios/
+android/
 
 pubspec.lock

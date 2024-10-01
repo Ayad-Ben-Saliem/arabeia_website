@@ -50,28 +50,32 @@ class CheckoutPage extends ConsumerWidget {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  onPressed: () async {
-                    final savedInvoice = await Database.addInvoice(invoice);
-                    final invoiceUrl = '$baseUrl/#/invoices/${savedInvoice.id}';
-                    final text = 'مرحبا!! أريد طلب المنتجات الموجودة في هذه الفاتورة:\n\n$invoiceUrl';
-                    launchUrlString('whatsapp://send?phone=+218913238833&text=${Uri.encodeComponent(text)}');
+                child: Consumer(
+                  builder: (context, ref, child) {
+                    return ElevatedButton(
+                      onPressed: () async {
+                        final savedInvoice = await Database.addInvoice(invoice);
+                        final invoiceUrl = '$baseUrl/#/invoices/${savedInvoice.id}';
+                        final text = 'مرحبا!! أريد طلب المنتجات الموجودة في هذه الفاتورة:\n\n$invoiceUrl';
+                        launchUrlString('whatsapp://send?phone=+218913238833&text=${Uri.encodeComponent(text)}');
+                        _reset(ref);
 
-                    _reset(ref);
+                        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                          Navigator.popUntil(context, ModalRoute.withName('/'));
+                          Navigator.pushNamed(context, '/invoices/${savedInvoice.id}');
+                        });
+                      },
 
-                    Navigator.popUntil(context, ModalRoute.withName('/'));
-                    Navigator.pushNamed(context, '/invoices/${savedInvoice.id}');
-                  },
-                  // },
-
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('إرسال'),
-                      SizedBox(width: 8),
-                      Icon(Icons.send),
-                    ],
-                  ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('إرسال'),
+                          SizedBox(width: 8),
+                          Icon(Icons.send),
+                        ],
+                      ),
+                    );
+                  }
                 ),
               )
             ],

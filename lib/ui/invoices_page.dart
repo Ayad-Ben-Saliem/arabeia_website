@@ -1,0 +1,202 @@
+import 'package:arabiya/db/db.dart';
+import 'package:arabiya/models/invoice.dart';
+import 'package:arabiya/pdf/reporting.dart';
+import 'package:arabiya/ui/app.dart';
+import 'package:arabiya/ui/widgets/custom_indicator.dart';
+import 'package:arabiya/ui/home_page.dart';
+import 'package:arabiya/ui/invoice_page.dart';
+import 'package:arabiya/ui/invoice_viewer.dart';
+import 'package:arabiya/ui/reports_page.dart';
+import 'package:arabiya/utils.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:resizable_widget/resizable_widget.dart';
+
+final getInvoicesProvider = FutureProvider((_) => Database.invoicesSearch(limit: 10));
+
+final selectedInvoice = StateProvider<Invoice?>((_) => null);
+
+final pagingController = PagingController<String?, Invoice>(firstPageKey: null);
+
+final searchText = StateProvider((ref) => '');
+
+class InvoicesPage extends StatelessWidget {
+  const InvoicesPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    const widget = InvoicesView();
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Scaffold(
+          appBar: AppBar(title: const Text('الفواتير')),
+          drawer: drawer(context),
+          body: widget,
+        );
+      },
+    );
+  }
+}
+
+class InvoicesView extends ConsumerStatefulWidget {
+  const InvoicesView({super.key});
+
+  @override
+  ConsumerState<InvoicesView> createState() => _InvoicesPageState();
+
+  static void refresh(WidgetRef ref) {
+    ref.read(selectedInvoice.notifier).state = null;
+    pagingController.refresh();
+  }
+}
+
+class _InvoicesPageState extends ConsumerState<InvoicesView> {
+  @override
+  void initState() {
+    super.initState();
+
+    pagingController.addPageRequestListener(_fetchData);
+  }
+
+  void _fetchData(String? pageKey) async {
+    try {
+      final invoices = await Database.invoicesSearch(
+        searchText: ref.read(searchText),
+        limit: 10,
+        lastInvoiceId: pageKey,
+      );
+      if (invoices.isEmpty) {
+        pagingController.appendLastPage(invoices.toList());
+      } else {
+        pagingController.appendPage(invoices.toList(), invoices.lastOrNull?.id);
+      }
+    } catch (error) {
+      pagingController.error = error;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ref.listen(searchText, (previous, next) => InvoicesView.refresh(ref));
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Consumer(
+          builder: (context, ref, child) {
+            return ref.watch(getInvoicesProvider).when(
+                  data: (invoices) {
+                    if (constraints.isSmall) {
+                      return invoicesList();
+                    } else {
+                      return ResizableWidget(
+                        percentages: const [0.25, 0.75],
+                        separatorColor: Theme.of(context).dividerColor,
+                        children: [
+                          invoicesList(),
+                          Consumer(
+                            builder: (context, ref, child) {
+                              return ref.watch(selectedInvoice) != null
+                                  ? InvoiceViewer(invoice: ref.read(selectedInvoice)!)
+                                  : const Center(child: Text('اختر فاتورة لعرض تفاصيلها'));
+                            },
+                          ),
+                        ],
+                      );
+                    }
+                  },
+                  error: (err, stack) => const Text('Error'),
+                  loading: () => const CustomIndicator(),
+                );
+          },
+        );
+      },
+    );
+  }
+
+  Widget invoicesList() {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SearchBar(
+                  elevation: const WidgetStatePropertyAll(4),
+                  leading: const Icon(Icons.search),
+                  hintText: 'بحث',
+                  onChanged: (txt) => ref.read(searchText.notifier).state = txt,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: IconButton(onPressed: () => pagingController.refresh(), icon: const Icon(Icons.refresh)),
+            ),
+          ],
+        ),
+        const Divider(),
+        Flexible(
+          child: PagedListView(
+            pagingController: pagingController,
+            builderDelegate: PagedChildBuilderDelegate<Invoice>(
+              animateTransitions: true,
+              itemBuilder: (context, invoice, index) => invoiceListTile(invoice),
+              firstPageErrorIndicatorBuilder: (context) {
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text('ابحث لعرض النتائج'),
+                  ),
+                );
+              },
+              newPageErrorIndicatorBuilder: (context) => Container(),
+              noItemsFoundIndicatorBuilder: (context) {
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text('لا يوجد نماذج لعرضها', style: TextStyle(color: Color(0xe8ff9393))),
+                  ),
+                );
+              },
+              noMoreItemsIndicatorBuilder: (context) {
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text('لا يوجد المزيد من الفواتير لعرضها', style: TextStyle(color: Color(0xe8ff9393))),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget invoiceListTile(Invoice invoice) {
+    return Consumer(builder: (context, ref, child) {
+      return ListTile(
+        contentPadding: const EdgeInsets.only(right: 8.0),
+        title: Text(
+          '${invoice.recipientName} (${invoice.total} $currency)',
+          overflow: TextOverflow.ellipsis,
+        ),
+        subtitle: Text(Reporting.format(invoice.createAt)),
+        onTap: () {
+          if (ScreenType.type(context) == ScreenType.small) {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => InvoicePage(invoice: invoice)));
+          } else {
+            ref.read(selectedInvoice.notifier).state = invoice;
+          }
+        },
+        selected: ref.watch(selectedInvoice) == invoice,
+        trailing: Container(
+          width: ref.watch(selectedInvoice) == invoice ? 8 : 0,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+      );
+    });
+  }
+}

@@ -1,5 +1,6 @@
 import 'package:arabiya/models/invoice.dart';
 import 'package:arabiya/models/item.dart';
+import 'package:arabiya/ui/app.dart';
 import 'package:arabiya/utils.dart';
 import 'package:flutter/services.dart';
 import 'package:printing/printing.dart';
@@ -51,7 +52,7 @@ abstract class Reporting {
                       Align(
                         alignment: Alignment.bottomCenter,
                         child: Text(
-                          'Created by Manassa Ltd - manassa.ly',
+                          'Created by Manassa Ltd. - manassa.ly',
                           style: const TextStyle(
                             color: PdfColors.grey,
                             fontSize: 10
@@ -216,11 +217,11 @@ abstract class Reporting {
         Spacer(),
         Column(children: [
           Text(
-            'الإجمالي: ${invoice.total} د.ل',
+            'الإجمالي: ${invoice.total} $currency',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           Text(
-            'لقد ادخرت: ${invoice.savings} د.ل',
+            'لقد ادخرت: ${invoice.savings} $currency',
             style: TextStyle(fontWeight: FontWeight.bold),
           )
         ]),

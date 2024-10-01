@@ -1,7 +1,9 @@
 import 'package:arabiya/pdf/reporting.dart';
+import 'package:arabiya/ui/app.dart';
 import 'package:arabiya/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:arabiya/models/invoice.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class InvoiceViewer extends StatelessWidget {
   final Invoice invoice;
@@ -12,13 +14,14 @@ class InvoiceViewer extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final EdgeInsets padding;
-    if (DeviceType.isPhone(context)) {
-      padding = const EdgeInsets.all(8);
+    if (ScreenType.type(context) == ScreenType.small) {
+      padding = const EdgeInsets.all(16);
     } else {
-      padding = EdgeInsets.symmetric(horizontal: size.width / 10, vertical: 24);
+      padding = EdgeInsets.symmetric(horizontal: size.width / 50, vertical: 24);
     }
 
     return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
       child: Padding(
         padding: padding,
         child: Column(
@@ -37,46 +40,95 @@ class InvoiceViewer extends StatelessWidget {
 
   Widget _buildRecipientInfo() {
     const style = TextStyle(fontSize: 18);
-    return Row(
-      children: [
-        const SizedBox(
-          width: 75,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('اسم الزبون', style: style),
-              Text('رقم الهاتف', style: style),
-              Text('العنوان', style: style),
-              Text('التاريخ', style: style),
-            ],
-          ),
-        ),
-        const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = MediaQuery.of(context).size.width;
+        // Use LayoutBuilder to decide the layout based on available width
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(' : ', style: style),
-            Text(' : ', style: style),
-            Text(' : ', style: style),
-            Text(' : ', style: style),
+            Expanded(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('اسم الزبون', style: style, overflow: TextOverflow.ellipsis),
+                        Text('رقم الهاتف', style: style, overflow: TextOverflow.ellipsis),
+                        Text('العنوان', style: style, overflow: TextOverflow.ellipsis),
+                        Text('التاريخ', style: style, overflow: TextOverflow.ellipsis),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(' : ', style: style, overflow: TextOverflow.ellipsis),
+                        Text(' : ', style: style, overflow: TextOverflow.ellipsis),
+                        Text(' : ', style: style, overflow: TextOverflow.ellipsis),
+                        Text(' : ', style: style, overflow: TextOverflow.ellipsis),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          invoice.recipientName,
+                          style: style,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(invoice.recipientPhone, style: style, overflow: TextOverflow.ellipsis),
+                        Text(invoice.recipientAddress, style: style, overflow: TextOverflow.ellipsis),
+                        Text(Reporting.format(invoice.createAt), style: style, overflow: TextOverflow.ellipsis),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (width > 400)
+              SizedBox(
+                width: 75,
+                height: 75,
+                child: Consumer(
+                  builder: (context, ref, child) {
+                    try {
+                      return ref.watch(mode) != Mode.dark ? Image.asset('images/logo.webp') : Image.asset('images/white_logo.webp');
+                    } catch (e) {
+                      return Wrap(
+                        children: [
+                          Text('${const Icon(Icons.error_outline)} | Error: $e'),
+                        ],
+                      );
+                    }
+                  },
+                ),
+              ),
           ],
-        ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(invoice.recipientName, style: style),
-            Text(invoice.recipientPhone, style: style),
-            Text(invoice.recipientAddress, style: style),
-            Text(Reporting.format(invoice.createAt), style: style),
-          ],
-        ),
-      ],
+        );
+      },
     );
   }
 
   Widget _buildInvoiceItems(BuildContext context) {
-    if (DeviceType.isPhone(context)) return _itemsList();
-
-    return _itemsTable();
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 600) {
+          return _itemsList();
+        } else {
+          return _itemsTable();
+        }
+      },
+    );
   }
 
   Widget _itemsTable() {
@@ -93,45 +145,50 @@ class InvoiceViewer extends StatelessWidget {
                 DataColumn(
                   label: ConstrainedBox(
                     constraints: BoxConstraints(minWidth: 0.50 * constraints.maxWidth),
-                    child: const Center(child: Text('الصنف', style: boldFontStyle)),
+                    child: const Center(child: Text('الصنف', style: boldFontStyle, overflow: TextOverflow.ellipsis)),
                   ),
                 ),
-                const DataColumn(label: Center(child: Text('الحجم', style: boldFontStyle))),
-                const DataColumn(label: Center(child: Text('الكمية', style: boldFontStyle)), numeric: true),
-                const DataColumn(label: Center(child: Text('السعر', style: boldFontStyle)), numeric: true),
-                const DataColumn(label: Center(child: Text('المجموع', style: boldFontStyle)), numeric: true),
+                const DataColumn(label: Center(child: Text('الحجم', style: boldFontStyle, overflow: TextOverflow.ellipsis))),
+                const DataColumn(label: Center(child: Text('الكمية', style: boldFontStyle, overflow: TextOverflow.ellipsis)), numeric: true),
+                const DataColumn(label: Center(child: Text('السعر', style: boldFontStyle, overflow: TextOverflow.ellipsis)), numeric: true),
+                const DataColumn(label: Center(child: Text('المجموع', style: boldFontStyle, overflow: TextOverflow.ellipsis)), numeric: true),
               ],
               rows: [
                 for (final item in invoice.invoiceItems)
                   DataRow(
                     cells: [
                       DataCell(
-                        Row(
-                          children: [Text(item.item.name)],
+                        SizedBox(
+                          width: 0.50 * constraints.maxWidth,
+                          child: Text(item.item.name, overflow: TextOverflow.ellipsis),
                         ),
                       ),
                       DataCell(
                         ConstrainedBox(
                           constraints: const BoxConstraints(minWidth: 64),
-                          child: Text(item.size),
+                          child: Text(item.size, overflow: TextOverflow.ellipsis),
                         ),
                       ),
                       DataCell(
                         ConstrainedBox(
                           constraints: const BoxConstraints(minWidth: 64),
-                          child: Text(item.quantity.toString()),
+                          child: Text(item.quantity.toString(), overflow: TextOverflow.ellipsis),
                         ),
                       ),
                       DataCell(
                         ConstrainedBox(
                           constraints: const BoxConstraints(minWidth: 64),
-                          child: DiscountedPrice(price: item.item.price, discount: item.item.discount),
+                          child: PriceWidget(
+                            price: item.item.price,
+                            discount: item.item.discount,
+                            direction: Axis.vertical,
+                          ),
                         ),
                       ),
                       DataCell(
                         ConstrainedBox(
                           constraints: const BoxConstraints(minWidth: 64),
-                          child: Text('${item.totalPrice} د.ل'),
+                          child: Text('${item.totalPrice} $currency', overflow: TextOverflow.ellipsis),
                         ),
                       ),
                     ],
@@ -147,63 +204,40 @@ class InvoiceViewer extends StatelessWidget {
   Widget _itemsList() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'أصناف الفاتورة:',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          for (final item in invoice.invoiceItems)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        item.item.name,
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        'الحجم: ${item.size}',
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'الكمية:',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      Text(
-                        '${item.quantity}x',
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  if (item.item.discountedPrice < item.item.price) ...[
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'أصناف الفاتورة:',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 8),
+            for (final indexedItem in invoice.invoiceItems.indexed)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      indexedItem.$2.item.name,
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'السعر قبل التخفيض:',
-                          style: TextStyle(fontSize: 16),
+                        const Flexible(
+                          child: Text(
+                            'الحجم:',
+                            style: TextStyle(fontSize: 16),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                         Text(
-                          '${item.item.price.toStringAsFixed(2)} د.ل',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            decoration: TextDecoration.lineThrough,
-                            color: Colors.red,
-                          ),
+                          indexedItem.$2.size,
+                          style: const TextStyle(fontSize: 16),
                         ),
                       ],
                     ),
@@ -211,60 +245,99 @@ class InvoiceViewer extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'السعر بعد التخفيض:',
-                          style: TextStyle(fontSize: 16),
+                        const Flexible(
+                          child: Text(
+                            'الكمية:',
+                            style: TextStyle(fontSize: 16),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                         Text(
-                          '${item.item.discountedPrice.toStringAsFixed(2)} د.ل',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green,
-                          ),
+                          '${indexedItem.$2.quantity}x',
+                          style: const TextStyle(fontSize: 16),
                         ),
                       ],
                     ),
-                  ] else ...[
+                    const SizedBox(height: 4),
+                    if (indexedItem.$2.item.discountedPrice < indexedItem.$2.item.price) ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Flexible(
+                            child: Text(
+                              'السعر قبل التخفيض:',
+                              style: TextStyle(fontSize: 16),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          Text(
+                            '${indexedItem.$2.item.price.toStringAsFixed(2)} $currency',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              decoration: TextDecoration.lineThrough,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Flexible(
+                            child: Text(
+                              'السعر بعد التخفيض:',
+                              style: TextStyle(fontSize: 16),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          Text(
+                            '${indexedItem.$2.item.discountedPrice.toStringAsFixed(2)} $currency',
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),
+                          ),
+                        ],
+                      ),
+                    ] else ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Flexible(
+                            child: Text(
+                              'السعر:',
+                              style: TextStyle(fontSize: 16),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          Text(
+                            '${indexedItem.$2.item.price.toStringAsFixed(2)} $currency',
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ],
+                    const SizedBox(height: 4),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'السعر:',
-                          style: TextStyle(fontSize: 16),
+                        const Flexible(
+                          child: Text(
+                            'إجمالي السعر:',
+                            style: TextStyle(fontSize: 16),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                         Text(
-                          '${item.item.price.toStringAsFixed(2)} د.ل',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          '${indexedItem.$2.totalPrice.toStringAsFixed(2)} $currency',
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
+                    if (indexedItem.$1 != invoice.invoiceItems.length - 1) const Divider(),
                   ],
-                  const SizedBox(height: 4),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'إجمالي السعر:',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      Text(
-                        '${item.totalPrice.toStringAsFixed(2)} د.ل',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Divider(),
-                ],
+                ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -273,42 +346,37 @@ class InvoiceViewer extends StatelessWidget {
     return Column(
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const SizedBox(
-              width: 200,
+            const Flexible(
               child: Text(
                 'الإجمالي:',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
-            SizedBox(
-              width: 100,
-              child: Text(
-                '${readableMoney(invoice.total)} د.ل',
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
+            Text(
+              '${readableMoney(invoice.total)} $currency',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
         const SizedBox(height: 8),
         if (invoice.savings > 0) ...[
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const SizedBox(
-                width: 200,
+              const Flexible(
                 child: Text(
                   'لقد قمت بتوفير:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.green),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-              SizedBox(
-                width: 100,
-                child: Text(
-                  '${readableMoney(invoice.savings)} د.ل',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.green),
-                ),
+              Text(
+                '${readableMoney(invoice.savings)} $currency',
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.green),
               ),
             ],
           ),
@@ -319,38 +387,53 @@ class InvoiceViewer extends StatelessWidget {
   }
 }
 
-class DiscountedPrice extends StatelessWidget {
+class PriceWidget extends StatelessWidget {
   final double price;
   final double? discount;
+  final Axis direction;
 
   final TextStyle? style;
 
-  const DiscountedPrice({super.key, required this.price, this.discount, this.style});
+  const PriceWidget({
+    super.key,
+    required this.price,
+    this.discount,
+    this.style,
+    this.direction = Axis.horizontal,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Wrap(
+      direction: isVertical ? Axis.vertical : Axis.horizontal,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      alignment: WrapAlignment.center,
       children: [
-        if (discount != null && discount! > 0)
+        if (isDiscounted)
           Text(
-            '${readableMoney(price)} د.ل',
+            '${readableMoney(price)}${isVertical ? ' $currency' : ''}',
             style: _style.copyWith(
               decoration: style?.decoration ?? TextDecoration.lineThrough,
               color: style?.color ?? Colors.red,
             ),
           ),
+        if (isDiscounted && isHorizontal) const SizedBox(width: 8),
         Text(
-          '${readableMoney(price - (discount ?? 0))} د.ل',
+          '${readableMoney(price - (discount ?? 0))} $currency',
           style: _style.copyWith(
             fontWeight: style?.fontWeight ?? FontWeight.bold,
-            color: style?.color ?? Colors.green,
+            color: isDiscounted ? style?.color ?? Colors.green : null,
           ),
         ),
       ],
     );
   }
+
+  bool get isDiscounted => discount != null && discount! > 0;
+
+  bool get isVertical => direction == Axis.vertical;
+
+  bool get isHorizontal => direction == Axis.horizontal;
 
   TextStyle get _style => style ?? const TextStyle();
 }

@@ -53,6 +53,8 @@ class InvoiceItem extends Equatable {
 
   double get totalPrice => item.discountedPrice * quantity;
 
+  double get totalDiscount => (item.discount ?? 0) * quantity;
+
   @override
   List<Object?> get props => [
         item,

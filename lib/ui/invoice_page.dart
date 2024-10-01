@@ -1,6 +1,7 @@
 import 'package:arabiya/db/db.dart';
 import 'package:arabiya/models/invoice.dart';
 import 'package:arabiya/pdf/reporting.dart';
+import 'package:arabiya/ui/widgets/custom_indicator.dart';
 import 'package:arabiya/ui/invoice_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,9 +10,10 @@ import 'package:printing/printing.dart';
 final invoiceProvider = StateProvider<Invoice?>((ref) => null);
 
 class InvoicePage extends StatelessWidget {
-  final String invoiceId;
+  final Invoice? invoice;
+  final String? invoiceId;
 
-  const InvoicePage({super.key, required this.invoiceId});
+  const InvoicePage({super.key, this.invoiceId, this.invoice}) : assert(invoice != null || invoiceId != null);
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +21,7 @@ class InvoicePage extends StatelessWidget {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('فاتورة مبيعات - $invoiceId'),
+          title: Text('فاتورة مبيعات - ${invoice?.id ?? invoiceId}'),
           actions: [
             Consumer(
               builder: (context, ref, child) {
@@ -34,11 +36,11 @@ class InvoicePage extends StatelessWidget {
           ],
         ),
         body: FutureBuilder<Invoice?>(
-          future: Database.getInvoice(invoiceId), // Get the invoice asynchronously
+          future: invoice != null ? Future.value(invoice) : Database.getInvoice(invoiceId!),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               // Show a loading indicator while waiting for the data
-              return const Center(child: CircularProgressIndicator());
+              return const CustomIndicator();
             } else if (snapshot.connectionState == ConnectionState.done) {
               if (snapshot.hasError) {
                 return Column(
