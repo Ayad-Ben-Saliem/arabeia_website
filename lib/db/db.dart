@@ -1,5 +1,6 @@
 import 'package:arabiya/models/invoice.dart';
 import 'package:arabiya/models/item.dart';
+import 'package:arabiya/models/user.dart';
 import 'package:arabiya/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -11,6 +12,39 @@ class Database {
   static final CollectionReference<Map<String, dynamic>> _invoicesRef = _db.collection('invoices');
 
   static final CollectionReference<Map<String, dynamic>> _managementRef = _db.collection('management');
+
+  static final CollectionReference<Map<String, dynamic>> _usersRef = _db.collection('users');
+
+  // ------------------------- Users ---------------------------
+
+  static Future<Iterable<User>> getUsers() async {
+    final query = await _usersRef.get();
+    return query.docs.map((doc) => User.fromJson({...doc.data(), 'id': doc.id}));
+  }
+
+  static Future<User> addUser(User user) async {
+    user = user.copyWith(password: Utils.hashPassword(user.password));
+    final docRef = await _usersRef.add(user.toJson());
+    final doc = await docRef.get();
+    final data = doc.data()!;
+    return User.fromJson({...data, 'id': doc.id});
+  }
+
+  static Future<void> updateUser(User user) async {
+    var data = user.toJson();
+    if(user.password.isNotEmpty) {
+      data['password'] = Utils.hashPassword(user.password);
+    } else {
+      data.remove("password");
+    }
+    await _usersRef.doc(user.id.toString()).update(data);
+  }
+
+  static Future<void> deleteUser(User user) async {
+    await _usersRef.doc(user.id).delete();
+  }
+
+  // ------------------------- Items ------------------------------
 
   static Future<Iterable<Item>> getItems() async {
     final query = await _itemsRef.get();
@@ -33,6 +67,51 @@ class Database {
     if (doc.exists) return Item.fromJson(doc.data()!);
     return null;
   }
+
+  static Future<Item> addItem(Item item) async {
+    final json = item.toJson()..remove('id');
+    final docRef = await _itemsRef.add(json);
+    final doc = await docRef.get();
+    return Item.fromJson(doc.data()!);
+  }
+
+  static Stream<Item> addItems(Iterable<Item> items) async* {
+    for (var item in items) {
+      yield await addItem(item);
+    }
+  }
+
+  static Future<Item> addUpdateItem(Item item) async {
+    if (item.id == null) {
+      return addItem(item);
+    } else {
+      await updateItem(item);
+      return item;
+    }
+  }
+
+  static Future<void> updateItem(Item item) async {
+    final json = item.toJson()..remove('id');
+    await _itemsRef.doc(item.id).update(json);
+  }
+
+  static Stream<void> updateItems(Iterable<Item> items) async* {
+    for (var item in items) {
+      updateItem(item);
+    }
+  }
+
+  static Future<void> deleteItem(Item item) async {
+    await _itemsRef.doc(item.id).delete();
+  }
+
+  static Stream<void> deleteItems(Iterable<Item> items) async* {
+    for (var item in items) {
+      deleteItem(item);
+    }
+  }
+
+  // ------------------------- Invoices -----------------------------
 
   static Future<Invoice> addInvoice(Invoice invoice) async {
     final docRef = await _invoicesRef.add(invoice.toJson());
@@ -78,52 +157,11 @@ class Database {
     return invoices;
   }
 
-  static void deleteInvoice(invoice) {
+  static Future<void> deleteInvoice(invoice) async {
     _invoicesRef.doc(invoice.id).delete();
   }
 
-  static Future<Item> addItem(Item item) async {
-    final json = item.toJson()..remove('id');
-    final docRef = await _itemsRef.add(json);
-    final doc = await docRef.get();
-    return Item.fromJson(doc.data()!);
-  }
-
-  static Stream<Item> addItems(Iterable<Item> items) async* {
-    for (var item in items) {
-      yield await addItem(item);
-    }
-  }
-
-  static Future<Item> addUpdateItem(Item item) async {
-    if (item.id == null) {
-      return addItem(item);
-    } else {
-      await updateItem(item);
-      return item;
-    }
-  }
-
-  static Future<void> updateItem(Item item) async {
-    final json = item.toJson()..remove('id');
-    await _itemsRef.doc(item.id).update(json);
-  }
-
-  static Stream<void> updateItems(Iterable<Item> items) async* {
-    for (var item in items) {
-      updateItem(item);
-    }
-  }
-
-  static Future<void> deleteItem(Item item) async {
-    await _itemsRef.doc(item.id).delete();
-  }
-
-  static Stream<void> deleteItems(Iterable<Item> items) async* {
-    for (var item in items) {
-      deleteItem(item);
-    }
-  }
+  // ------------------------ homepage -------------------------------
 
   static Future<JsonMap> getHomePageData() async {
     final doc = await _managementRef.doc('home-page').get();
