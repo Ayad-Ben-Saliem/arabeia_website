@@ -9,6 +9,7 @@ class Invoice {
   final double latitude;
   final double longitude;
   final Iterable<InvoiceItem> invoiceItems;
+  final String? note;
   final DateTime createAt;
 
   const Invoice({
@@ -19,6 +20,7 @@ class Invoice {
     required this.latitude,
     required this.longitude,
     required this.invoiceItems,
+    this.note,
     required this.createAt,
   });
 
@@ -49,6 +51,7 @@ class Invoice {
       'latitude': latitude,
       'longitude': longitude,
       'invoiceItems': invoiceItems.map((item) => item.toJson()).toList(),
+      'note' : note,
       'createAt': createAt.toUtc().toString(),
     };
   }
@@ -66,6 +69,7 @@ class Invoice {
       latitude: data['latitude'],
       longitude: data['longitude'],
       invoiceItems: invoiceItems,
+      note: data['note'],
       createAt: DateTime.parse(data['createAt']),
     );
   }
