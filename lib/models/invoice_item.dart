@@ -4,12 +4,12 @@ import 'package:equatable/equatable.dart';
 
 class InvoiceItem extends Equatable {
   final Item item;
-  final String size;
+  final String? size;
   final int quantity;
 
   const InvoiceItem({
     required this.item,
-    required this.size,
+    this.size,
     required this.quantity,
   });
 

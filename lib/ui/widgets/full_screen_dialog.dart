@@ -31,8 +31,9 @@ class FullScreenDialog extends ConsumerWidget {
 
     return Dialog(
       alignment: Alignment.center,
-      backgroundColor: Colors.transparent,
+      // backgroundColor: Theme.of(context).colorScheme.onPrimary,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Expanded(
             child: Stack(
@@ -46,6 +47,15 @@ class FullScreenDialog extends ConsumerWidget {
                       color: Colors.transparent,
                     ),
                     controller: ref.read(controller),
+                    errorBuilder: (context, error, stackTrace) => Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.error, size: 45, color: Colors.red[200]),
+                          Text('تعذر تحميل الصورة', style: TextStyle(color: Colors.red[200])),
+                        ],
+                      ),
+                    ),
                   );
                 }),
                 Align(
@@ -54,8 +64,8 @@ class FullScreenDialog extends ConsumerWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: IconButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.cancel),
-                      color: Colors.redAccent,
+                      icon: const Icon(Icons.cancel_outlined),
+                      splashRadius: 18,
                     ),
                   ),
                 ),
@@ -77,21 +87,15 @@ class FullScreenDialog extends ConsumerWidget {
                         },
                         child: Stack(
                           children: [
-                            Container(
+                            SizedBox(
                               width: 50,
                               height: 50,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                border: Border.all(
-                                  color: _getBorderColor(ref, image),
-                                  width: 2,
-                                ),
-                              ),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(5),
                                 child: CachedNetworkImage(
                                   imageUrl: image.thumbImage,
                                   fit: BoxFit.cover,
+                                  errorWidget: (context, url, error) => Icon(Icons.error, color: Colors.red[200]),
                                 ),
                               ),
                             ),

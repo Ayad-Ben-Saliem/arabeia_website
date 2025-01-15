@@ -24,6 +24,18 @@ class ItemView extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        if (!cardView && !editable)
+          Align(
+            alignment: Alignment.topRight,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: IconButton(
+                splashRadius: 18,
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.cancel_outlined),
+              ),
+            ),
+          ),
         Row(
           mainAxisAlignment: editable ? MainAxisAlignment.spaceBetween : MainAxisAlignment.start,
           children: [
@@ -72,10 +84,11 @@ class ItemView extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8),
-          child: Text('الحجم', style: TextStyle(fontWeight: FontWeight.bold)),
-        ),
+        if (item.sizes.isNotEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8),
+            child: Text('الحجم', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: SizedBox(
@@ -138,7 +151,14 @@ class ItemView extends StatelessWidget {
                             quantity: 1,
                           ),
                         )
-                    : null,
+                    : item.sizes.isEmpty
+                        ? () => ref.read(CartNotifier.itemsProvider.notifier).addItem(
+                              InvoiceItem(
+                                item: item,
+                                quantity: 1,
+                              ),
+                            )
+                        : null,
                 child: const Text('إضافة للسلة'),
               );
             },
@@ -216,7 +236,13 @@ class _ImageCarouselState extends State<ImageCarousel> {
                   child: CachedNetworkImage(
                     imageUrl: image.fullHDImage,
                     fit: BoxFit.fill,
-                    errorWidget: (context, url, error) => const Icon(Icons.error),
+                    errorWidget: (context, url, error) => Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.error, color: Colors.red[200]),
+                        Text('تعذر تحميل الصورة', style: TextStyle(color: Colors.red[200])),
+                      ],
+                    ),
                     placeholder: (context, url) => Stack(
                       alignment: Alignment.center,
                       children: [
@@ -225,7 +251,13 @@ class _ImageCarouselState extends State<ImageCarousel> {
                             imageUrl: image.thumbImage,
                             fit: BoxFit.fill,
                             placeholder: (context, url) => const CustomIndicator(),
-                            errorWidget: (context, url, error) => const Icon(Icons.error),
+                            errorWidget: (context, url, error) => Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.error, color: Colors.red[200]),
+                                Text('تعذر تحميل الصورة', style: TextStyle(color: Colors.red[200])),
+                              ],
+                            ),
                           ),
                         ),
                         const CustomIndicator(),
@@ -264,9 +296,8 @@ class _ImageCarouselState extends State<ImageCarousel> {
                           child: Padding(
                             padding: EdgeInsets.all(index == _current ? 2 : 1),
                             child: CircleAvatar(
-                              backgroundImage: CachedNetworkImageProvider(
-                                image.thumbImage,
-                              ),
+                              backgroundImage: CachedNetworkImageProvider(image.thumbImage),
+                              onBackgroundImageError: (exception, stackTrace) => Icon(Icons.error, color: Colors.red[200]),
                             ),
                           ),
                         ),

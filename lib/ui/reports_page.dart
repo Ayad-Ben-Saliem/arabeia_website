@@ -6,14 +6,12 @@ class ReportsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Scaffold(
-          appBar: AppBar(title: const Text('التقارير')),
-          drawer: drawer(context),
-          body: const Placeholder(),
-        );
-      },
+    return Scaffold(
+      appBar: AppBar(title: const Text('التقارير')),
+      drawer: drawer(context),
+      body: const Center(
+        child: Text('غير منفذة بعد'),
+      ),
     );
   }
 }

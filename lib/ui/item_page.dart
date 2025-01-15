@@ -1,5 +1,6 @@
 import 'package:arabiya/db/db.dart';
 import 'package:arabiya/models/item.dart';
+import 'package:arabiya/ui/home_page.dart';
 import 'package:arabiya/ui/widgets/custom_indicator.dart';
 import 'package:arabiya/ui/widgets/item_view.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ class ItemPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
+      drawer: drawer(context),
       body: LayoutBuilder(
         builder: (context, constraints) {
           return SingleChildScrollView(
