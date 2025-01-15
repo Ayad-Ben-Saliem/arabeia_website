@@ -14,12 +14,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:resizable_widget/resizable_widget.dart';
 
-final getInvoicesProvider = FutureProvider((_) => Database.searchDocuments<Invoice>(
-  collectionRef: Database.invoicesRef,  // تمرير CollectionReference
-  fromJson: (data) => Invoice.fromJson(data),  // استخدام fromJson لتحويل البيانات
-  limit: 10,  // تحديد الحد
-));
-
+final getInvoicesProvider =
+    FutureProvider((_) => Database.searchDocuments<Invoice>(
+          collectionRef: Database.invoicesRef, // تمرير CollectionReference
+          fromJson: (data) =>
+              Invoice.fromJson(data), // استخدام fromJson لتحويل البيانات
+          limit: 10, // تحديد الحد
+        ));
 
 final selectedInvoice = StateProvider<Invoice?>((_) => null);
 
@@ -76,11 +77,12 @@ class _InvoicesPageState extends ConsumerState<InvoicesView> {
   void _fetchData(String? pageKey) async {
     try {
       final invoices = await Database.searchDocuments<Invoice>(
-        collectionRef: Database.invoicesRef,  // تمرير CollectionReference
-        fromJson: (data) => Invoice.fromJson(data),  // استخدام fromJson لتحويل البيانات
-        searchText: ref.read(searchText),  // تمرير نص البحث
-        limit: 10,  // تحديد الحد
-        lastDocumentId: pageKey,  // تحديد ID آخر فاتورة (للـ pagination)
+        collectionRef: Database.invoicesRef, // تمرير CollectionReference
+        fromJson: (data) =>
+            Invoice.fromJson(data), // استخدام fromJson لتحويل البيانات
+        searchText: ref.read(searchText), // تمرير نص البحث
+        limit: 10, // تحديد الحد
+        lastDocumentId: pageKey, // تحديد ID آخر فاتورة (للـ pagination)
       );
 
       if (invoices.isEmpty) {
@@ -114,15 +116,23 @@ class _InvoicesPageState extends ConsumerState<InvoicesView> {
                           Consumer(
                             builder: (context, ref, child) {
                               return ref.watch(selectedInvoice) != null
-                                  ? InvoiceViewer(invoice: ref.read(selectedInvoice)!)
-                                  : const Center(child: Text('اختر فاتورة لعرض تفاصيلها'));
+                                  ? InvoiceViewer(
+                                      invoice: ref.read(selectedInvoice)!)
+                                  : const Center(
+                                      child: Text('اختر فاتورة لعرض تفاصيلها'));
                             },
                           ),
                         ],
                       );
                     }
                   },
-                  error: (err, stack) => Scaffold(body: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center,children: [SelectableText('Error : $err \n Stack : $stack')]))),
+                  error: (err, stack) => Scaffold(
+                      body: Center(
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                        SelectableText('Error : $err \n Stack : $stack')
+                      ]))),
                   loading: () => const CustomIndicator(),
                 );
           },
@@ -167,7 +177,8 @@ class _InvoicesPageState extends ConsumerState<InvoicesView> {
             pagingController: pagingController,
             builderDelegate: PagedChildBuilderDelegate<Invoice>(
               animateTransitions: true,
-              itemBuilder: (context, invoice, index) => invoiceListTile(invoice),
+              itemBuilder: (context, invoice, index) =>
+                  invoiceListTile(invoice),
               firstPageErrorIndicatorBuilder: (context) {
                 return const Center(
                   child: Padding(
@@ -181,7 +192,8 @@ class _InvoicesPageState extends ConsumerState<InvoicesView> {
                 return const Center(
                   child: Padding(
                     padding: EdgeInsets.all(8.0),
-                    child: Text('لا يوجد نماذج لعرضها', style: TextStyle(color: Color(0xe8ff9393))),
+                    child: Text('لا يوجد فواتير لعرضها',
+                        style: TextStyle(color: Color(0xe8ff9393))),
                   ),
                 );
               },
@@ -189,7 +201,8 @@ class _InvoicesPageState extends ConsumerState<InvoicesView> {
                 return const Center(
                   child: Padding(
                     padding: EdgeInsets.all(8.0),
-                    child: Text('لا يوجد المزيد من الفواتير لعرضها', style: TextStyle(color: Color(0xe8ff9393))),
+                    child: Text('لا يوجد المزيد من الفواتير لعرضها',
+                        style: TextStyle(color: Color(0xe8ff9393))),
                   ),
                 );
               },
@@ -199,6 +212,7 @@ class _InvoicesPageState extends ConsumerState<InvoicesView> {
       ],
     );
   }
+
   Widget invoiceListTile(Invoice invoice) {
     return Consumer(builder: (context, ref, child) {
       return ListTile(
@@ -210,14 +224,18 @@ class _InvoicesPageState extends ConsumerState<InvoicesView> {
         subtitle: Text(Reporting.format(invoice.createAt!)),
         onTap: () {
           if (ScreenType.type(context) == ScreenType.small) {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => InvoicePage(invoice: invoice)));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => InvoicePage(invoice: invoice)));
             ref.read(selectedInvoice.notifier).state = invoice;
           } else {
             ref.read(selectedInvoice.notifier).state = invoice;
           }
         },
         onLongPress: () {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => InvoicePage(invoice: invoice)));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (_) => InvoicePage(invoice: invoice)));
           ref.read(selectedInvoice.notifier).state = invoice;
         },
         selected: ref.watch(selectedInvoice) == invoice,
